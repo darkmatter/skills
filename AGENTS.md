@@ -1,33 +1,25 @@
-# darkmatter — agent entry point
+# darkmatter/agents — agent entry point
 
-This file is a shim. The canonical agent context lives in `.agent/`. Read these files in order before starting any session in this repo:
+This repo is **infrastructure for other agent projects**, not an agent project itself. There is no `.agent/` directory here, no `agent.yaml`, no project-state to read.
 
-1. **`.agent/README.md`** — explains the structure of agent-readable files
-2. **`.agent/context/overview.md`** — what darkmatter is, current state, who's involved
-3. **`.agent/context/decisions.md`** — standing decisions and constraints (do not re-litigate without flagging)
-4. **`.agent/context/conventions.md`** — operating principles
-5. **`.agent/context/glossary.md`** — domain terminology
-6. **`.agent/memory/known-issues.md`** — active rough edges
-7. **`.agent/memory/lessons.md`** — accumulated wisdom
+What lives here:
 
-For specific tasks:
+- `skills/` — team-wide shared skills, distributed via the Nix Home Manager module exported by `flake.nix`
+- `template/` — the bootstrap template for new darkmatter projects (`.agent/`, config, hooks, compliance, shims)
+- `scripts/new-project.sh` — stamps `template/` into a new project repo
+- `scripts/validate-skill.sh` — sanity-check the skills catalog
+- `docs/` — catalog overview and bootstrap walkthrough
 
-- **Daily reports / cron-driven status** → `.agent/workflows/daily-report.md`
-- **Funding rate analysis** → `.agent/skills/hl-funding-analysis/`
-- **HL API queries** → `.agent/skills/hl-api/`
+If you're an agent reading this because you were pointed at the darkmatter agents repo:
 
-For deliverables and project artifacts (not agent context):
+- For "add a skill to the team catalog" → see `skills/README.md` and validate with `scripts/validate-skill.sh`
+- For "bootstrap a new project" → see `docs/new-project-guide.md` and use `scripts/new-project.sh`
+- For "what's already shared" → see `docs/catalog.md`
 
-- **zkXMR cryptographic spec** → `docs/zkxmr_spec.md`
-- **Reports** (daily/weekly) → `reports/`
-- **Source code** → `src/`
+If you're working inside a darkmatter **project repo** (not this one), look for that project's `AGENTS.md` and `.agent/` — they have the project-state and decisions you need.
 
-## Why this is structured this way
+## What this repo is not
 
-`.agent/` is provider-agnostic. Claude Code, Codex, Cursor, and any other AI tooling read from the same canonical files. Provider shims at the repo root (this file, `AGENTS.md`, `.cursorrules`) point to the canonical content rather than duplicating it.
-
-If you find duplication, regenerate shims with `scripts/regen-agent-shims.sh`.
-
-## For users (humans) reading this file directly
-
-This is a quant trading project — vault management on Hyperliquid, with adjacent infrastructure work. The README at the project root has user-facing setup instructions. This file is for AI agents working in the codebase.
+- Not where vault state, trading positions, or any other live project data lives
+- Not where any single project's agent context belongs (that goes in the project's own `.agent/`)
+- Not a place to commit secrets, addresses-with-balance, or personal skills (use `personal/`, gitignored)

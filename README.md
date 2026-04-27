@@ -1,10 +1,45 @@
-# .agent/ — provider-agnostic agent context
+# darkmatter/agents
 
-This directory is the canonical source of truth for AI agent context, capabilities, and workflows for the darkmatter project. It is provider-agnostic: any AI tool (Claude Code, Cursor, Codex, Aider, Cline, etc.) should read from here.
+Team-wide agent infrastructure for the darkmatter umbrella. This repo ships three things:
 
-## Nix-managed skills
+1. **A catalog of shared skills** (`skills/`) — installed across all darkmatter projects via Nix Home Manager.
+2. **A project template** (`template/`) — `.agent/`, config, and shims to stamp into a new project repo.
+3. **Tooling** (`scripts/`) — a generator that stamps the template into a project, plus skill-catalog validation.
 
-This repo is also a shareable `agent-skills-nix` catalog. Team-wide skills live in `skills/` and are installed through the exported Home Manager module. Personal skills should live outside git, for example in the ignored `personal/skills/` directory in your local checkout or another private repo.
+It is **provider-agnostic**. Skills and `.agent/` content target any agent tool (Claude Code, Codex, OpenCode, Cursor, Aider, etc.) by following the cross-vendor `AGENTS.md` convention plus the per-vendor shims (`CLAUDE.md`, `.cursorrules`).
+
+## Layout
+
+```
+darkmatter/agents/
+├── README.md                ← this file
+├── flake.nix                ← Nix entry; exports the Home Manager module
+├── home-manager.nix         ← HM module that wires skills/ into agent CLIs
+├── skills/                  ← team-wide shareable skills (the catalog)
+├── template/                ← the per-project bootstrap (stamped by new-project.sh)
+├── scripts/
+│   ├── new-project.sh       ← stamp template/ into a target dir
+│   └── validate-skill.sh    ← sanity-check skills/ catalog
+└── docs/
+    ├── catalog.md           ← what's in skills/
+    └── new-project-guide.md ← walkthrough for bootstrapping a project
+```
+
+## Bootstrap a new project
+
+```sh
+scripts/new-project.sh ~/git/darkmatter/<name> <name> "Short description"
+cd ~/git/darkmatter/<name>
+$EDITOR .agent/context/overview.md     # describe the project
+./scripts/regen-agent-shims.sh         # regenerate AGENTS.md / CLAUDE.md / .cursorrules
+git init && git add . && git commit -m "bootstrap agent config"
+```
+
+See [`docs/new-project-guide.md`](docs/new-project-guide.md) for the full walkthrough.
+
+## Shared skills via Nix
+
+The flake exports a Home Manager module that installs all team-wide skills into your agent CLIs. Wire it into your home config:
 
 ```nix
 {
@@ -19,53 +54,34 @@ This repo is also a shareable `agent-skills-nix` catalog. Team-wide skills live 
 
       extraSpecialArgs = {
         inherit inputs;
-        personalAgentSkillsPath = /Users/me/git/darkmatter/agents/personal/skills;
+        # Optional — only set on machines where a private skills checkout exists:
+        personalAgentSkillsPath = /Users/me/personal/skills;
       };
     };
   };
 }
 ```
 
-By default the module enables all shared `darkmatter/*` skills and syncs them to Claude, Codex, and the generic `$HOME/.agents/skills` target. If `personalAgentSkillsPath` is set, all `personal/*` skills from that path are enabled too. Omit `personalAgentSkillsPath` on shared machines or when the private path does not exist.
+The module enables every `darkmatter/*` skill and syncs them to Claude, Codex, and the generic `$HOME/.agents/skills` target. Personal skills (when `personalAgentSkillsPath` is set) sync alongside.
 
-## Layout
+## Adding a new shared skill
 
-```
-.agent/
-├── README.md           ← this file
-├── context/            ← "what is" — durable project state, always loaded
-├── workflows/          ← "how to do specific tasks" — recurring procedures
-├── skills/             ← "capabilities" — reusable tools with code + instructions
-├── memory/             ← "what we've learned" — accumulated lessons, history
-└── prompts/            ← "task templates" — one-shot or recurring task entry points
-```
+1. Create `skills/<skill-name>/SKILL.md` with YAML frontmatter (`name`, `description`).
+2. Optionally add `scripts/`, `reference/` subdirectories for code and supporting docs.
+3. Run `scripts/validate-skill.sh skills/<skill-name>` to check structure.
+4. Document it in `docs/catalog.md`.
+5. Open a PR.
 
-## Lifecycle
+See [`skills/README.md`](skills/README.md) for the skill format spec.
 
-| Folder | Update pattern | When to edit |
+## Personal vs. team vs. project skills
+
+| Scope | Where it lives | When to use |
 |---|---|---|
-| `context/` | Updated as reality changes | When facts about the project change (new positions, new decisions, etc.) |
-| `workflows/` | Stable | When the procedure for a recurring task changes |
-| `skills/` | Versioned like libraries | When the capability itself evolves; new skills added as new use cases emerge |
-| `memory/` | Append-mostly | After incidents, mistakes, or significant learnings |
-| `prompts/` | Stable | When you add a new task template or change the entry point |
+| Personal | private repo, `personal/skills/`, gitignored | Only useful to you; no team value |
+| Team-wide | `skills/` here | Useful across multiple darkmatter projects |
+| Project-local | `<project>/.agent/skills/` | Only relevant inside one project |
 
-## Provider shims
+## For agents reading this file
 
-Files at the repo root that shim to this directory:
-
-- `CLAUDE.md` — for Claude Code
-- `AGENTS.md` — for Codex, OpenCode, and any agent following the emerging convention
-- `.cursorrules` — for Cursor (if used)
-
-These shims either symlink, include-by-reference, or are concatenated copies of the canonical files in `.agent/`. Regenerate them with `scripts/regen-agent-shims.sh` after editing canonical files.
-
-## How agents should use this directory
-
-Any session targeting this project should:
-
-1. Read all of `.agent/context/*.md` for grounding
-2. Skim `.agent/memory/lessons.md` and `.agent/memory/known-issues.md`
-3. Pull in specific skills from `.agent/skills/` only when their trigger conditions match the current task
-4. Use workflows in `.agent/workflows/` when executing a recurring task
-5. Use prompts in `.agent/prompts/` when invoked with a specific task template
+This repo is **not itself an agent project** — it ships infrastructure for them. There is no `.agent/` here, and no `agent.yaml`. Each darkmatter project (zkXMR, Stackpanel, the trading vault, etc.) has its own `.agent/`, stamped from `template/` and customized.

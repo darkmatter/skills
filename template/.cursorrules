@@ -1,0 +1,7 @@
+# Cursor rules — {{project}}
+
+When working in this repo, read `.agent/context/overview.md` and `.agent/context/decisions.md` before producing analysis. Standing decisions and operating principles live in `.agent/context/`.
+
+Do not re-litigate decisions without flagging. Do not invent data. Read-only operations only when running cron-driven workflows.
+
+For full context, see `AGENTS.md` and the `.agent/` directory.
