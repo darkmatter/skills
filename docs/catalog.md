@@ -2,9 +2,9 @@
 
 Team-wide skills currently shipped from `skills/`. Add an entry here when you add a skill.
 
-| Skill | One-liner | Triggers |
-|---|---|---|
-| _none yet_ | The catalog is empty. The previous HL-specific skills (hl-api, hl-funding-analysis) were moved to the trading project's own `.agent/skills/` since they're project-local. | — |
+| Skill | One-liner | Triggers | Notes |
+|---|---|---|---|
+| `hl-funding-analysis` | Analyze Hyperliquid perpetual funding rates and identify carry-trade opportunities, with realized harvest PnL across configurable windows. | "find me funding harvest opportunities", "what's paying funding on HL", "should I short X for the funding", basis trade evaluation on HL | Python 3, no external deps. Caches to `/tmp/hl_*` by default. Use `--exclude` per project to skip names already in your book. Project-specific sizing tiers should live in that project's `decisions.md`. |
 
 ## How to add an entry
 
