@@ -2,7 +2,13 @@
 # Scaffold a new skill directory in darkmatter/agents/skills/.
 #
 # Usage:
-#   scripts/scaffold-skill.sh <skill-name> "Short description"
+#   scripts/scaffold-skill.sh [--manual] <skill-name> "Short description"
+#
+# Flags:
+#   --manual   Scaffold a manual-invocation skill (per ADR-0001). Requires the
+#              name to start with run- / kickoff- / setup- / init- / do-, and
+#              prepends the manual-invocation opening line to the description
+#              so the agent does not auto-trigger.
 #
 # Creates:
 #   skills/<name>/SKILL.md          (with frontmatter pre-filled)
@@ -14,8 +20,19 @@
 
 set -euo pipefail
 
+MANUAL=0
+if [[ "${1:-}" == "--manual" ]]; then
+	MANUAL=1
+	shift
+fi
+
 if [[ $# -lt 2 ]]; then
-	echo "usage: $0 <skill-name> \"Short description\"" >&2
+	cat >&2 <<-USAGE
+		usage: $0 [--manual] <skill-name> "Short description"
+
+		auto skill (default) — name as a noun phrase: funding-screener, codebase-cleanup
+		manual skill (--manual) — name with verb prefix: kickoff-design, run-screen, setup-vault
+	USAGE
 	exit 2
 fi
 
@@ -29,6 +46,23 @@ if [[ ! "$NAME" =~ ^[a-z][a-z0-9-]*$ ]]; then
 	exit 1
 fi
 
+# Manual skills must use a known verb prefix (ADR-0001).
+if [[ $MANUAL -eq 1 ]]; then
+	if [[ ! "$NAME" =~ ^(run|kickoff|setup|init|do)- ]]; then
+		echo "error: --manual requires a verb prefix from {run-, kickoff-, setup-, init-, do-} (got: $NAME)" >&2
+		echo "see docs/adr/0001-skill-naming-convention.md for rationale" >&2
+		exit 1
+	fi
+fi
+
+# Auto skills should NOT use a verb prefix (warn, don't block — there are edge cases).
+if [[ $MANUAL -eq 0 ]] && [[ "$NAME" =~ ^(run|kickoff|setup|init|do)- ]]; then
+	echo "warning: name '$NAME' looks like a manual-invocation skill but --manual was not passed." >&2
+	echo "         if this skill needs explicit invocation, re-run with --manual." >&2
+	echo "         if it should auto-trigger, pick a noun-phrase name." >&2
+	echo
+fi
+
 REPO_ROOT="$(cd "$(dirname "$0")/../../.." && pwd)"
 SKILL_DIR="$REPO_ROOT/skills/$NAME"
 
@@ -40,10 +74,16 @@ fi
 mkdir -p "$SKILL_DIR/scripts" "$SKILL_DIR/reference"
 touch "$SKILL_DIR/scripts/.gitkeep" "$SKILL_DIR/reference/.gitkeep"
 
+if [[ $MANUAL -eq 1 ]]; then
+	FRONTMATTER_DESC="Manual-invocation skill — run only when the user explicitly asks for \"$NAME\" or invokes it as a slash command. Do not auto-trigger on adjacent topics. $DESC"
+else
+	FRONTMATTER_DESC="$DESC Triggers when the user asks <fill in concrete phrases>. Do NOT trigger for <fill in adjacent-but-different cases>."
+fi
+
 cat > "$SKILL_DIR/SKILL.md" <<EOF
 ---
 name: $NAME
-description: $DESC Triggers when the user asks <fill in concrete phrases>. Do NOT trigger for <fill in adjacent-but-different cases>.
+description: $FRONTMATTER_DESC
 ---
 
 # ${NAME//-/ }
@@ -79,7 +119,7 @@ scripts/<name>.sh --help
 - \`reference/<topic>.md\` — <when to load this>
 EOF
 
-echo "created $SKILL_DIR"
+echo "created $SKILL_DIR ($([ $MANUAL -eq 1 ] && echo manual || echo auto))"
 echo
 echo "next steps:"
 echo "  1. edit $SKILL_DIR/SKILL.md"

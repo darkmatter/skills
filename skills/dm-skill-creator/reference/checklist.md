@@ -21,20 +21,33 @@ Confirm with the user:
 - Lowercase, hyphenated. Directory name will equal the frontmatter `name:` field.
 - Don't prefix with the domain (`screener`, not `hl-screener`) unless the venue is genuinely load-bearing.
 - Check for collisions: `ls skills/`. The id-prefix in `home-manager.nix` namespaces installed skills as `darkmatter:<name>`, so collisions with upstream skill catalogs are not an issue, but collisions inside this repo are.
+- Pick the right grammar for the triggering mode (ADR-0001):
+  - **Auto-triggered** (default): noun-phrase name describing a domain or capability. Examples: `funding-screener`, `codebase-cleanup`.
+  - **Manual-invocation** (the action is expensive, irreversible, has side effects on shared resources, or drives a guided workflow): verb-prefixed name from `{run-, kickoff-, setup-, init-, do-}`. Examples: `kickoff-dm-design`, `run-funding-screen`, `setup-vault`.
 
 ## 3. Scaffold
+
+For an auto-triggered skill:
 
 ```bash
 scripts/scaffold-skill.sh <name> "Short description ending with a period."
 ```
 
-(That's the helper inside `dm-skill-creator/scripts/`. You can also create the directory by hand if you prefer — see `skills/README.md` for the format.)
+For a manual-invocation skill (verb-prefixed name + manual-invocation opening line):
+
+```bash
+scripts/scaffold-skill.sh --manual <name> "Short description ending with a period."
+```
+
+The script enforces a verb prefix on `--manual` and warns if a verb-prefixed name is passed without `--manual`. You can also create the directory by hand if you prefer — see `skills/README.md` for the format and `docs/adr/0001-skill-naming-convention.md` for the manual-vs-auto rules.
 
 ## 4. Fill in SKILL.md
 
 Sections to write:
 
-- **Frontmatter `description`** — the primary triggering signal. Combine *what* and *when*. Include explicit `Do NOT trigger for…` clauses for adjacent things.
+- **Frontmatter `description`** — the primary triggering signal.
+  - For auto-triggered skills: combine *what* and *when*. Include explicit `Do NOT trigger for…` clauses for adjacent things.
+  - For manual-invocation skills: open with `Manual-invocation skill — run only when the user explicitly asks for "<name>" or invokes it as a slash command. Do not auto-trigger on adjacent topics.` then describe what the skill does.
 - **When to use** — concrete trigger phrases.
 - **When NOT to use** — adjacent-but-different cases.
 - **Tools** — for each script: purpose, usage example, env vars/deps.

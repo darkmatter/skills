@@ -32,7 +32,14 @@ These come from `skills/README.md` and `scripts/validate-skill.sh`. Following th
 
 2. **Frontmatter.** `SKILL.md` must start with a YAML block declaring `name` and `description`. The validator only checks these two fields, but a good description carries its weight: it's the only thing an agent sees when deciding whether to load the skill, so include both *what the skill does* and *concrete trigger phrases / contexts for when to use it*. The first ~200 characters matter most.
 
-3. **Naming.** Lowercase, hyphenated. Directory name must equal the `name:` field. Don't prefix with the domain (`funding-screener`, not `hl-funding-screener`) unless the venue is genuinely load-bearing — `hl-funding-analysis` and `dm-design-kickoff` qualify because they only make sense in those contexts.
+3. **Naming.** Lowercase, hyphenated. Directory name must equal the `name:` field. Don't prefix with the domain (`funding-screener`, not `hl-funding-screener`) unless the venue is genuinely load-bearing — `hl-funding-analysis` and `kickoff-dm-design` qualify because they only make sense in those contexts.
+
+   The name's grammar also signals how the skill expects to be triggered (see ADR-0001):
+
+   - **Auto-triggered skills** are noun phrases describing a domain or capability — `<domain>-<aspect>` or compound nouns. The skill reads as a thing the agent consults. Examples: `hl-funding-analysis`, `codebase-cleanup`, `end-of-turn-review`.
+   - **Manual-invocation skills** start with an imperative verb prefix from a fixed set: `run-`, `kickoff-`, `setup-`, `init-`, or `do-` as a generic fallback. The verb makes the name read as a command, only sensible at invocation time. Examples: `kickoff-dm-design`, `run-funding-screen`, `setup-vault`.
+
+   A skill is manual when its action is expensive, irreversible, has side effects on shared resources (Linear tickets, Slack posts, vault mutations), or drives a multi-step user-facing workflow with check-ins. Otherwise default to auto.
 
 4. **No external deps.** A user must be able to consume this skill solely by adding `darkmatter/agents` as a flake input. That means: don't require `pip install` of anything outside the standard library, don't require a particular CLI tool that isn't already on a teammate's machine, don't reach for secrets that aren't reachable through `.sops.yaml`. If a script needs Python, only use the stdlib. If it needs a CLI tool, document it conspicuously and prefer something already common (jq, curl, git).
 
@@ -68,7 +75,11 @@ This creates `skills/<name>/SKILL.md` with the frontmatter pre-filled and `scrip
 
 Fill in these sections. Use the imperative form. Explain the *why* behind instructions rather than piling on `MUST`s — modern models reason better when they understand what's load-bearing and what's a guideline.
 
-- **Frontmatter `description`** — combine "what it does" with "when it triggers". A pushy description (`Triggers when the user asks…`, `Also triggers for…`) helps because the default failure mode for skills is *under*-triggering, not over-triggering. Include explicit *do not trigger* clauses for adjacent things that aren't a fit.
+- **Frontmatter `description`** — for an auto-triggered skill, combine "what it does" with "when it triggers". A pushy description (`Triggers when the user asks…`, `Also triggers for…`) helps because the default failure mode for auto skills is *under*-triggering, not over-triggering. Include explicit *do not trigger* clauses for adjacent things that aren't a fit. For a **manual-invocation skill** (verb-prefixed name), open the description with this exact line so the agent knows not to auto-fire:
+
+  > `Manual-invocation skill — run only when the user explicitly asks for "<name>" or invokes it as a slash command. Do not auto-trigger on adjacent topics.`
+
+  Then describe what the skill does. The verb-prefix in the name plus this opening line together make under-triggering the safe default for these. See ADR-0001 in `docs/adr/` for the full rationale.
 - **When to use** — concrete trigger phrases and situations.
 - **When NOT to use** — adjacent-but-different cases that would naively look like fits.
 - **Tools** — for each script the skill ships, document its purpose, usage, key flags, and any env vars or external deps.
@@ -145,4 +156,5 @@ Substitute `id_ed25519` for whichever key is actually present in `~/.ssh/`. Don'
 ## Reference
 
 - `reference/checklist.md` — copy/paste end-to-end checklist to walk through with the user
-- `scripts/scaffold-skill.sh` — creates the skill directory with frontmatter pre-filled
+- `scripts/scaffold-skill.sh` — creates the skill directory with frontmatter pre-filled. Pass `--manual` to scaffold a manual-invocation skill (verb-prefixed name + manual-invocation opening line in the description).
+- `../../docs/adr/0001-skill-naming-convention.md` — manual-vs-auto naming convention

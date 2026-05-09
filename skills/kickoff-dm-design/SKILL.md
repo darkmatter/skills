@@ -1,6 +1,6 @@
 ---
-name: dm-design-kickoff
-description: Inverted-flow design-room kickoff for Darkmatter teammates. Operator creates a Claude Design project manually, drops the URL — this skill creates the Linear ticket, posts the kickoff to #design-room, and cross-links Linear ⇄ Slack ⇄ Claude Design. Non-interactive — never asks for a brief, team, or confirmation. Derives screen name + brief from the URL itself. Idempotent on rerun.
+name: kickoff-dm-design
+description: "Manual-invocation skill — run only when the user explicitly asks for \"kickoff-dm-design\" or invokes it as a slash command. Do not auto-trigger on adjacent topics. Inverted-flow design-room kickoff for Darkmatter teammates. Operator creates a Claude Design project manually, drops the URL — this skill creates the Linear ticket, posts the kickoff to #design-room, and cross-links Linear ⇄ Slack ⇄ Claude Design. Non-interactive — never asks for a brief, team, or confirmation. Derives screen name + brief from the URL itself. Idempotent on rerun."
 ---
 
 # Darkmatter design-room kickoff
@@ -37,7 +37,7 @@ Claude Design is the iteration surface. Slack is the discussion surface. Linear 
 ## Invocation
 
 ```text
-/dm-design-kickoff <claude-design-url> [optional brief]
+/kickoff-dm-design <claude-design-url> [optional brief]
 ```
 
 The Claude Design URL is required — must match `https://claude.ai/design/p/<uuid>(\?file=...)?`. The `?file=...` suffix is preserved in stored URLs (deep-links to the right file when collaborators open).
@@ -210,6 +210,6 @@ Partial success is allowed only when one surface fails after the others succeede
 These are NOT in v1; tracked here so the next iteration starts from a clear baseline:
 
 - **Slack-bot trigger** so seatless-contractor-originated kickoffs work without an employee in the loop. Required if measured contractor-originated kickoffs become frequent. Build path: Slack app installed in Darkmatter workspace + listener + service-account creds. The Slack-bot value is identity laundering (let a service account do the Linear/Slack writes on a contractor's behalf), not latency.
-- **Configurable Linear team / Slack channel** via skill args, e.g. `/dm-design-kickoff <url> --team=Engineering --channel=#nixmac-design-room`. Useful when DM grows and per-project channels emerge.
+- **Configurable Linear team / Slack channel** via skill args, e.g. `/kickoff-dm-design <url> --team=Engineering --channel=#nixmac-design-room`. Useful when DM grows and per-project channels emerge.
 - **Higher-fidelity brief extraction** — fold in Claude Design project title and first-prompt content when Anthropic ships an API for it. Today the URL-derived brief is the floor; the inline-brief override is the ceiling. An API would let the skill produce a brief mid-way between the two without operator effort.
 - **Bidirectional Claude Design backlinking** when the API ships — write the Linear ticket ID and Slack permalink back into the Claude Design project as a comment or property.
