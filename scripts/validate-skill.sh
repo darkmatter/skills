@@ -8,6 +8,7 @@
 # Checks:
 #   - SKILL.md exists at skill root
 #   - SKILL.md has a YAML frontmatter block with `name` and `description`
+#   - Skill directory name starts with `dm-`
 #   - Skill directory name matches `name:` in frontmatter
 #   - Any referenced sub-paths (scripts/, reference/) actually exist if mentioned
 
@@ -19,6 +20,8 @@ fail=0
 check_skill() {
 	local dir="$1"
 	local rel="${dir#$REPO_ROOT/}"
+	local dirname
+	dirname="$(basename "$dir")"
 
 	if [[ ! -f "$dir/SKILL.md" ]]; then
 		echo "FAIL $rel: missing SKILL.md"
@@ -48,8 +51,17 @@ check_skill() {
 		echo "FAIL $rel: SKILL.md frontmatter has no description"
 		fail=$((fail + 1))
 	fi
-	if [[ -n "$name" && "$(basename "$dir")" != "$name" ]]; then
-		echo "WARN $rel: directory name does not match frontmatter name ($name)"
+	if [[ "$dirname" != dm-* ]]; then
+		echo "FAIL $rel: team-wide skill names must start with dm-"
+		fail=$((fail + 1))
+	fi
+	if [[ "$dirname" == dm-dm-* ]]; then
+		echo "FAIL $rel: skill name has duplicate dm- namespace"
+		fail=$((fail + 1))
+	fi
+	if [[ -n "$name" && "$dirname" != "$name" ]]; then
+		echo "FAIL $rel: directory name does not match frontmatter name ($name)"
+		fail=$((fail + 1))
 	fi
 
 	echo "ok   $rel"

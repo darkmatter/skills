@@ -20,12 +20,12 @@ model:
 
 skills:
   required:
-    - darkmatter/test-driven-development
-    - darkmatter/systematic-debugging
-    - darkmatter/verification-before-completion
-    - darkmatter/end-of-turn-review
+    - darkmatter/dm-test-driven-development
+    - darkmatter/dm-systematic-debugging
+    - darkmatter/dm-verification-before-completion
+    - darkmatter/dm-end-of-turn-review
   optional:
-    - darkmatter/codebase-cleanup
+    - darkmatter/dm-codebase-cleanup
 
 tools:
   allowed:

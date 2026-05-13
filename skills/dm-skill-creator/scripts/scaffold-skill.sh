@@ -30,8 +30,8 @@ if [[ $# -lt 2 ]]; then
 	cat >&2 <<-USAGE
 		usage: $0 [--manual] <skill-name> "Short description"
 
-		auto skill (default) — name as a noun phrase: funding-screener, codebase-cleanup
-		manual skill (--manual) — name with verb prefix: kickoff-design, run-screen, setup-vault
+		auto skill (default) — dm-prefixed noun phrase: dm-funding-screener, dm-codebase-cleanup
+		manual skill (--manual) — dm-prefixed name with verb after dm-: dm-kickoff-design, dm-run-screen, dm-setup-vault
 	USAGE
 	exit 2
 fi
@@ -42,14 +42,26 @@ DESC="$2"
 # Validate name format (lowercase, hyphenated, no underscores or caps)
 if [[ ! "$NAME" =~ ^[a-z][a-z0-9-]*$ ]]; then
 	echo "error: skill name must be lowercase, hyphenated, alphanumeric (got: $NAME)" >&2
-	echo "examples of good names: funding-screener, dm-skill-creator, end-of-turn-review" >&2
+	echo "examples of good names: dm-funding-screener, dm-skill-creator, dm-end-of-turn-review" >&2
+	exit 1
+fi
+
+if [[ ! "$NAME" =~ ^dm- ]]; then
+	echo "error: team-wide skill names must start with dm- (got: $NAME)" >&2
+	echo "examples of good names: dm-funding-screener, dm-skill-creator, dm-end-of-turn-review" >&2
+	exit 1
+fi
+
+if [[ "$NAME" == dm-dm-* ]]; then
+	echo "error: skill name has duplicate dm- namespace (got: $NAME)" >&2
+	echo "examples of good names: dm-funding-screener, dm-skill-creator, dm-end-of-turn-review" >&2
 	exit 1
 fi
 
 # Manual skills must use a known verb prefix (ADR-0001).
 if [[ $MANUAL -eq 1 ]]; then
-	if [[ ! "$NAME" =~ ^(run|kickoff|setup|init|do)- ]]; then
-		echo "error: --manual requires a verb prefix from {run-, kickoff-, setup-, init-, do-} (got: $NAME)" >&2
+	if [[ ! "$NAME" =~ ^dm-(run|kickoff|setup|init|do)- ]]; then
+		echo "error: --manual requires a verb after dm- from {run-, kickoff-, setup-, init-, do-} (got: $NAME)" >&2
 		echo "see docs/adr/0001-skill-naming-convention.md for rationale" >&2
 		exit 1
 	fi

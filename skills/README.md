@@ -48,9 +48,10 @@ Recommended subdirectories:
 
 ## Naming
 
-- Lowercase, hyphenated: `funding-screener`, not `FundingScreener` or `funding_screener`
+- Lowercase, hyphenated: `dm-funding-screener`, not `FundingScreener` or `funding_screener`
+- Team-wide skill names must start with `dm-`. Do not add a second `dm-` prefix to names that already have one.
 - Directory name must match the `name:` field in frontmatter
-- Don't prefix with the domain (use `funding-screener`, not `hl-funding-screener`) unless the skill is genuinely venue-specific and that's load-bearing
+- After the `dm-` namespace, add a domain prefix only when the domain is genuinely load-bearing, such as `dm-hl-funding-analysis`
 
 ## Validation
 
@@ -58,6 +59,7 @@ Run `scripts/validate-skill.sh` from the repo root before opening a PR. It check
 
 - `SKILL.md` exists
 - Frontmatter has `name` and `description`
+- Skill names start with `dm-` and do not double-prefix `dm-dm-`
 - Directory name matches frontmatter name
 
 ## Adding a skill

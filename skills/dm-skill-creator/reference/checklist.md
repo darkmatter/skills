@@ -18,12 +18,13 @@ Confirm with the user:
 
 ## 2. Pick a name
 
-- Lowercase, hyphenated. Directory name will equal the frontmatter `name:` field.
-- Don't prefix with the domain (`screener`, not `hl-screener`) unless the venue is genuinely load-bearing.
+- Lowercase, hyphenated, and prefixed with `dm-`. Directory name will equal the frontmatter `name:` field.
+- Do not add a second `dm-` to a name that already has one.
+- After the `dm-` namespace, add a domain prefix only when the domain is genuinely load-bearing.
 - Check for collisions: `ls skills/`. The id-prefix in `home-manager.nix` namespaces installed skills as `darkmatter:<name>`, so collisions with upstream skill catalogs are not an issue, but collisions inside this repo are.
 - Pick the right grammar for the triggering mode (ADR-0001):
-  - **Auto-triggered** (default): noun-phrase name describing a domain or capability. Examples: `funding-screener`, `codebase-cleanup`.
-  - **Manual-invocation** (the action is expensive, irreversible, has side effects on shared resources, or drives a guided workflow): verb-prefixed name from `{run-, kickoff-, setup-, init-, do-}`. Examples: `kickoff-dm-design`, `run-funding-screen`, `setup-vault`.
+  - **Auto-triggered** (default): noun-phrase name after `dm-` describing a domain or capability. Examples: `dm-funding-screener`, `dm-codebase-cleanup`.
+  - **Manual-invocation** (the action is expensive, irreversible, has side effects on shared resources, or drives a guided workflow): verb after `dm-` from `{run-, kickoff-, setup-, init-, do-}`. Examples: `dm-kickoff-dm-design`, `dm-run-funding-screen`, `dm-setup-vault`.
 
 ## 3. Scaffold
 

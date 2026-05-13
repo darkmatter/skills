@@ -21,7 +21,7 @@ If the user is creating a skill that isn't intended to be shared across multiple
 
 - The user wants a skill scoped to a single project — point them at `<project>/.agent/skills/` instead
 - The user wants a personal-only skill — point them at `personal/skills/` (gitignored, separate repo)
-- The user is asking about discovering/installing skills from elsewhere — that's `find-skills`
+- The user is asking about discovering/installing skills from elsewhere — that's `dm-find-skills`
 - The user wants to create a skill in some other repo's conventions (Anthropic upstream, vercel-labs, etc.) — use the upstream `skill-creator` instead
 
 ## Repo conventions (the load-bearing parts)
@@ -32,12 +32,12 @@ These come from `skills/README.md` and `scripts/validate-skill.sh`. Following th
 
 2. **Frontmatter.** `SKILL.md` must start with a YAML block declaring `name` and `description`. The validator only checks these two fields, but a good description carries its weight: it's the only thing an agent sees when deciding whether to load the skill, so include both *what the skill does* and *concrete trigger phrases / contexts for when to use it*. The first ~200 characters matter most.
 
-3. **Naming.** Lowercase, hyphenated. Directory name must equal the `name:` field. Don't prefix with the domain (`funding-screener`, not `hl-funding-screener`) unless the venue is genuinely load-bearing — `hl-funding-analysis` and `kickoff-dm-design` qualify because they only make sense in those contexts.
+3. **Naming.** Lowercase, hyphenated, and namespaced with `dm-`. Directory name must equal the `name:` field. Do not add a second `dm-` to a name that already has one. After the `dm-` namespace, add a domain prefix only when the domain is genuinely load-bearing — `dm-hl-funding-analysis` and `dm-kickoff-dm-design` qualify because they only make sense in those contexts.
 
    The name's grammar also signals how the skill expects to be triggered (see ADR-0001):
 
-   - **Auto-triggered skills** are noun phrases describing a domain or capability — `<domain>-<aspect>` or compound nouns. The skill reads as a thing the agent consults. Examples: `hl-funding-analysis`, `codebase-cleanup`, `end-of-turn-review`.
-   - **Manual-invocation skills** start with an imperative verb prefix from a fixed set: `run-`, `kickoff-`, `setup-`, `init-`, or `do-` as a generic fallback. The verb makes the name read as a command, only sensible at invocation time. Examples: `kickoff-dm-design`, `run-funding-screen`, `setup-vault`.
+   - **Auto-triggered skills** are noun phrases after the `dm-` namespace, describing a domain or capability — `<domain>-<aspect>` or compound nouns. The skill reads as a thing the agent consults. Examples: `dm-hl-funding-analysis`, `dm-codebase-cleanup`, `dm-end-of-turn-review`.
+   - **Manual-invocation skills** put an imperative verb after the `dm-` namespace from a fixed set: `run-`, `kickoff-`, `setup-`, `init-`, or `do-` as a generic fallback. The verb makes the name read as a command, only sensible at invocation time. Examples: `dm-kickoff-dm-design`, `dm-run-funding-screen`, `dm-setup-vault`.
 
    A skill is manual when its action is expensive, irreversible, has side effects on shared resources (Linear tickets, Slack posts, vault mutations), or drives a multi-step user-facing workflow with check-ins. Otherwise default to auto.
 

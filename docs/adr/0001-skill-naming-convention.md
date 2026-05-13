@@ -1,4 +1,4 @@
-# 0001 — Skill naming convention: manual-invocation vs auto-trigger
+# 0001 — Skill naming convention: namespace, manual-invocation, and auto-trigger
 
 - **Status:** accepted
 - **Date:** 2026-05-09
@@ -8,10 +8,10 @@
 
 Skills in `skills/` are loaded by an agent (Claude, Codex, etc.) in two distinct ways:
 
-1. **Auto-trigger** — the agent reads each skill's frontmatter `description`, and pulls a skill into context when its trigger phrases match the user's intent. This is the default and the desired behavior for most skills (`hl-funding-analysis`, `codebase-cleanup`, `end-of-turn-review`).
-2. **Manual invocation** — the user explicitly invokes the skill by name, typically via a slash command or by saying "run X". The skill should *not* auto-trigger on adjacent topics. This fits skills that are expensive, irreversible, or that drive a multi-step user-facing workflow with check-ins (`dm-design-kickoff` posts to Linear and Slack on first run).
+1. **Auto-trigger** — the agent reads each skill's frontmatter `description`, and pulls a skill into context when its trigger phrases match the user's intent. This is the default and the desired behavior for most skills (`dm-hl-funding-analysis`, `dm-codebase-cleanup`, `dm-end-of-turn-review`).
+2. **Manual invocation** — the user explicitly invokes the skill by name, typically via a slash command or by saying "run X". The skill should *not* auto-trigger on adjacent topics. This fits skills that are expensive, irreversible, or that drive a multi-step user-facing workflow with check-ins (`dm-kickoff-dm-design` posts to Linear and Slack on first run).
 
-Both flavors live in the same `skills/` directory and ship through the same Nix Home Manager module. Until now, names have been a free-for-all (`dm-design-kickoff`, `hl-funding-analysis`, `codebase-cleanup`) — there's no signal in the name about which mode the skill expects, which leads to two failure modes:
+Both flavors live in the same `skills/` directory and ship through the same Nix Home Manager module. All team-wide skills use the `dm-` namespace so installed skill lists make ownership obvious. After that namespace, names still need to signal which mode the skill expects; otherwise two failure modes show up:
 
 - A manual skill ends up auto-triggering because its description shares vocabulary with adjacent topics. The user gets surprised when the skill posts to Slack uninvited.
 - An auto skill is named like an action (`run-foo`) and the agent treats it as something it should only fire when explicitly asked, leaving capability on the table.
@@ -20,10 +20,10 @@ We need a convention that's recognizable on sight, doesn't require new tooling, 
 
 ## Decision
 
-**The skill name's grammar signals its triggering mode.**
+**Every team-wide skill starts with `dm-`, and the rest of the skill name signals its triggering mode.**
 
-- **Auto-triggered skills** are named as **noun phrases** describing a domain or capability — `<domain>-<aspect>` or a compound noun. Examples: `hl-funding-analysis`, `codebase-cleanup`, `end-of-turn-review`, `systematic-debugging`. The skill reads as a thing you consult, not an action you invoke.
-- **Manual-invocation skills** start with an **imperative verb prefix** drawn from a small fixed set — `run-`, `kickoff-`, `setup-`, `init-`, or `do-` as a generic fallback. The verb makes the name only sensible at invocation time. Examples: `kickoff-dm-design`, `run-funding-screen`, `setup-vault`, `init-project`.
+- **Auto-triggered skills** are named as **noun phrases** after `dm-`, describing a domain or capability — `<domain>-<aspect>` or a compound noun. Examples: `dm-hl-funding-analysis`, `dm-codebase-cleanup`, `dm-end-of-turn-review`, `dm-systematic-debugging`. The skill reads as a thing you consult, not an action you invoke.
+- **Manual-invocation skills** put an **imperative verb** after `dm-`, drawn from a small fixed set — `run-`, `kickoff-`, `setup-`, `init-`, or `do-` as a generic fallback. The verb makes the name only sensible at invocation time. Examples: `dm-kickoff-dm-design`, `dm-run-funding-screen`, `dm-setup-vault`, `dm-init-project`.
 
 **A skill is manual when at least one of these is true.** Otherwise default to auto.
 
@@ -37,21 +37,22 @@ We need a convention that's recognizable on sight, doesn't require new tooling, 
 - **Auto skills** open with what the skill does, then list concrete `Triggers when…` clauses and explicit `Do NOT trigger for…` carve-outs. (Already the convention in this repo.)
 - **Manual skills** open with the line `Manual-invocation skill — run only when the user explicitly asks for "<name>" or invokes it as a slash command. Do not auto-trigger on adjacent topics.` Then describe what it does. The verb-prefixed name and this opening line together make under-triggering the safe default.
 
-**Renames apply to existing skills that violate the convention.** At the time of this ADR, that means `dm-design-kickoff` → `kickoff-dm-design`. Other current skills are already correctly named for their triggering mode.
+**Renames apply to existing skills that violate the convention.** At the time of this ADR, every team-wide skill without a `dm-` prefix is renamed by adding one. For manual skills, the imperative verb stays immediately after `dm-`, for example `kickoff-dm-design` → `dm-kickoff-dm-design`.
 
 ## Consequences
 
 **Upside.**
 
-- A teammate skimming `skills/` or `docs/catalog.md` can tell at a glance whether a skill expects to be invoked or expects to be picked up by the agent. That changes how they write the description and how they reason about side effects.
-- The convention is enforced socially in code review rather than by the validator, so it costs nothing to adopt and is easy to relax for genuine edge cases.
+- A teammate skimming `skills/` or `docs/catalog.md` can tell at a glance that a skill belongs to Dark Matter and whether it expects to be invoked or picked up by the agent. That changes how they write the description and how they reason about side effects.
+- The `dm-` namespace, duplicate `dm-dm-` rejection, and directory/frontmatter name match are enforced by `scripts/validate-skill.sh` and CI, so ownership drift is caught before merge.
+- The auto-vs-manual grammar and manual description opening line remain review-enforced conventions, which leaves room for genuine edge cases without complicating the validator.
 - The "Manual-invocation skill — …" opening line is a hard signal in the description, robust to whatever heuristic the model uses for triggering. Even if the model's behavior shifts across versions, a manual skill stays manual.
 
 **Costs.**
 
-- One immediate rename (`dm-design-kickoff` → `kickoff-dm-design`), which means rewriting the slash-invocation examples inside that skill and updating the catalog row.
-- Future skills need to pick a verb at naming time. The fixed set (`run-`, `kickoff-`, `setup-`, `init-`, `do-`) reduces bikeshedding but still requires a moment of thought.
-- The convention is not enforced by `scripts/validate-skill.sh`. Drift is possible. If we see drift in practice, we can extend the validator to grep frontmatter descriptions of `do-/run-/kickoff-/setup-/init-` skills for the manual-invocation opening line and warn if absent.
+- A one-time namespace migration, which means rewriting slash-invocation examples, path examples, and catalog rows.
+- Future manual skills need to pick a verb at naming time. The fixed set (`run-`, `kickoff-`, `setup-`, `init-`, `do-`) reduces bikeshedding but still requires a moment of thought.
+- The validator only enforces the namespace and basic structural invariants. Drift is still possible in the trigger-mode convention itself; if we see that in practice, we can extend the validator to grep manual skill descriptions for the manual-invocation opening line and warn if absent.
 
 **Out of scope.**
 

@@ -66,11 +66,12 @@ The module enables every `darkmatter/*` skill and syncs them to Claude, Codex, a
 
 ## Adding a new shared skill
 
-1. Create `skills/<skill-name>/SKILL.md` with YAML frontmatter (`name`, `description`).
-2. Optionally add `scripts/`, `reference/` subdirectories for code and supporting docs.
-3. Run `scripts/validate-skill.sh skills/<skill-name>` to check structure.
-4. Document it in `docs/catalog.md`.
-5. Open a PR.
+1. Pick a lowercase, hyphenated name that starts with `dm-`, such as `dm-funding-screener`. Do not double-prefix names that already start with `dm-`.
+2. Create `skills/<skill-name>/SKILL.md` with YAML frontmatter (`name`, `description`), where `name` exactly matches the directory name.
+3. Optionally add `scripts/`, `reference/` subdirectories for code and supporting docs.
+4. Run `scripts/validate-skill.sh skills/<skill-name>` to check structure and enforce the `dm-` namespace.
+5. Document it in `docs/catalog.md`.
+6. Open a PR.
 
 See [`skills/README.md`](skills/README.md) for the skill format spec.
 
