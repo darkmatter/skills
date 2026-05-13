@@ -27,12 +27,12 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "skills/README.md",
+                "file": "skills/hl-funding-analysis/reference/api-shapes.md",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "README"
+              "title": "api-shapes"
             }
           }
         ],
@@ -199,8 +199,18 @@
       "workspaces:Manage workspace layouts": false
     }
   },
-  "active": "37d47e568094d320",
+  "active": "8dcb90301acac5d9",
   "lastOpenFiles": [
+    "skills/end-of-turn-review/reference/output-schema.md",
+    "skills/README.md",
+    "flake.lock",
+    "skills/dm-skill-creator/reference/checklist.md",
+    "skills/dm-skill-creator/reference",
+    "skills/dm-skill-creator/scripts/scaffold-skill.sh",
+    "skills/dm-skill-creator/scripts",
+    "skills/dm-skill-creator/SKILL.md",
+    "skills/dm-skill-creator",
+    "skills/hl-funding-analysis/scripts/dashboard_data.py",
     "skills/writing-skills/examples/CLAUDE_MD_TESTING.md",
     "skills/writing-skills/testing-skills-with-subagents.md",
     "skills/writing-skills/render-graphs.js",
@@ -212,9 +222,7 @@
     "skills/writing-skills",
     "skills/writing-plans/plan-document-reviewer-prompt.md",
     "skills/writing-plans/SKILL.md",
-    "skills/writing-plans",
     "skills/verification-before-completion/SKILL.md",
-    "skills/verification-before-completion",
     "skills/vercel-react-best-practices/rules/server-serialization.md",
     "skills/vercel-react-best-practices/rules/server-parallel-fetching.md",
     "skills/vercel-react-best-practices/rules/server-hoist-static-io.md",
@@ -228,14 +236,6 @@
     "skills/vercel-react-best-practices/rules/rerender-transitions.md",
     "skills/vercel-react-best-practices/rules/rerender-no-inline-components.md",
     "skills/vercel-react-best-practices/rules/rerender-move-effect-to-event.md",
-    "skills/vercel-react-best-practices/rules/rerender-memo.md",
-    "skills/vercel-react-best-practices/rules/rerender-memo-with-default-value.md",
-    "skills/vercel-react-best-practices/rules/rerender-lazy-state-init.md",
-    "skills/vercel-react-best-practices/rules/rerender-functional-setstate.md",
-    "skills/vercel-react-best-practices/rules/rerender-derived-state.md",
-    "skills/vercel-react-best-practices/rules",
-    "skills/vercel-react-best-practices",
-    "skills/using-superpowers/references",
-    "skills/using-superpowers"
+    "skills/vercel-react-best-practices/rules/rerender-memo.md"
   ]
 }
