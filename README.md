@@ -1,10 +1,16 @@
 # darkmatter/agents
 
-Team-wide agent infrastructure for the darkmatter umbrella. This repo ships three things:
+Team-wide LLM preset infrastructure for the darkmatter umbrella. OpenCode is the
+preferred client, but this repo stays source-oriented: shared assets live here
+and are synced into OpenCode, Claude-compatible, Codex, and generic agent
+locations as needed.
 
-1. **A catalog of shared skills** (`skills/`) — installed across all darkmatter projects via Nix Home Manager.
-2. **A project template** (`template/`) — `.agent/`, config, and shims to stamp into a new project repo.
-3. **Tooling** (`scripts/`) — a generator that stamps the template into a project, plus skill-catalog validation.
+This repo ships four things:
+
+1. **OpenCode-first presets** (`presets/`) — installable source packs for LLM clients.
+2. **A catalog of shared skills** (`skills/`) — installed across all darkmatter projects via Nix Home Manager.
+3. **A project template** (`template/`) — `.agent/`, config, and shims to stamp into a new project repo.
+4. **Tooling** (`scripts/`) — generators, installers, sync scripts, and validation helpers.
 
 It is **provider-agnostic**. Skills and `.agent/` content target any agent tool (Claude Code, Codex, OpenCode, Cursor, Aider, etc.) by following the cross-vendor `AGENTS.md` convention plus the per-vendor shims (`CLAUDE.md`, `.cursorrules`).
 
@@ -15,6 +21,7 @@ darkmatter/agents/
 ├── README.md                ← this file
 ├── flake.nix                ← Nix entry; exports the Home Manager module
 ├── home-manager.nix         ← HM module that wires skills/ into agent CLIs
+├── presets/                 ← installable source packs, especially OpenCode
 ├── skills/                  ← team-wide shareable skills (the catalog)
 ├── template/                ← the per-project bootstrap (stamped by new-project.sh)
 ├── scripts/
@@ -24,6 +31,13 @@ darkmatter/agents/
     ├── catalog.md           ← what's in skills/
     └── new-project-guide.md ← walkthrough for bootstrapping a project
 ```
+
+## OpenCode presets
+
+OpenCode-native assets live in `presets/opencode/`. Shared cross-client
+instructions live in `presets/base/`, and shared skills remain in `skills/`.
+
+See `docs/opencode-layout.md` for the source-to-install mapping.
 
 ## Bootstrap a new project
 
@@ -62,7 +76,7 @@ The flake exports a Home Manager module that installs all team-wide skills into 
 }
 ```
 
-The module enables every `darkmatter/*` skill and syncs them to Claude, Codex, and the generic `$HOME/.agents/skills` target. Personal skills (when `personalAgentSkillsPath` is set) sync alongside.
+The module enables every `darkmatter/*` skill and syncs them to Claude, Codex, and the generic `$HOME/.agents/skills` target. The Home Manager module also links the OpenCode preset into `~/.config/opencode`. Personal skills (when `personalAgentSkillsPath` is set) sync alongside.
 
 ## Adding a new shared skill
 
