@@ -1,0 +1,91 @@
+name: opencode-review
+
+on:
+  workflow_call:
+    inputs:
+      model:
+        description: OpenCode model to use for pull request reviews.
+        type: string
+        default: openrouter/google/gemini-3.1-pro-preview-customtools
+      runner:
+        description: Runner label for the OpenCode review job.
+        type: string
+        default: ubuntu-latest
+      agents_repository:
+        description: Repository containing the shared Darkmatter OpenCode preset and skills.
+        type: string
+        default: ""
+      agents_ref:
+        description: Git ref to checkout from the shared agents repository.
+        type: string
+        default: main
+
+      prompt:
+        description: Optional prompt override. Leave empty to use prompt_file from the shared agents repository.
+        type: string
+        default: ""
+      prompt_file:
+        description: Prompt file path inside the shared agents repository.
+        type: string
+        default: .github/prompts/opencode-review.md
+    secrets:
+      OPENROUTER_API_KEY:
+        required: false
+      ANTHROPIC_API_KEY:
+        required: false
+      AGENTS_REPO_TOKEN:
+        required: false
+
+jobs:
+  review:
+    if: github.event.pull_request.draft == false
+    runs-on: ${{ inputs.runner || 'ubuntu-latest' }}
+    permissions:
+      id-token: write
+      contents: read
+      pull-requests: write
+      issues: read
+    steps:
+      - name: Checkout caller repository
+        uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+
+      - name: Checkout shared Darkmatter agent presets
+        uses: actions/checkout@v6
+        with:
+          repository: ${{ inputs.agents_repository || format('{0}/agents', github.repository_owner) }}
+          ref: ${{ inputs.agents_ref || 'main' }}
+          path: .darkmatter-agents
+          persist-credentials: false
+          token: ${{ secrets.AGENTS_REPO_TOKEN || github.token }}
+
+      - name: Install shared OpenCode preset and skills
+        run: ./.darkmatter-agents/scripts/install-opencode.sh --copy --target "${XDG_CONFIG_HOME:-$HOME/.config}/opencode"
+
+      - name: Resolve OpenCode review prompt
+        id: prompt
+        env:
+          PROMPT_INPUT: ${{ inputs.prompt }}
+          PROMPT_FILE: ${{ inputs.prompt_file || '.github/prompts/opencode-review.md' }}
+        run: |
+          {
+            echo 'prompt<<__OPENCODE_PROMPT__'
+            if [ -n "$PROMPT_INPUT" ]; then
+              printf '%s\n' "$PROMPT_INPUT"
+            else
+              cat ".darkmatter-agents/$PROMPT_FILE"
+            fi
+            echo '__OPENCODE_PROMPT__'
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Run opencode review
+        uses: anomalyco/opencode/github@latest
+        env:
+          OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          GITHUB_TOKEN: ${{ github.token }}
+        with:
+          model: ${{ inputs.model || 'openrouter/google/gemini-3.1-pro-preview-customtools' }}
+          use_github_token: true
+          prompt: ${{ steps.prompt.outputs.prompt }}
