@@ -14,7 +14,7 @@ on:
       agents_repository:
         description: Repository containing the shared Darkmatter OpenCode preset and skills.
         type: string
-        default: ""
+        default: darkmatter/skills
       agents_ref:
         description: Git ref to checkout from the shared agents repository.
         type: string
@@ -58,7 +58,7 @@ jobs:
       - name: Checkout shared Darkmatter agent presets
         uses: actions/checkout@v6
         with:
-          repository: ${{ inputs.agents_repository || format('{0}/agents', github.repository_owner) }}
+          repository: ${{ inputs.agents_repository || 'darkmatter/skills' }}
           ref: ${{ inputs.agents_ref || 'main' }}
           path: .darkmatter-agents
           persist-credentials: false
