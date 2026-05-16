@@ -1,5 +1,19 @@
 { agent-skills }:
 { lib, personalAgentSkillsPath ? null, ... }:
+let
+  # Each subdirectory is one skill. Non-directory entries (.DS_Store,
+  # README.md, etc) are skipped so they don't get wrapped as SKILL.md.
+  readSkills = path:
+    let
+      entries = builtins.readDir path;
+      onlyDirs = lib.filterAttrs (_: type: type == "directory") entries;
+    in
+    lib.mapAttrs' (name: _: lib.nameValuePair name (path + "/${name}")) onlyDirs;
+
+  teamSkills = readSkills ./skills;
+  personalSkills =
+    if personalAgentSkillsPath != null then readSkills personalAgentSkillsPath else { };
+in
 {
   imports = [
     agent-skills.homeManagerModules.default
@@ -28,29 +42,55 @@
     })
   ];
 
-  # NOTE: OpenCode skill install inconsistency — personal skills from
-  # `personalAgentSkillsPath` flow into Claude/Codex/agents targets via
-  # `programs.agent-skills` above, but the OpenCode xdg.configFile block
-  # below only symlinks the team-wide `skills/` directory.  Merging two
-  # source directories into a single symlink target is not possible with
-  # xdg.configFile.  To get personal skills into OpenCode, either:
-  #   (a) add a second xdg.configFile entry per personal skill (requires
-  #       enumerating skill names), or
-  #   (b) replace the directory symlink with a generation script that
-  #       creates per-skill symlinks from both sources.
-  # Until resolved, personal skills are available in Claude/Codex but
-  # not in OpenCode.
+  # OpenCode is configured via the canonical home-manager module
+  # (programs.opencode.*). This avoids the EACCES error caused by
+  # symlinking opencode/package.json into the read-only nix store —
+  # opencode writes that file itself when managing plugin deps.
+  programs.opencode = {
+    enable = lib.mkDefault true;
+    # Note: this also installs pkgs.opencode into home.packages. Override
+    # with `programs.opencode.package = ...` if you manage the binary
+    # elsewhere, or set `programs.opencode.enable = false` to skip the
+    # whole module (configs included). We can't set `package = null`
+    # here due to an upstream HM bug in the warnings block (calls
+    # versionAtLeast on a null version).
+    settings = {
+      instructions = [ "AGENTS.md" ];
+      permission = {
+        edit = "ask";
+        bash = "ask";
+        skill = {
+          "*" = "allow";
+        };
+      };
+      share = "manual";
+      autoupdate = "notify";
+    };
+
+    tui = {
+      diff_style = "auto";
+      mouse = true;
+    };
+
+    context = ./presets/base/AGENTS.md;
+    commands = ./presets/opencode/commands;
+    agents = ./presets/opencode/agents;
+    tools = ./presets/opencode/tools;
+    themes = ./presets/opencode/themes;
+
+    # Per-skill entries merge team + personal sources into a single
+    # opencode/skills directory, which fixes the prior limitation
+    # documented in this module's history.
+    skills = teamSkills // personalSkills;
+  };
+
+  # Entries the canonical programs.opencode module does not yet
+  # support. `recursive = true` keeps the parent directory real so
+  # opencode can drop files alongside the managed symlinks.
   xdg.configFile = {
-    "opencode/AGENTS.md".source = ./presets/base/AGENTS.md;
-    "opencode/opencode.jsonc".source = ./presets/opencode/opencode.jsonc;
-    "opencode/tui.json".source = ./presets/opencode/tui.json;
-    "opencode/package.json".source = ./presets/opencode/package.json;
-    "opencode/agents".source = ./presets/opencode/agents;
-    "opencode/commands".source = ./presets/opencode/commands;
-    "opencode/plugins".source = ./presets/opencode/plugins;
-    "opencode/tools".source = ./presets/opencode/tools;
-    "opencode/themes".source = ./presets/opencode/themes;
-    "opencode/modes".source = ./presets/opencode/modes;
-    "opencode/skills".source = ./skills;
+    "opencode/plugins" = {
+      source = ./presets/opencode/plugins;
+      recursive = true;
+    };
   };
 }
