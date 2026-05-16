@@ -119,6 +119,15 @@ jobs:
             echo '__OPENCODE_PROMPT__'
           } >> "$GITHUB_OUTPUT"
 
+      - name: Configure caller repository git auth
+        env:
+          GITHUB_TOKEN: ${{ steps.caller-token.outputs.token || github.token }}
+        run: |
+          auth_header="$(python3 -c 'import base64, os; print(base64.b64encode(("x-access-token:" + os.environ["GITHUB_TOKEN"]).encode()).decode())')"
+          git config --local http.https://github.com/.extraheader "AUTHORIZATION: basic ${auth_header}"
+          git config --global user.name "opencode-agent[bot]"
+          git config --global user.email "opencode-agent[bot]@users.noreply.github.com"
+
       - name: Run opencode review
         env:
           OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
