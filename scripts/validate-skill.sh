@@ -8,6 +8,8 @@
 # Checks:
 #   - SKILL.md exists at skill root
 #   - SKILL.md has a YAML frontmatter block with `name` and `description`
+#   - Frontmatter block is properly closed (second ---)
+#   - Frontmatter keys are well-formed (no markdown headings like ## name:)
 #   - Skill directory name matches `name:` in frontmatter
 #   - Any referenced sub-paths (scripts/, reference/) actually exist if mentioned
 
@@ -26,7 +28,18 @@ check_skill() {
 		return
 	fi
 
-	# Read first frontmatter block.
+	# Count frontmatter delimiters (lines that are exactly "---").
+	local delim_count
+	delim_count="$(grep -cx -e '---' "$dir/SKILL.md" 2>/dev/null || true)"
+	delim_count="${delim_count:-0}"
+
+	if [[ "$delim_count" -lt 2 ]]; then
+		echo "FAIL $rel: SKILL.md frontmatter is unclosed (missing closing ---)"
+		fail=$((fail + 1))
+		return
+	fi
+
+	# Read first frontmatter block (between first and second ---).
 	local fm
 	fm="$(awk '/^---$/{c++; next} c==1' "$dir/SKILL.md" 2>/dev/null || true)"
 
@@ -36,9 +49,16 @@ check_skill() {
 		return
 	fi
 
+	# Check for malformed keys (markdown headings like ## name: instead of name:).
+	if echo "$fm" | grep -qE '^#+[[:space:]]*(name|description):'; then
+		echo "FAIL $rel: SKILL.md frontmatter has markdown heading instead of YAML key (## name: or ## description:)"
+		fail=$((fail + 1))
+		return
+	fi
+
 	local name desc
-	name="$(echo "$fm" | grep -E '^name:' | head -1 | sed -E 's/^name:[[:space:]]*//; s/^"//; s/"$//')"
-	desc="$(echo "$fm" | grep -E '^description:' | head -1 | sed -E 's/^description:[[:space:]]*//')"
+	name="$(printf '%s\n' "$fm" | awk '/^name:/ {sub(/^name:[[:space:]]*/, ""); gsub(/^"|"$/, ""); print; exit}')"
+	desc="$(printf '%s\n' "$fm" | awk '/^description:/ {sub(/^description:[[:space:]]*/, ""); print; exit}')"
 
 	if [[ -z "$name" ]]; then
 		echo "FAIL $rel: SKILL.md frontmatter has no name"
