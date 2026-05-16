@@ -1,4 +1,4 @@
-# darkmatter/agents
+# darkmatter/skills
 
 Team-wide LLM preset infrastructure for the darkmatter umbrella. OpenCode is the
 preferred client, but this repo stays source-oriented: shared assets live here
@@ -17,7 +17,7 @@ It is **provider-agnostic**. Skills and `.agent/` content target any agent tool 
 ## Layout
 
 ```
-darkmatter/agents/
+darkmatter/skills/
 ├── README.md                ← this file
 ├── flake.nix                ← Nix entry; exports the Home Manager module
 ├── home-manager.nix         ← HM module that wires skills/ into agent CLIs
@@ -57,12 +57,12 @@ The flake exports a Home Manager module that installs all team-wide skills into 
 
 ```nix
 {
-  inputs.darkmatter-agents.url = "git+ssh://git@github.com/darkmatter/agents";
+  inputs.darkmatter-skills.url = "git+ssh://git@github.com/darkmatter/skills";
 
-  outputs = { home-manager, darkmatter-agents, ... }@inputs: {
+  outputs = { home-manager, darkmatter-skills, ... }@inputs: {
     homeConfigurations.me = home-manager.lib.homeManagerConfiguration {
       modules = [
-        darkmatter-agents.homeManagerModules.default
+        darkmatter-skills.homeManagerModules.default
         ./home.nix
       ];
 
