@@ -30,7 +30,7 @@ Read order:
 
 ## Inheritance
 
-This project inherits policy from `darkmatter/agents`. If a project policy conflicts with org policy, the stricter rule wins unless `project-exceptions.md` records an approved exception.
+This project inherits policy from `darkmatter/skills`. If a project policy conflicts with org policy, the stricter rule wins unless `project-exceptions.md` records an approved exception.
 
 ## What belongs here
 

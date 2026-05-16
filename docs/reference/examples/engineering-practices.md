@@ -1,6 +1,6 @@
 # Reference example — org-wide engineering practices
 
-This is a reference shape for `policy/engineering-practices.md` in `darkmatter/agents`, or for `.agent/policy/engineering-practices.md` after it is stamped into a project.
+This is a reference shape for `policy/engineering-practices.md` in `darkmatter/skills`, or for `.agent/policy/engineering-practices.md` after it is stamped into a project.
 
 Keep this file short enough that every agent can read it at session start. Put tutorials in skills; put project-specific decisions in `.agent/context/decisions.md`; put exceptions in `.agent/policy/project-exceptions.md`.
 

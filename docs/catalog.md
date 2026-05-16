@@ -4,12 +4,70 @@ Team-wide skills currently shipped from `skills/`. Add an entry here when you ad
 
 | Skill | One-liner | Triggers | Notes |
 |---|---|---|---|
-| `hl-funding-analysis` | Analyze Hyperliquid perpetual funding rates and identify carry-trade opportunities, with realized harvest PnL across configurable windows. | "find me funding harvest opportunities", "what's paying funding on HL", "should I short X for the funding", basis trade evaluation on HL | Python 3, no external deps. Caches to `/tmp/hl_*` by default. Use `--exclude` per project to skip names already in your book. Project-specific sizing tiers should live in that project's `decisions.md`. |
-| `end-of-turn-review` | GPT-5.5 second-opinion pass over a diff, plan, or turn transcript. Returns LGTM / notes / BLOCK with file:line citations. | end-of-turn (via Stop hook), "review what you just did", "critique this plan", pre-commit second opinion | Bash + `jq` + `curl`. Calls LiteLLM at `LITELLM_BASE_URL` (default `https://litellm.drkmttr.dev/v1`). `REVIEW_MODEL` env var overrides the model alias (default `gpt-5.5`). Hook setup is per-machine — see `reference/hook-setup.md`. |
-| `codebase-cleanup` | Multi-pass refactor / code-quality sweep dispatched as 8 specialist subagents (AI slop, legacy, unused code, circular deps, weak types, type consolidation, defensive programming, DRY). Each pass runs research → critical assessment → high-confidence implementation. | "clean up the codebase", "tech-debt pass", "find dead code", "remove AI slop", "remove circular deps", quarterly hygiene runs | No scripts — pure prompt library. Calling agent dispatches each pass as a subagent (or sequentially in one). Recommended ordering and which passes can parallelize is in `reference/pass-ordering.md`. |
-| `nix-flake-organization` | Organize Nix flake repos into a thin `flake/` public output layer with implementation details under `src/<name>/...`. | "organize flake outputs", "thin flake modules", "move Nix implementation to src", NixOS/nix-darwin/Home Manager/flake-parts layout refactors | No scripts. Preserves `flake.nix` at repo root and public output names by default. |
-| `dm-skill-creator` | Create new team-wide skills inside this repo following its conventions (frontmatter, validator, catalog row, no external deps) and test the addition end-to-end via a `~/darwin` rebuild. | "add a skill", "create a darkmatter skill", "promote this into a shared skill", "make this reusable across projects" | Bash + Python 3 stdlib only. Ships `scripts/scaffold-skill.sh` (with `--manual` flag per ADR-0001) for a starter `SKILL.md` and `reference/checklist.md` for the end-to-end walkthrough. Test step uses `darwin-rebuild --override-input darkmatter/darkmatter-agents path:...` so changes can be validated before pushing. |
-| `kickoff-dm-design` | **Manual.** Inverted-flow design-room kickoff. Operator drops a Claude Design URL; this skill creates the Linear ticket, posts to `#design-room`, and cross-links Linear ⇄ Slack ⇄ Claude Design. Non-interactive, idempotent. | `/kickoff-dm-design <claude-design-url>`, "kick off a design room for X", "broadcast this design" | Manual-invocation skill (ADR-0001) — does not auto-trigger. Requires Linear + Slack write access via MCP server (code agents) or built-in connectors (claude.ai). Hard-fails preflight if either is missing. |
+| `agent-browser` | Browser automation CLI for AI agents (Chrome/Chromium via CDP). | "open a website", "fill out a form", "take a screenshot", "scrape data from a page", "test this web app" | npm/cargo/brew install. Overlaps with `browser-use`; see precedence note below. |
+| `brainstorming` | Explore user intent, requirements, and design before implementation. | Before any creative work — creating features, building components, adding functionality | Must-use before implementation. |
+| `browser-use` | Browser automation via `browser-use` CLI with persistent sessions. | "navigate websites", "interact with web pages", "fill forms", "take screenshots", "extract information" | Python-based. Overlaps with `agent-browser`; see precedence note below. |
+| `caveman` | Ultra-compressed communication mode (~75% token savings). | "caveman mode", "talk like caveman", "less tokens", "be brief" | Supports intensity levels: lite, full, ultra, wenyan variants. |
+| `caveman-commit` | Ultra-compressed conventional commit messages. | "write a commit", "commit message", "/commit" | Subject ≤50 chars, body only when "why" isn't obvious. |
+| `caveman-review` | Ultra-compressed code review comments. | "review this PR", "code review", "/review" | One line per finding: location, problem, fix. |
+| `codebase-cleanup` | Multi-pass refactor sweep as 8 specialist subagents. | "clean up the codebase", "tech-debt pass", "find dead code", "remove AI slop" | No scripts — pure prompt library. See `reference/pass-ordering.md`. |
+| `coding-standards` | Universal coding standards for TS/JS/React/Node. | Any code authoring or review task | Broad reference; `vercel-react-best-practices` is more specific for React perf. |
+| `compress` | Compress natural-language memory files into caveman format. | "/caveman:compress <filepath>", "compress memory file" | Saves backup as FILE.original.md. |
+| `continuous-learning` | Runtime policy: extract reusable patterns from sessions into learned skills. | OpenCode Stop hook (automatic) | **Client/runtime policy doc** — not an ordinary task skill. See note below. |
+| `dispatching-parallel-agents` | Delegate 2+ independent tasks to isolated subagents. | "do these in parallel", multiple independent tasks | See also `subagent-driven-development` for plan-driven dispatch. |
+| `dm-skill-creator` | Create new team-wide skills in this repo following its conventions. | "add a skill", "create a darkmatter skill", "promote this into a shared skill" | Ships `scripts/scaffold-skill.sh`. Test via `darwin-rebuild`. |
+| `end-of-turn-review` | GPT-5.5 second-opinion pass over diffs or plans. | End-of-turn (Stop hook), "review what you just did", "critique this plan" | Calls LiteLLM. `REVIEW_MODEL` env var overrides model. |
+| `effect-typescript` | Use Effect deliberately in TypeScript/Bun projects, with services, Layers, typed errors, testing, and Alchemy deployment conventions. | "use Effect", "write Effect code", "Effect service", "Layer", "Schema", "Alchemy deployment" | Pure prompt reference. Adapts upstream Effect guidance to Bun over pnpm and Alchemy-first deploys. |
+| `executing-plans` | Execute a written implementation plan with review checkpoints. | When handed a plan to implement | Redirects to `subagent-driven-development` if subagents are available. |
+| `find-skills` | Discover and install agent skills from the open ecosystem. | "how do I do X", "find a skill for X", "is there a skill that can..." | |
+| `finishing-a-development-branch` | Guide completion of dev work: merge, PR, or cleanup options. | Implementation complete, all tests pass | |
+| `frontend-design` | Create distinctive, production-grade frontend interfaces. | Build web components, pages, dashboards, React components, HTML/CSS layouts | Overlaps with `ui-ux-pro-max`; see precedence note below. |
+| `hl-funding-analysis` | Analyze Hyperliquid perp funding rates for carry-trade opportunities. | "find me funding harvest opportunities", "what's paying funding on HL" | Python 3, no external deps. Caches to `/tmp/hl_*`. |
+| `kickoff-dm-design` | Inverted-flow design-room kickoff: Linear ticket + Slack post from a Claude Design URL. | `/kickoff-dm-design <url>`, "kick off a design room" | Manual-invocation only. Requires Linear + Slack access. |
+| `neon-postgres` | Guides and best practices for Neon Serverless Postgres. | Any Neon-related question | |
+| `nix-flake-organization` | Organize Nix flake repos into thin `flake/` public layer with `src/` implementation. | "organize flake outputs", "thin flake modules" | |
+| `receiving-code-review` | Evaluate code review feedback with technical rigor before implementing. | When receiving review feedback | Don't blindly implement — verify first. |
+| `requesting-code-review` | Dispatch code-reviewer subagent before merging. | After completing tasks or major features | |
+| `strategic-compact` | Make auto-compaction safe for autonomous multi-phase work. | OpenCode sessions with auto-compaction enabled | **Client/runtime policy doc** — not an ordinary task skill. |
+| `subagent-driven-development` | Execute plan tasks via dispatched subagents with two-stage review. | Executing implementation plans with independent tasks | Prefer over `executing-plans` when subagents are available. |
+| `systematic-debugging` | Structured approach to bugs, test failures, and unexpected behavior. | Any bug, test failure, or unexpected behavior | Before proposing fixes. |
+| `tdd-workflow` | Legacy TDD skill — redirects to `test-driven-development`. | Writing features, fixing bugs, refactoring | **Deprecated** — use `test-driven-development` instead. |
+| `test-driven-development` | TDD discipline: write test first, watch it fail, minimal code to pass. | Implementing any feature or bugfix, before writing implementation code | |
+| `ui-ux-pro-max` | Comprehensive UI/UX design intelligence: 50+ styles, 161 palettes, 57 font pairings, 99 UX guidelines across 10 stacks. | Design, build, review, or improve UI/UX code | Overlaps with `frontend-design`; see precedence note below. |
+| `using-superpowers` | Runtime policy: establish skill discovery and invocation protocol at conversation start. | Start of any conversation (automatic) | **Client/runtime policy doc** — not an ordinary task skill. See note below. |
+| `verification-before-completion` | Run verification commands and confirm output before claiming work is done. | About to claim work is complete, fixed, or passing | Evidence before assertions. |
+| `vercel-react-best-practices` | React/Next.js performance optimization guidelines from Vercel Engineering. | Writing, reviewing, or refactoring React/Next.js code | More specific than `coding-standards` for React perf. |
+| `writing-plans` | Write comprehensive implementation plans before touching code. | Have a spec or requirements for a multi-step task | |
+| `writing-skills` | TDD applied to process documentation — create, edit, or verify skills. | Creating, editing, or verifying skills before deployment | |
+
+## Overlap & precedence notes
+
+### `tdd-workflow` → `test-driven-development`
+`tdd-workflow` is a legacy entry. Use `test-driven-development` for all new work. `tdd-workflow` is retained for backward compatibility with a redirect note in its description and body.
+
+### `browser-use` vs `agent-browser`
+Both provide browser automation. `browser-use` uses a Python CLI with persistent sessions; `agent-browser` uses Chrome/Chromium via CDP directly. Prefer `browser-use` for Python-centric workflows and `agent-browser` for Node.js/rust-centric workflows or when direct CDP control is needed.
+
+### `frontend-design` vs `ui-ux-pro-max` vs `vercel-react-best-practices`
+- **`frontend-design`**: Use when the primary goal is *visual design quality* — distinctive aesthetics, avoiding generic AI look.
+- **`ui-ux-pro-max`**: Use when the primary goal is *design system intelligence* — structured style/palette/font/guideline selection across stacks.
+- **`vercel-react-best-practices`**: Use when the primary goal is *React/Next.js performance* — bundle size, waterfalls, re-renders.
+- When both design and performance matter, apply `frontend-design` or `ui-ux-pro-max` first, then `vercel-react-best-practices` as a review pass.
+
+### `coding-standards` vs `vercel-react-best-practices`
+`coding-standards` covers universal TS/JS/React/Node patterns. `vercel-react-best-practices` is a deeper, React/Next-specific performance supplement. Apply `coding-standards` broadly; layer `vercel-react-best-practices` for React perf work.
+
+### `coding-standards` vs `effect-typescript`
+`coding-standards` covers general TypeScript quality. `effect-typescript` is the deeper supplement for projects already using Effect or features where Effect's typed errors, Layers, resources, retries, tests, and Alchemy deployment conventions matter.
+
+## Client/runtime policy docs
+
+`using-superpowers` and `continuous-learning` are **not ordinary task skills** that implement hooks or produce artifacts themselves. They are **runtime policy documents** consumed by the agent client (e.g., OpenCode, Claude Code) to configure session behavior:
+
+- **`using-superpowers`**: Instructs the agent runtime to always check for and invoke relevant skills before responding. It is a *dispatch policy*, not a task implementation.
+- **`continuous-learning`**: Instructs the agent runtime to extract reusable patterns at session end. It is a *learning policy*, not a task implementation.
+
+`strategic-compact` similarly configures auto-compaction behavior for long autonomous sessions.
 
 ## How to add an entry
 
@@ -17,4 +75,5 @@ When you add a skill at `skills/<name>/`:
 
 1. Pick a one-line description that overlaps with `SKILL.md` frontmatter `description` but is human-skim-friendly.
 2. Add a row to the table above.
-3. If the skill ships scripts that depend on environment (Python, Node, particular CLIs), note that in a "Notes" column or in a footnote.
+3. If the skill overlaps with an existing one, add a precedence note in the section above.
+4. If the skill ships scripts that depend on environment (Python, Node, particular CLIs), note that in a "Notes" column or in a footnote.

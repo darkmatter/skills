@@ -2,10 +2,10 @@
 
 This shows two CI examples:
 
-1. Validation for the `darkmatter/agents` infrastructure repo.
+1. Validation for the `darkmatter/skills` infrastructure repo.
 2. Validation stamped into downstream project repos.
 
-## `darkmatter/agents` repo workflow
+## `darkmatter/skills` repo workflow
 
 Path: `.github/workflows/validate.yml`
 

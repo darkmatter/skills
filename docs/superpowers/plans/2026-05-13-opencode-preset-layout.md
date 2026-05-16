@@ -103,7 +103,7 @@ Write:
 # Darkmatter Global Agent Preset
 
 This is the shared global instruction entrypoint installed from
-`darkmatter/agents/presets/base`.
+`darkmatter/skills/presets/base`.
 
 Project-specific instructions override this file. When working in a project,
 read that project's `AGENTS.md` first and treat this file as general background.

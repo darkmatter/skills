@@ -31,7 +31,7 @@ The source repo should map cleanly to these conventions while preserving the exi
 ## Recommended Layout
 
 ```text
-darkmatter/agents/
+darkmatter/skills/
 ├── README.md
 ├── flake.nix
 ├── home-manager.nix

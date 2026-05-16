@@ -9,7 +9,7 @@ This walks through stamping the `template/` into a fresh project repo and gettin
 
 ## Step 1 — stamp the template
 
-From inside `darkmatter/agents/`:
+From inside `darkmatter/skills/`:
 
 ```sh
 scripts/new-project.sh ~/git/darkmatter/<name> <name> "Short description"
@@ -67,7 +67,7 @@ Then add at least the first standing decisions to `.agent/context/decisions.md`.
 Edit `agent.yaml`:
 
 - `description`: short
-- `compliance.*`: the defaults are conservative and correct for most projects; tighten per project risk tier
+- `compliance.*`: advisory defaults; detailed controls live in `compliance/` — edit `compliance/risk-assessment.md` and `compliance/*.yaml` for project-specific risk tier and regulatory mappings
 
 Customize `RULES.md`, `DUTIES.md`, `SOUL.md` as needed. The defaults are sensible.
 
@@ -78,19 +78,19 @@ cd <target>
 ./scripts/regen-agent-shims.sh
 ```
 
-This rewrites `AGENTS.md`, `CLAUDE.md`, and `.cursorrules` from `agent.yaml` (for the project name) and the `.agent/` structure. Run it any time you significantly change `.agent/` content.
+This rewrites `AGENTS.md`, `CLAUDE.md`, and `.cursorrules` from `agent.yaml` (for the project name) and the `.agent/` structure. Run it any time you significantly change `.agent/` content. You do not need to run it immediately after stamping — the initial shims are already correct.
 
 ## Step 4 — initial commit
 
 ```sh
 git init
 git add .
-git commit -m "bootstrap agent config from darkmatter/agents"
+git commit -m "bootstrap agent config from darkmatter/skills"
 ```
 
 ## Step 5 — wire team-wide skills
 
-If you don't already have the `darkmatter/agents` Nix module wired into your home configuration, see the README at the root of this repo. Once it is, every team-wide skill in `skills/` is auto-installed for the agent CLIs you use, in every project.
+If you don't already have the `darkmatter/skills` Nix module wired into your home configuration, see the README at the root of this repo. Once it is, every team-wide skill in `skills/` is auto-installed for the agent CLIs you use, in every project.
 
 ## Updating after the template changes
 
