@@ -7,6 +7,10 @@ on:
         description: OpenCode model to use for pull request reviews.
         type: string
         default: openrouter/google/gemini-3.1-pro-preview-customtools
+      opencode_version:
+        description: OpenCode npm package version to run. Pinned to avoid the 1.15.1 InstanceRef regression.
+        type: string
+        default: 1.15.0
       runner:
         description: Runner label for the OpenCode review job.
         type: string
@@ -116,13 +120,12 @@ jobs:
           } >> "$GITHUB_OUTPUT"
 
       - name: Run opencode review
-        uses: anomalyco/opencode/github@latest
         env:
           OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
           GITHUB_TOKEN: ${{ steps.caller-token.outputs.token || github.token }}
-        with:
-          model: ${{ inputs.model }}
-          use_github_token: true
-          share: true
-          prompt: ${{ steps.prompt.outputs.prompt }}
+          MODEL: ${{ inputs.model }}
+          PROMPT: ${{ steps.prompt.outputs.prompt }}
+          USE_GITHUB_TOKEN: "true"
+          SHARE: "true"
+        run: npx -y opencode-ai@${{ inputs.opencode_version }} github run
