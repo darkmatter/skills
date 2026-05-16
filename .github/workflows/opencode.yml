@@ -43,7 +43,7 @@ jobs:
       startsWith(github.event.comment.body, '/oc') ||
       contains(github.event.comment.body, ' /opencode') ||
       startsWith(github.event.comment.body, '/opencode')
-    runs-on: ${{ inputs.runner || 'ubuntu-latest' }}
+    runs-on: ${{ inputs.runner }}
     permissions:
       id-token: write
       contents: write
@@ -58,8 +58,8 @@ jobs:
       - name: Checkout shared Darkmatter agent presets
         uses: actions/checkout@v6
         with:
-          repository: ${{ inputs.agents_repository || 'darkmatter/skills' }}
-          ref: ${{ inputs.agents_ref || 'main' }}
+          repository: ${{ inputs.agents_repository }}
+          ref: ${{ inputs.agents_ref }}
           path: .darkmatter-agents
           persist-credentials: false
           token: ${{ secrets.AGENTS_REPO_TOKEN || github.token }}
@@ -71,7 +71,7 @@ jobs:
         id: prompt
         env:
           PROMPT_INPUT: ${{ inputs.prompt }}
-          PROMPT_FILE: ${{ inputs.prompt_file || '.github/prompts/opencode.md' }}
+          PROMPT_FILE: ${{ inputs.prompt_file }}
         run: |
           {
             echo 'prompt<<__OPENCODE_PROMPT__'
@@ -90,6 +90,6 @@ jobs:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
           GITHUB_TOKEN: ${{ github.token }}
         with:
-          model: ${{ inputs.model || 'openrouter/google/gemini-3.1-pro-preview-customtools' }}
+          model: ${{ inputs.model }}
           use_github_token: true
           prompt: ${{ steps.prompt.outputs.prompt }}
