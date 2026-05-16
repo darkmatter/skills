@@ -123,6 +123,9 @@ jobs:
             echo '__OPENCODE_PROMPT__'
           } >> "$GITHUB_OUTPUT"
 
+      - name: Remove shared agents checkout from caller worktree
+        run: rm -rf .darkmatter-agents
+
       - name: Configure caller repository git auth
         env:
           GITHUB_TOKEN: ${{ steps.caller-token.outputs.token || github.token }}
