@@ -7,6 +7,8 @@ metadata:
   version: "1.0.0"
 ---
 
+> **Precedence:** Use this skill when the primary goal is *React/Next.js performance*. For visual design, use `frontend-design` or `ui-ux-pro-max`. For universal coding standards, use `coding-standards`.
+
 # Vercel React Best Practices
 
 Comprehensive performance optimization guide for React and Next.js applications, maintained by Vercel. Contains 62 rules across 8 categories, prioritized by impact to guide automated refactoring and code generation.

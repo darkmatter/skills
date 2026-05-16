@@ -1,11 +1,11 @@
 ---
 name: dm-skill-creator
-description: Create new team-wide skills inside the darkmatter/agents repo following its conventions (skills/<name>/SKILL.md, no external deps, self-contained, validated by scripts/validate-skill.sh, registered in docs/catalog.md, distributed via the flake's home-manager module). Triggers when the user asks to "add a skill", "create a skill", "promote this into a skill", "make a darkmatter skill", or wants to generalize a workflow used across multiple darkmatter projects into the shared catalog. Also triggers when editing or refactoring an existing skill in this repo. Do NOT trigger for personal/project-local skills (those live elsewhere) or for skills outside the darkmatter/agents catalog.
+description: Create new team-wide skills inside the darkmatter/skills repo following its conventions (skills/<name>/SKILL.md, no external deps, self-contained, validated by scripts/validate-skill.sh, registered in docs/catalog.md, distributed via the flake's home-manager module). Triggers when the user asks to "add a skill", "create a skill", "promote this into a skill", "make a darkmatter skill", or wants to generalize a workflow used across multiple darkmatter projects into the shared catalog. Also triggers when editing or refactoring an existing skill in this repo. Do NOT trigger for personal/project-local skills (those live elsewhere) or for skills outside the darkmatter/skills catalog.
 ---
 
 # Darkmatter skill creator
 
-Create skills that ship in `darkmatter/agents/skills/` and are auto-installed via the repo's Nix Home Manager module. This skill encodes the conventions specific to *this* repo — directory layout, frontmatter, validator, catalog row, and how to test the change end-to-end through `~/darwin`.
+Create skills that ship in `darkmatter/skills/skills/` and are auto-installed via the repo's Nix Home Manager module. This skill encodes the conventions specific to _this_ repo — directory layout, frontmatter, validator, catalog row, and how to test the change end-to-end through `~/darwin`.
 
 If the user is creating a skill that isn't intended to be shared across multiple darkmatter projects, redirect them: project-local skills go in `<project>/.agent/skills/`, personal skills go in their gitignored `personal/skills/`. This skill is only for the team-wide catalog.
 
@@ -30,18 +30,17 @@ These come from `skills/README.md` and `scripts/validate-skill.sh`. Following th
 
 1. **Layout.** Each skill is a directory at `skills/<name>/` containing a `SKILL.md` at its root. Optional `scripts/` (runnable code) and `reference/` (extra docs loaded on demand). Use `reference/` singular — that's the documented form.
 
-2. **Frontmatter.** `SKILL.md` must start with a YAML block declaring `name` and `description`. The validator only checks these two fields, but a good description carries its weight: it's the only thing an agent sees when deciding whether to load the skill, so include both *what the skill does* and *concrete trigger phrases / contexts for when to use it*. The first ~200 characters matter most.
+2. **Frontmatter.** `SKILL.md` must start with a YAML block declaring `name` and `description`. The validator only checks these two fields, but a good description carries its weight: it's the only thing an agent sees when deciding whether to load the skill, so include both _what the skill does_ and _concrete trigger phrases / contexts for when to use it_. The first ~200 characters matter most.
 
 3. **Naming.** Lowercase, hyphenated. Directory name must equal the `name:` field. Don't prefix with the domain (`funding-screener`, not `hl-funding-screener`) unless the venue is genuinely load-bearing — `hl-funding-analysis` and `kickoff-dm-design` qualify because they only make sense in those contexts.
 
    The name's grammar also signals how the skill expects to be triggered (see ADR-0001):
-
    - **Auto-triggered skills** are noun phrases describing a domain or capability — `<domain>-<aspect>` or compound nouns. The skill reads as a thing the agent consults. Examples: `hl-funding-analysis`, `codebase-cleanup`, `end-of-turn-review`.
    - **Manual-invocation skills** start with an imperative verb prefix from a fixed set: `run-`, `kickoff-`, `setup-`, `init-`, or `do-` as a generic fallback. The verb makes the name read as a command, only sensible at invocation time. Examples: `kickoff-dm-design`, `run-funding-screen`, `setup-vault`.
 
    A skill is manual when its action is expensive, irreversible, has side effects on shared resources (Linear tickets, Slack posts, vault mutations), or drives a multi-step user-facing workflow with check-ins. Otherwise default to auto.
 
-4. **No external deps.** A user must be able to consume this skill solely by adding `darkmatter/agents` as a flake input. That means: don't require `pip install` of anything outside the standard library, don't require a particular CLI tool that isn't already on a teammate's machine, don't reach for secrets that aren't reachable through `.sops.yaml`. If a script needs Python, only use the stdlib. If it needs a CLI tool, document it conspicuously and prefer something already common (jq, curl, git).
+4. **No external deps.** A user must be able to consume this skill solely by adding `darkmatter/skills` as a flake input. That means: don't require `pip install` of anything outside the standard library, don't require a particular CLI tool that isn't already on a teammate's machine, don't reach for secrets that aren't reachable through `.sops.yaml`. If a script needs Python, only use the stdlib. If it needs a CLI tool, document it conspicuously and prefer something already common (jq, curl, git).
 
 5. **Secrets.** Assume the consumer is a recipient in `.sops.yaml`. Fetch via the project's existing sops setup; don't bake credentials into the skill or expect env vars without documenting how they're populated.
 
@@ -73,13 +72,14 @@ This creates `skills/<name>/SKILL.md` with the frontmatter pre-filled and `scrip
 
 ### 3. Write SKILL.md
 
-Fill in these sections. Use the imperative form. Explain the *why* behind instructions rather than piling on `MUST`s — modern models reason better when they understand what's load-bearing and what's a guideline.
+Fill in these sections. Use the imperative form. Explain the _why_ behind instructions rather than piling on `MUST`s — modern models reason better when they understand what's load-bearing and what's a guideline.
 
-- **Frontmatter `description`** — for an auto-triggered skill, combine "what it does" with "when it triggers". A pushy description (`Triggers when the user asks…`, `Also triggers for…`) helps because the default failure mode for auto skills is *under*-triggering, not over-triggering. Include explicit *do not trigger* clauses for adjacent things that aren't a fit. For a **manual-invocation skill** (verb-prefixed name), open the description with this exact line so the agent knows not to auto-fire:
+- **Frontmatter `description`** — for an auto-triggered skill, combine "what it does" with "when it triggers". A pushy description (`Triggers when the user asks…`, `Also triggers for…`) helps because the default failure mode for auto skills is _under_-triggering, not over-triggering. Include explicit _do not trigger_ clauses for adjacent things that aren't a fit. For a **manual-invocation skill** (verb-prefixed name), open the description with this exact line so the agent knows not to auto-fire:
 
   > `Manual-invocation skill — run only when the user explicitly asks for "<name>" or invokes it as a slash command. Do not auto-trigger on adjacent topics.`
 
   Then describe what the skill does. The verb-prefix in the name plus this opening line together make under-triggering the safe default for these. See ADR-0001 in `docs/adr/` for the full rationale.
+
 - **When to use** — concrete trigger phrases and situations.
 - **When NOT to use** — adjacent-but-different cases that would naively look like fits.
 - **Tools** — for each script the skill ships, document its purpose, usage, key flags, and any env vars or external deps.
@@ -119,10 +119,10 @@ The skill only matters if it actually flows through the flake to consumer machin
 cd ~/darwin
 darwin-rebuild switch \
   --flake .#$(hostname -s) \
-  --override-input darkmatter/darkmatter-agents path:/Users/cm/git/darkmatter/agents
+  --override-input darkmatter/darkmatter-skills path:/Users/cm/git/darkmatter/skills
 ```
 
-Why the slash-syntax: `darkmatter-agents` is a *nested* input — it's an input of the `darkmatter` flake, not a top-level input of `~/darwin`. The slash form (`darkmatter/darkmatter-agents`) addresses the nested input. Without the override, Nix would try to fetch the pinned GitHub revision and would not see the local change.
+Why the slash-syntax: `darkmatter-skills` is a _nested_ input — it's an input of the `darkmatter` flake, not a top-level input of `~/darwin`. The slash form (`darkmatter/darkmatter-skills`) addresses the nested input. Without the override, Nix would try to fetch the pinned GitHub revision and would not see the local change.
 
 If the rebuild succeeds, the new skill is live for the user in every CLI surface the home-manager module wires up (Claude, Codex, agents).
 
@@ -130,7 +130,7 @@ If the rebuild fails, the most common causes are:
 
 - Validator-level errors that slipped through (bad frontmatter, name mismatch) — re-run `scripts/validate-skill.sh`.
 - A reference to a path outside `skills/<name>/` — fix and retry.
-- The agents flake's own `flake.nix` doesn't compile — `cd /Users/cm/git/darkmatter/agents && nix flake check` to localize.
+- The skills flake's own `flake.nix` doesn't compile — `cd /Users/cm/git/darkmatter/skills && nix flake check` to localize.
 
 ### 8. Commit and push
 
@@ -138,10 +138,10 @@ Once the rebuild is clean, commit the skill so the next teammate's `darwin-rebui
 
 ```bash
 GIT_SSH_COMMAND='ssh -i ~/.ssh/id_ed25519 -o IdentitiesOnly=yes' \
-  git -C /Users/cm/git/darkmatter/agents commit -am "Add <name> skill"
+  git -C /Users/cm/git/darkmatter/skills commit -am "Add <name> skill"
 
 GIT_SSH_COMMAND='ssh -i ~/.ssh/id_ed25519 -o IdentitiesOnly=yes' \
-  git -C /Users/cm/git/darkmatter/agents push
+  git -C /Users/cm/git/darkmatter/skills push
 ```
 
 Substitute `id_ed25519` for whichever key is actually present in `~/.ssh/`. Don't commit on the user's behalf without confirmation — that's their call.
@@ -149,7 +149,7 @@ Substitute `id_ed25519` for whichever key is actually present in `~/.ssh/`. Don'
 ## Writing style
 
 - Imperative form for instructions ("Run the validator before opening a PR"), not "you should run the validator".
-- Explain *why* rather than barking `ALWAYS` and `NEVER` in caps. The model reads tone — if the prompt sounds anxious, it gets anxious. Reserve emphatic forms for things that genuinely break if violated (validator-level checks, security boundaries).
+- Explain _why_ rather than barking `ALWAYS` and `NEVER` in caps. The model reads tone — if the prompt sounds anxious, it gets anxious. Reserve emphatic forms for things that genuinely break if violated (validator-level checks, security boundaries).
 - Show, don't restate. If a script's `--help` output is informative, lean on that and link to it; don't recapitulate every flag in `SKILL.md`.
 - Concrete examples beat abstract rules. A worked example of "what triggers this skill" reads cleaner than three paragraphs of policy.
 

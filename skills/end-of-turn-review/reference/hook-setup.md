@@ -20,7 +20,7 @@ Below: snippets for the most common agent runtimes and a few non-agent fallbacks
         "hooks": [
           {
             "type": "command",
-            "command": "/Users/cm/git/darkmatter/agents/skills/end-of-turn-review/scripts/diff-review-hook.sh"
+            "command": "/Users/cm/git/darkmatter/skills/skills/end-of-turn-review/scripts/diff-review-hook.sh"
           }
         ]
       }
@@ -39,7 +39,7 @@ The `Stop` event fires when the assistant finishes a turn. Stdout from the hook 
 {
   "hooks": {
     "session.idle": {
-      "command": ["/Users/cm/git/darkmatter/agents/skills/end-of-turn-review/scripts/diff-review-hook.sh"]
+      "command": ["/Users/cm/git/darkmatter/skills/skills/end-of-turn-review/scripts/diff-review-hook.sh"]
     }
   }
 }
@@ -54,7 +54,7 @@ Cursor's `afterTurn` hook in `.cursor/hooks.json` (workspace-level) or via the d
 ```json
 {
   "afterTurn": {
-    "command": "/Users/cm/git/darkmatter/agents/skills/end-of-turn-review/scripts/diff-review-hook.sh"
+    "command": "/Users/cm/git/darkmatter/skills/skills/end-of-turn-review/scripts/diff-review-hook.sh"
   }
 }
 ```

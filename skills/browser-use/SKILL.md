@@ -1,8 +1,10 @@
 ---
 name: browser-use
 description: Automates browser interactions for web testing, form filling, screenshots, and data extraction. Use when the user needs to navigate websites, interact with web pages, fill forms, take screenshots, or extract information from web pages.
-allowed-tools: Bash(browser-use:*)
 ---
+
+> **Note:** This skill overlaps with `agent-browser`. Prefer `browser-use` for Python-centric workflows; prefer `agent-browser` for Node.js/rust-centric workflows or when direct CDP control is needed.
+> Tool access belongs in the agent client's permission config; this skill documents workflow only.
 
 # Browser Automation with browser-use CLI
 

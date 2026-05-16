@@ -1,8 +1,10 @@
 ---
 name: agent-browser
 description: Browser automation CLI for AI agents. Use when the user needs to interact with websites, including navigating pages, filling forms, clicking buttons, taking screenshots, extracting data, testing web apps, or automating any browser task. Triggers include requests to "open a website", "fill out a form", "click a button", "take a screenshot", "scrape data from a page", "test this web app", "login to a site", "automate browser actions", or any task requiring programmatic web interaction.
-allowed-tools: Bash(npx agent-browser:*), Bash(agent-browser:*)
 ---
+
+> **Note:** This skill overlaps with `browser-use`. Prefer `agent-browser` for Node.js/rust-centric workflows or direct CDP control; prefer `browser-use` for Python-centric workflows.
+> Tool access belongs in the agent client's permission config; this skill documents workflow only.
 
 # Browser Automation with agent-browser
 

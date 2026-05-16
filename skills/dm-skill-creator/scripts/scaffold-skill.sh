@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Scaffold a new skill directory in darkmatter/agents/skills/.
+# Scaffold a new skill directory in darkmatter/skills/skills/.
 #
 # Usage:
 #   scripts/scaffold-skill.sh [--manual] <skill-name> "Short description"
@@ -128,4 +128,4 @@ echo "  3. $REPO_ROOT/scripts/validate-skill.sh $SKILL_DIR"
 echo "  4. add a row to $REPO_ROOT/docs/catalog.md"
 echo "  5. rebuild ~/darwin to test:"
 echo "     cd ~/darwin && darwin-rebuild switch --flake .#\$(hostname -s) \\"
-echo "       --override-input darkmatter/darkmatter-agents path:$REPO_ROOT"
+echo "       --override-input darkmatter/darkmatter-skills path:$REPO_ROOT"
