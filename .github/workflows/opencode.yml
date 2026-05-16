@@ -93,5 +93,6 @@ jobs:
           GITHUB_TOKEN: ${{ github.token }}
         with:
           model: ${{ inputs.model }}
+          use_github_token: true
           share: true
           prompt: ${{ steps.prompt.outputs.prompt }}
