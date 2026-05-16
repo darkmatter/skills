@@ -37,6 +37,10 @@ on:
         required: false
       GH_ACCESS_TOKEN:
         required: false
+      DARKMATTER_APP_ID:
+        required: false
+      DARKMATTER_APP_PRIVATE_KEY:
+        required: false
 
 jobs:
   review:
@@ -47,11 +51,41 @@ jobs:
       contents: read
       pull-requests: write
       issues: read
+    env:
+      DARKMATTER_APP_AUTH_ENABLED: ${{ secrets.DARKMATTER_APP_ID != '' && secrets.DARKMATTER_APP_PRIVATE_KEY != '' }}
     steps:
       - name: Checkout caller repository
         uses: actions/checkout@v6
         with:
           persist-credentials: false
+
+      - name: Resolve shared agents repository
+        id: agents-repository
+        env:
+          AGENTS_REPOSITORY: ${{ inputs.agents_repository }}
+        run: |
+          echo "owner=${AGENTS_REPOSITORY%%/*}" >> "$GITHUB_OUTPUT"
+          echo "repo=${AGENTS_REPOSITORY#*/}" >> "$GITHUB_OUTPUT"
+
+      - name: Mint shared agents repository token
+        id: agents-token
+        if: env.DARKMATTER_APP_AUTH_ENABLED == 'true'
+        uses: actions/create-github-app-token@v1
+        with:
+          app-id: ${{ secrets.DARKMATTER_APP_ID }}
+          private-key: ${{ secrets.DARKMATTER_APP_PRIVATE_KEY }}
+          owner: ${{ steps.agents-repository.outputs.owner }}
+          repositories: ${{ steps.agents-repository.outputs.repo }}
+
+      - name: Mint caller repository token
+        id: caller-token
+        if: env.DARKMATTER_APP_AUTH_ENABLED == 'true'
+        uses: actions/create-github-app-token@v1
+        with:
+          app-id: ${{ secrets.DARKMATTER_APP_ID }}
+          private-key: ${{ secrets.DARKMATTER_APP_PRIVATE_KEY }}
+          owner: ${{ github.repository_owner }}
+          repositories: ${{ github.event.repository.name }}
 
       - name: Checkout shared Darkmatter agent presets
         uses: actions/checkout@v6
@@ -60,7 +94,7 @@ jobs:
           ref: ${{ inputs.agents_ref }}
           path: .darkmatter-agents
           persist-credentials: false
-          token: ${{ secrets.AGENTS_REPO_TOKEN || secrets.GH_ACCESS_TOKEN || github.token }}
+          token: ${{ steps.agents-token.outputs.token || secrets.AGENTS_REPO_TOKEN || secrets.GH_ACCESS_TOKEN || github.token }}
 
       - name: Install shared OpenCode preset and skills
         run: ./.darkmatter-agents/scripts/install-opencode.sh --copy --target "${XDG_CONFIG_HOME:-$HOME/.config}/opencode"
@@ -86,7 +120,7 @@ jobs:
         env:
           OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
-          GITHUB_TOKEN: ${{ github.token }}
+          GITHUB_TOKEN: ${{ steps.caller-token.outputs.token || github.token }}
         with:
           model: ${{ inputs.model }}
           use_github_token: true
