@@ -1,0 +1,147 @@
+name: opencode
+
+on:
+  workflow_call:
+    inputs:
+      model:
+        description: OpenCode model to use.
+        type: string
+        default: openrouter/google/gemini-3.1-pro-preview-customtools
+      opencode_version:
+        description: OpenCode npm package version to run. Pinned to avoid the 1.15.1 InstanceRef regression.
+        type: string
+        default: 1.15.0
+      runner:
+        description: Runner label for the OpenCode job.
+        type: string
+        default: ubuntu-latest
+      agents_repository:
+        description: Repository containing the shared Darkmatter OpenCode preset and skills.
+        type: string
+        default: darkmatter/skills
+      agents_ref:
+        description: Git ref to checkout from the shared agents repository.
+        type: string
+        default: main
+      prompt:
+        description: Optional prompt override. Leave empty to use prompt_file from the shared agents repository.
+        type: string
+        default: ""
+      prompt_file:
+        description: Prompt file path inside the shared agents repository.
+        type: string
+        default: .github/prompts/opencode.md
+
+    secrets:
+      OPENROUTER_API_KEY:
+        required: false
+      ANTHROPIC_API_KEY:
+        required: false
+      AGENTS_REPO_TOKEN:
+        required: false
+      GH_ACCESS_TOKEN:
+        required: false
+      DARKMATTER_APP_ID:
+        required: false
+      DARKMATTER_APP_PRIVATE_KEY:
+        required: false
+
+jobs:
+  opencode:
+    if: |
+      contains(github.event.comment.body, ' /oc') ||
+      startsWith(github.event.comment.body, '/oc') ||
+      contains(github.event.comment.body, ' /opencode') ||
+      startsWith(github.event.comment.body, '/opencode')
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: write
+      pull-requests: write
+      issues: write
+    env:
+      DARKMATTER_APP_AUTH_ENABLED: ${{ secrets.DARKMATTER_APP_ID != '' && secrets.DARKMATTER_APP_PRIVATE_KEY != '' }}
+    steps:
+      - name: Checkout caller repository
+        uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+
+      - name: Resolve shared agents repository
+        id: agents-repository
+        env:
+          AGENTS_REPOSITORY: ${{ inputs.agents_repository }}
+        run: |
+          echo "owner=${AGENTS_REPOSITORY%%/*}" >> "$GITHUB_OUTPUT"
+          echo "repo=${AGENTS_REPOSITORY#*/}" >> "$GITHUB_OUTPUT"
+
+      - name: Mint shared agents repository token
+        id: agents-token
+        if: env.DARKMATTER_APP_AUTH_ENABLED == 'true'
+        uses: actions/create-github-app-token@v1
+        with:
+          app-id: ${{ secrets.DARKMATTER_APP_ID }}
+          private-key: ${{ secrets.DARKMATTER_APP_PRIVATE_KEY }}
+          owner: ${{ steps.agents-repository.outputs.owner }}
+          repositories: ${{ steps.agents-repository.outputs.repo }}
+
+      - name: Mint caller repository token
+        id: caller-token
+        if: env.DARKMATTER_APP_AUTH_ENABLED == 'true'
+        uses: actions/create-github-app-token@v1
+        with:
+          app-id: ${{ secrets.DARKMATTER_APP_ID }}
+          private-key: ${{ secrets.DARKMATTER_APP_PRIVATE_KEY }}
+          owner: ${{ github.repository_owner }}
+          repositories: ${{ github.event.repository.name }}
+
+      - name: Checkout shared Darkmatter agent presets
+        uses: actions/checkout@v6
+        with:
+          repository: ${{ inputs.agents_repository }}
+          ref: ${{ inputs.agents_ref }}
+          path: .darkmatter-agents
+          persist-credentials: false
+          token: ${{ steps.agents-token.outputs.token || secrets.AGENTS_REPO_TOKEN || secrets.GH_ACCESS_TOKEN || github.token }}
+
+      - name: Install shared OpenCode preset and skills
+        run: ./.darkmatter-agents/scripts/install-opencode.sh --copy --target "${XDG_CONFIG_HOME:-$HOME/.config}/opencode"
+
+      - name: Resolve OpenCode prompt
+        id: prompt
+        env:
+          PROMPT_INPUT: ${{ inputs.prompt }}
+          PROMPT_FILE: ${{ inputs.prompt_file }}
+        run: |
+          {
+            echo 'prompt<<__OPENCODE_PROMPT__'
+            if [ -n "$PROMPT_INPUT" ]; then
+              printf '%s\n' "$PROMPT_INPUT"
+            else
+              cat ".darkmatter-agents/$PROMPT_FILE"
+            fi
+            echo '__OPENCODE_PROMPT__'
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Remove shared agents checkout from caller worktree
+        run: rm -rf .darkmatter-agents
+
+      - name: Configure caller repository git auth
+        env:
+          GITHUB_TOKEN: ${{ steps.caller-token.outputs.token || github.token }}
+        run: |
+          auth_header="$(python3 -c 'import base64, os; print(base64.b64encode(("x-access-token:" + os.environ["GITHUB_TOKEN"]).encode()).decode())')"
+          git config --local http.https://github.com/.extraheader "AUTHORIZATION: basic ${auth_header}"
+          git config --global user.name "opencode-agent[bot]"
+          git config --global user.email "opencode-agent[bot]@users.noreply.github.com"
+
+      - name: Run opencode
+        env:
+          OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          GITHUB_TOKEN: ${{ steps.caller-token.outputs.token || github.token }}
+          MODEL: ${{ inputs.model }}
+          PROMPT: ${{ steps.prompt.outputs.prompt }}
+          USE_GITHUB_TOKEN: "true"
+          SHARE: "true"
+        run: npx -y opencode-ai@${{ inputs.opencode_version }} github run

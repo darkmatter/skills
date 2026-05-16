@@ -1,6 +1,6 @@
 # Skill creation checklist
 
-End-to-end walkthrough for adding a skill to `darkmatter/agents`. Load this when the user wants a step-by-step pass without leaving anything out.
+End-to-end walkthrough for adding a skill to `darkmatter/skills`. Load this when the user wants a step-by-step pass without leaving anything out.
 
 ## 0. Decide the scope is right
 
@@ -86,10 +86,10 @@ The catalog is human-skim. If the skill needs Python 3, document it. If it cache
 cd ~/darwin
 darwin-rebuild switch \
   --flake .#$(hostname -s) \
-  --override-input darkmatter/darkmatter-agents path:/Users/cm/git/darkmatter/agents
+  --override-input darkmatter/darkmatter-skills path:/Users/cm/git/darkmatter/skills
 ```
 
-Why the slash: `darkmatter-agents` is nested inside the `darkmatter` flake input — it's not a top-level input of `~/darwin`'s flake. The `darkmatter/darkmatter-agents` form addresses the nested input.
+Why the slash: `darkmatter-skills` is nested inside the `darkmatter` flake input — it's not a top-level input of `~/darwin`'s flake. The `darkmatter/darkmatter-skills` form addresses the nested input.
 
 If the rebuild succeeds, the skill is live in every CLI surface (Claude, Codex, agents) on the user's machine.
 
@@ -99,10 +99,10 @@ The user prefers explicit SSH key selection to avoid the 1Password prompt that h
 
 ```bash
 GIT_SSH_COMMAND='ssh -i ~/.ssh/id_ed25519 -o IdentitiesOnly=yes' \
-  git -C /Users/cm/git/darkmatter/agents commit -am "Add <name> skill"
+  git -C /Users/cm/git/darkmatter/skills commit -am "Add <name> skill"
 
 GIT_SSH_COMMAND='ssh -i ~/.ssh/id_ed25519 -o IdentitiesOnly=yes' \
-  git -C /Users/cm/git/darkmatter/agents push
+  git -C /Users/cm/git/darkmatter/skills push
 ```
 
 Use whichever key is actually present in `~/.ssh/` — `id_ed25519` is the common one but `ls ~/.ssh/` will confirm.
@@ -115,4 +115,4 @@ Don't commit or push without explicit user confirmation.
 - **Directory name doesn't match `name:`.** Validator emits a `WARN`. Fix it — the home-manager module relies on the directory name.
 - **Script not executable.** `chmod +x scripts/<file>.sh`.
 - **Skill works locally but not after rebuild.** Almost always: a path reference outside `skills/<name>/`, or an external dep that isn't on the consumer machine. Treat the consumer machine as one with only what the flake supplies.
-- **`darwin-rebuild` says input not found.** Double-check the slash form (`darkmatter/darkmatter-agents`, not `darkmatter-agents`). Inspect `~/darwin/flake.nix` to confirm the nesting.
+- **`darwin-rebuild` says input not found.** Double-check the slash form (`darkmatter/darkmatter-skills`, not `darkmatter-skills`). Inspect `~/darwin/flake.nix` to confirm the nesting.

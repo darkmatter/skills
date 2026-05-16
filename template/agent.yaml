@@ -4,6 +4,11 @@ version: 0.1.0
 description: "{{project_description}}"
 author: "darkmatter"
 license: proprietary
+# Advisory / example fields below.
+# No runtime in the darkmatter/skills ecosystem currently reads these.
+# They are kept as structured defaults for projects that want a central
+# place to record model and compliance preferences.  If your project
+# doesn't need them, trim freely.
 model:
   preferred: claude-opus-4-6
   fallback:
@@ -18,6 +23,9 @@ delegation:
 runtime:
   max_turns: 50
   timeout: 300
+# Compliance defaults — mirror the detailed templates in compliance/.
+# Prefer editing compliance/risk-assessment.md and compliance/*.yaml
+# for project-specific controls; the fields below are a summary only.
 compliance:
   risk_tier: standard
   frameworks: []

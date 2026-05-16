@@ -1,3 +1,10 @@
+# Hook definitions for {{project}}.
+#
+# NOTE: This is template/example scaffolding. No agent runtime in the
+# darkmatter/skills ecosystem currently consumes hooks.yaml. Script paths
+# are relative to this file's directory (i.e. hooks/scripts/ from the
+# project root). Adapt or remove hooks to match your agent client's
+# hook mechanism.
 hooks:
   on_session_start:
     - script: scripts/on-start.sh

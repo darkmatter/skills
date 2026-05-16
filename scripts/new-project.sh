@@ -16,7 +16,7 @@
 # After stamping:
 #   1. Edit .agent/context/overview.md to describe the project
 #   2. Run ./scripts/regen-agent-shims.sh inside the target repo
-#   3. git init && git add . && git commit -m "bootstrap agent config from darkmatter/agents"
+#   3. git init && git add . && git commit -m "bootstrap agent config from darkmatter/skills"
 
 set -euo pipefail
 
@@ -107,5 +107,5 @@ echo
 echo "next steps:"
 echo "  1. cd $TARGET_ABS"
 echo "  2. edit .agent/context/overview.md"
-echo "  3. ./scripts/regen-agent-shims.sh"
+echo "  3. ./scripts/regen-agent-shims.sh   # only needed if you edited .agent/ content; initial shims are already correct"
 echo "  4. git init && git add . && git commit -m 'bootstrap agent config'"

@@ -1,4 +1,4 @@
-# darkmatter/agents — agent entry point
+# darkmatter/skills — agent entry point
 
 This repo is **infrastructure for other agent projects**, not an agent project itself. There is no `.agent/` directory here, no `agent.yaml`, no project-state to read.
 
@@ -10,7 +10,7 @@ What lives here:
 - `scripts/validate-skill.sh` — sanity-check the skills catalog
 - `docs/` — catalog overview and bootstrap walkthrough
 
-If you're an agent reading this because you were pointed at the darkmatter agents repo:
+If you're an agent reading this because you were pointed at the darkmatter skills repo:
 
 - For "add a skill to the team catalog" → see `skills/README.md` and validate with `scripts/validate-skill.sh`
 - For "bootstrap a new project" → see `docs/new-project-guide.md` and use `scripts/new-project.sh`

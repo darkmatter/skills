@@ -6,7 +6,7 @@ Skills here are shared across all darkmatter projects via the Nix Home Manager m
 
 | Where | Scope |
 |---|---|
-| `darkmatter/agents/skills/` (here) | Useful across multiple darkmatter projects |
+| `darkmatter/skills/skills/` (here) | Useful across multiple darkmatter projects |
 | `<project>/.agent/skills/` | Only relevant inside one project |
 | `personal/skills/` (gitignored / private repo) | Only useful to one teammate |
 

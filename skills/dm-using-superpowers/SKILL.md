@@ -1,7 +1,9 @@
 ---
 name: dm-using-superpowers
-description: Use when starting any conversation - establishes how to find and use skills, requiring Skill tool invocation before ANY response including clarifying questions
+description: Runtime dispatch policy — establishes how to find and invoke skills before any response. Not an ordinary task skill; consumed by the agent client at session start.
 ---
+
+> **This is a runtime policy document**, not an ordinary task skill. It configures the agent's dispatch behavior at conversation start. The agent client (OpenCode, Claude Code, etc.) loads this to enforce skill-check-before-respond discipline. It does not implement hooks itself — it *prescribes* the hook behavior the client must follow.
 
 <SUBAGENT-STOP>
 If you were dispatched as a subagent to execute a specific task, skip this skill.

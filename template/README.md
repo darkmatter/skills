@@ -1,6 +1,6 @@
 # {{project}} — agent configuration
 
-This is the agent-facing configuration for **{{project}}**, stamped from the `darkmatter/agents` template via `scripts/new-project.sh`.
+This is the agent-facing configuration for **{{project}}**, stamped from the `darkmatter/skills` template via `scripts/new-project.sh`.
 
 ## What's here
 
@@ -32,7 +32,7 @@ The script reads `agent.yaml` for the project name and rewrites `AGENTS.md`, `CL
 
 ## Team-wide skills
 
-Skills shared across darkmatter projects are pulled in via the Nix Home Manager module exported by `darkmatter/agents`. Project-local skills live in `.agent/skills/`.
+Skills shared across darkmatter projects are pulled in via the Nix Home Manager module exported by `darkmatter/skills`. Project-local skills live in `.agent/skills/`.
 
 ## Where to start (for humans)
 

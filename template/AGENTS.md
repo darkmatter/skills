@@ -12,7 +12,7 @@ This file is a shim. Canonical agent context lives in `.agent/`. Read these file
 
 Then read the project-level config:
 
-- `agent.yaml` — runtime + compliance configuration
+- `agent.yaml` — project identity + advisory compliance defaults (detailed controls live in `compliance/`)
 - `RULES.md` — hard constraints (must / must-not)
 - `DUTIES.md` — responsibilities (owned, triggered, out-of-scope, escalation)
 - `SOUL.md` — voice and disposition
@@ -23,4 +23,4 @@ If content here drifts from `.agent/`, the `.agent/` files are authoritative. Re
 
 ## Project bootstrap
 
-This `.agent/` and these root files were stamped from the `darkmatter/agents` template via `scripts/new-project.sh`. Team-wide skills come in via the Nix Home Manager module from that repo. Project-local skills live in `.agent/skills/`.
+This `.agent/` and these root files were stamped from the `darkmatter/skills` template via `scripts/new-project.sh`. Team-wide skills come in via the Nix Home Manager module from that repo. Project-local skills live in `.agent/skills/`.

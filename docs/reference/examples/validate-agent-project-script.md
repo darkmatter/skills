@@ -1,6 +1,6 @@
 # Reference example — `validate-agent-project.sh`
 
-This is a reference shape for a validator that can live at `scripts/validate-agent-project.sh` in `darkmatter/agents`, and be stamped into downstream projects as `scripts/validate-agent-project.sh`.
+This is a reference shape for a validator that can live at `scripts/validate-agent-project.sh` in `darkmatter/skills`, and be stamped into downstream projects as `scripts/validate-agent-project.sh`.
 
 ```sh
 #!/usr/bin/env bash
