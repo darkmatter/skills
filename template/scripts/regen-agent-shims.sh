@@ -56,7 +56,7 @@ This file is a shim. Canonical agent context lives in \`.agent/\`. Read these fi
 
 Then read the project-level config:
 
-- \`agent.yaml\` — runtime + compliance configuration
+- \`agent.yaml\` — project identity + advisory compliance defaults (detailed controls live in \`compliance/\`)
 - \`RULES.md\` — hard constraints (must / must-not)
 - \`DUTIES.md\` — responsibilities (owned, triggered, out-of-scope, escalation)
 - \`SOUL.md\` — voice and disposition
