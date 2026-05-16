@@ -35,6 +35,8 @@ on:
         required: false
       AGENTS_REPO_TOKEN:
         required: false
+      GH_ACCESS_TOKEN:
+        required: false
 
 jobs:
   review:
@@ -58,7 +60,7 @@ jobs:
           ref: ${{ inputs.agents_ref }}
           path: .darkmatter-agents
           persist-credentials: false
-          token: ${{ secrets.AGENTS_REPO_TOKEN || github.token }}
+          token: ${{ secrets.AGENTS_REPO_TOKEN || secrets.GH_ACCESS_TOKEN || github.token }}
 
       - name: Install shared OpenCode preset and skills
         run: ./.darkmatter-agents/scripts/install-opencode.sh --copy --target "${XDG_CONFIG_HOME:-$HOME/.config}/opencode"
