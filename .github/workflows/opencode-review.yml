@@ -39,7 +39,7 @@ on:
 jobs:
   review:
     if: github.event.pull_request.draft == false
-    runs-on: ${{ inputs.runner }}
+    runs-on: ubuntu-latest
     permissions:
       id-token: write
       contents: read
