@@ -13,3 +13,4 @@ read that project's `AGENTS.md` first and treat this file as general background.
 - Do not read or commit secrets, private keys, credentials, or local environment files.
 - Preserve user changes in dirty worktrees unless explicitly asked to revert them.
 - Use reusable skills from the shared catalog when their trigger conditions apply.
+- Keep repository READMEs compliant with the Standard Readme spec: use `README.md` for Markdown READMEs, required sections/order, a valid chosen format, no broken links, and lintable code examples; use `standard-readme-preset` to lint and `generator-standard-readme` when scaffolding.

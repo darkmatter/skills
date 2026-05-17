@@ -1,6 +1,6 @@
 ---
 name: repository-organization
-description: Organize darkmatter repositories, agent context, docs, scripts, skills, and ADRs into the right durable locations. Triggers when deciding where something belongs, restructuring repo layout, adding always-follow rules, or documenting architectural decisions. Do NOT trigger for Nix flake-specific layout work; use nix-flake-organization instead.
+description: Organize darkmatter repositories, READMEs, agent context, docs, scripts, skills, and ADRs into the right durable locations. Triggers when deciding where something belongs, restructuring repo layout, adding always-follow rules, or documenting architectural decisions. Do NOT trigger for Nix flake-specific layout work; use nix-flake-organization instead.
 ---
 
 # Repository organization
@@ -12,6 +12,7 @@ Keep each repository easy for humans and agents to navigate by putting durable c
 - A user asks where to put a new instruction, convention, policy, skill, command, script, workflow, reference doc, or ADR.
 - A repo is accumulating scattered Markdown, duplicated agent instructions, or ad hoc decision notes.
 - A change introduces a naming, layout, vendor, architecture, security, deployment, or process decision that future contributors should not re-litigate.
+- A README is being created, reorganized, or reviewed for standard structure.
 - A user asks whether something belongs in `AGENTS.md`, `.agent/context/`, `.agent/policy/`, `.agent/workflows/`, `skills/`, `docs/`, `scripts/`, or `presets/`.
 - A project is being bootstrapped from the darkmatter template and needs its local context filled in cleanly.
 
@@ -28,25 +29,40 @@ Start from the question: who needs this, when do they need it, and does it need 
 
 The root `README.md` "Where to put what" table is the canonical placement table for this repo. This table is a task-focused summary for agents applying that policy.
 
-| Need | Put it here | Why |
-|---|---|---|
-| Org-wide rule every agent must follow | `presets/base/AGENTS.md` | Always loaded; keep it short and high-signal. |
-| Project entrypoint for agents | Root `AGENTS.md` plus provider shims | Lets tools find the canonical project context. |
-| Durable project facts and decisions | `.agent/context/` | Always loaded inside that project; use for what is true now. |
-| Mandatory project policy, gates, and exceptions | `.agent/policy/` | Enforceable project-local rules and approved deviations. |
-| Recurring project procedure | `.agent/workflows/` | Stable step-by-step task flow. |
-| Project-local reusable capability | `.agent/skills/` | Only useful in that project. |
-| Team-wide reusable capability | `skills/<name>/` | Useful across multiple darkmatter projects; add `docs/catalog.md` row. |
-| Long skill examples or lookup material | `skills/<name>/reference/` | Loaded only after the skill points there. |
-| Skill-owned deterministic helper | `skills/<name>/scripts/` | Travels with the skill through the Home Manager module. |
-| Repo maintenance automation | Top-level `scripts/` | Run from this repo; not auto-discovered by clients. |
-| Human-readable shared-skill inventory | `docs/catalog.md` | Teammates skim it before adding or choosing skills. |
-| OpenCode slash command | `presets/opencode/commands/` | User controls invocation timing. |
-| OpenCode lifecycle hook or integration | `presets/opencode/plugins/` | Event-driven runtime behavior. |
-| Model-callable deterministic function | `presets/opencode/tools/` | Structured tool result, not prose instructions. |
-| OpenCode specialist agent definition | `presets/opencode/agents/` | Role-specific agent behavior and permissions. |
+| Need                                            | Put it here                          | Why                                                                    |
+| ----------------------------------------------- | ------------------------------------ | ---------------------------------------------------------------------- |
+| Org-wide rule every agent must follow           | `presets/base/AGENTS.md`             | Always loaded; keep it short and high-signal.                          |
+| Project entrypoint for agents                   | Root `AGENTS.md` plus provider shims | Lets tools find the canonical project context.                         |
+| Durable project facts and decisions             | `.agent/context/`                    | Always loaded inside that project; use for what is true now.           |
+| Mandatory project policy, gates, and exceptions | `.agent/policy/`                     | Enforceable project-local rules and approved deviations.               |
+| Recurring project procedure                     | `.agent/workflows/`                  | Stable step-by-step task flow.                                         |
+| Project-local reusable capability               | `.agent/skills/`                     | Only useful in that project.                                           |
+| Team-wide reusable capability                   | `skills/<name>/`                     | Useful across multiple darkmatter projects; add `docs/catalog.md` row. |
+| Long skill examples or lookup material          | `skills/<name>/reference/`           | Loaded only after the skill points there.                              |
+| Skill-owned deterministic helper                | `skills/<name>/scripts/`             | Travels with the skill through the Home Manager module.                |
+| Repo maintenance automation                     | Top-level `scripts/`                 | Run from this repo; not auto-discovered by clients.                    |
+| Human-readable shared-skill inventory           | `docs/catalog.md`                    | Teammates skim it before adding or choosing skills.                    |
+| OpenCode slash command                          | `presets/opencode/commands/`         | User controls invocation timing.                                       |
+| OpenCode lifecycle hook or integration          | `presets/opencode/plugins/`          | Event-driven runtime behavior.                                         |
+| Model-callable deterministic function           | `presets/opencode/tools/`            | Structured tool result, not prose instructions.                        |
+| OpenCode specialist agent definition            | `presets/opencode/agents/`           | Role-specific agent behavior and permissions.                          |
 
 Prefer one canonical copy plus shims or links. If two files say the same thing, one of them will drift.
+
+## README standard
+
+Repository READMEs must follow Standard Readme: `https://github.com/RichardLitt/standard-readme/blob/main/spec.md`.
+
+Apply the standard when creating or editing `README.md` files:
+
+1. Use `README.md` capitalization for Markdown READMEs. For translated READMEs, use BCP 47 language tags such as `README.de.md`; reserve `README.md` for English when multiple languages exist.
+2. Make the title match the repository, folder, and package-manager names, or explain any mismatch in the long description.
+3. Keep Standard Readme section order and exact section titles unless translating the README. Required sections include title, short description, contributing, and license; install and usage are required by default unless the repo is documentation-only.
+4. Keep the short description on its own line, under 120 characters, and not formatted as a blockquote.
+5. Include a table of contents for READMEs longer than 100 lines. It should link to all sections, capture at least all level-two headings, and start with the next section after the table of contents.
+6. Keep links working, lint code examples the same way the project lints source code, and keep the license section last.
+7. Use `standard-readme-preset` (`https://github.com/RichardLitt/standard-readme-preset`) for remark-based linting when adding README checks.
+8. Use `generator-standard-readme` (`https://github.com/RichardLitt/generator-standard-readme`) when scaffolding a new README from scratch.
 
 ## ADR guidance
 
@@ -87,6 +103,7 @@ When adding or updating ADRs:
 
 - The artifact lives at the layer where consumers will actually load it.
 - Always-on context stayed short; detail moved to skills, workflows, reference docs, or ADRs.
+- README changes follow Standard Readme naming, section order, required sections, link hygiene, and code-example linting.
 - Project-local facts did not leak into team-wide skills or global presets.
 - Team-wide skills have `SKILL.md` frontmatter, a catalog row, and validation coverage.
 - ADR-worthy decisions are recorded or intentionally deferred with a clear reason.
