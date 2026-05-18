@@ -1,5 +1,5 @@
 { agent-skills }:
-{ lib, personalAgentSkillsPath ? null, personalOpencodeSettings ? { }, ... }:
+{ lib, pkgs, config, personalAgentSkillsPath ? null, personalOpencodeSettings ? { }, ... }:
 let
   # Each subdirectory is one skill. Non-directory entries (.DS_Store,
   # README.md, etc) are skipped so they don't get wrapped as SKILL.md.
@@ -42,10 +42,9 @@ in
     })
   ];
 
-  # OpenCode is configured via the canonical home-manager module
-  # (programs.opencode.*). This avoids the EACCES error caused by
-  # symlinking opencode/package.json into the read-only nix store —
-  # opencode writes that file itself when managing plugin deps.
+  # opencode.json is written as a mutable copy (not an HM symlink) via
+  # home.activation so opencode can modify it at runtime. We still use
+  # programs.opencode for everything else (tui, context, commands, etc.).
   programs.opencode = {
     enable = lib.mkDefault true;
     # Note: this also installs pkgs.opencode into home.packages. Override
@@ -54,7 +53,8 @@ in
     # whole module (configs included). We can't set `package = null`
     # here due to an upstream HM bug in the warnings block (calls
     # versionAtLeast on a null version).
-    settings = lib.recursiveUpdate (import ./presets/opencode/opencode.nix) personalOpencodeSettings;
+    # settings is intentionally NOT set — opencode.json is written by
+    # home.activation.opencodeJson below so opencode can write back to it.
 
     tui = {
       diff_style = "auto";
@@ -72,6 +72,22 @@ in
     # documented in this module's history.
     skills = teamSkills // personalSkills;
   };
+
+  # Write opencode.json as a mutable file so opencode can modify it at
+  # runtime (auth tokens, TUI setting changes, etc.). Only overwrites when
+  # the Nix-side config actually changes. Also removes any stale symlink
+  # left by a previous generation that used programs.opencode.settings.
+  home.activation.opencodeJson = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+    _oc_dir="${config.xdg.configHome}/opencode"
+    $DRY_RUN_CMD mkdir -p "$_oc_dir"
+    if [ -L "$_oc_dir/opencode.json" ]; then
+      $DRY_RUN_CMD rm "$_oc_dir/opencode.json"
+    fi
+    if ! cmp -s "${opencodeConfigFile}" "$_oc_dir/opencode.json" 2>/dev/null; then
+      $DRY_RUN_CMD cp "${opencodeConfigFile}" "$_oc_dir/opencode.json"
+      $DRY_RUN_CMD chmod u+w "$_oc_dir/opencode.json"
+    fi
+  '';
 
   # Entries the canonical programs.opencode module does not yet
   # support. `recursive = true` keeps the parent directory real so

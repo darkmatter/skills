@@ -78,7 +78,7 @@
    };
 
    plugin = [
-     "@warp-dot-dev/opencode-warp"
+     "@warp-dot-dev/opencode-warp@0.1.5"
      "opencode-claude-auth@latest"
      "opencode-beads"
    ];
