@@ -28,6 +28,8 @@ Team-wide skills currently shipped from `skills/`. Add an entry here when you ad
 | `nix-flake-organization` | Organize Nix flake repos into thin `flake/` public layer with `src/` implementation. | "organize flake outputs", "thin flake modules" | |
 | `receiving-code-review` | Evaluate code review feedback with technical rigor before implementing. | When receiving review feedback | Don't blindly implement — verify first. |
 | `requesting-code-review` | Dispatch code-reviewer subagent before merging. | After completing tasks or major features | |
+| `repository-organization` | Organize repo layout, Standard Readme compliance, agent context, docs, scripts, skills, presets, and ADR placement. | "where should this go", "standard README", "add an ADR", "repo structure", "organize agent context" | Pure prompt reference. Use `nix-flake-organization` for Nix flake-specific layouts. |
+| `run-meeting-summary` | **Manual.** Resolve meeting artifacts from loose requests, pasted text, local files, or provider connectors; draft a company-safe Obsidian summary; require a submit/edit/discard review gate before writing. | `/run-meeting-summary import my last meeting from Granola`, "import my last one-on-one with John Doe", pasted transcript/path, MeetJamie/Jamie notes | Manual-invocation. Provider-agnostic; connector access optional. Writes only approved sanitized summaries; raw artifacts are not persisted by default. |
 | `strategic-compact` | Make auto-compaction safe for autonomous multi-phase work. | OpenCode sessions with auto-compaction enabled | **Client/runtime policy doc** — not an ordinary task skill. |
 | `subagent-driven-development` | Execute plan tasks via dispatched subagents with two-stage review. | Executing implementation plans with independent tasks | Prefer over `executing-plans` when subagents are available. |
 | `systematic-debugging` | Structured approach to bugs, test failures, and unexpected behavior. | Any bug, test failure, or unexpected behavior | Before proposing fixes. |
@@ -59,6 +61,9 @@ Both provide browser automation. `browser-use` uses a Python CLI with persistent
 
 ### `coding-standards` vs `effect-typescript`
 `coding-standards` covers general TypeScript quality. `effect-typescript` is the deeper supplement for projects already using Effect or features where Effect's typed errors, Layers, resources, retries, tests, and Alchemy deployment conventions matter.
+
+### `repository-organization` vs `nix-flake-organization`
+`repository-organization` covers general repo layout, agent context, docs, scripts, skills, presets, and ADR placement. `nix-flake-organization` is the deeper supplement for Nix flake-specific output structure: thin `flake/` public layer and `src/` implementation. Apply `repository-organization` broadly; use `nix-flake-organization` when the task is specifically about flake layout.
 
 ## Client/runtime policy docs
 

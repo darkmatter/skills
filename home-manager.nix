@@ -54,18 +54,7 @@ in
     # whole module (configs included). We can't set `package = null`
     # here due to an upstream HM bug in the warnings block (calls
     # versionAtLeast on a null version).
-    settings = {
-      instructions = [ "AGENTS.md" ];
-      permission = {
-        edit = "ask";
-        bash = "ask";
-        skill = {
-          "*" = "allow";
-        };
-      };
-      share = "manual";
-      autoupdate = "notify";
-    };
+    settings = import ./presets/opencode/opencode.nix;
 
     tui = {
       diff_style = "auto";
