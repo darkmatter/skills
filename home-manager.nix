@@ -73,29 +73,14 @@ in
     skills = teamSkills // personalSkills;
   };
 
-  # Write opencode.json as a mutable file so opencode can modify it at
-  # runtime (auth tokens, TUI setting changes, etc.). Only overwrites when
-  # the Nix-side config actually changes. Also removes any stale symlink
-  # left by a previous generation that used programs.opencode.settings.
-  home.activation.opencodeJson = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
-    _oc_dir="${config.xdg.configHome}/opencode"
-    $DRY_RUN_CMD mkdir -p "$_oc_dir"
-    if [ -L "$_oc_dir/opencode.json" ]; then
-      $DRY_RUN_CMD rm "$_oc_dir/opencode.json"
-    fi
-    if ! cmp -s "${opencodeConfigFile}" "$_oc_dir/opencode.json" 2>/dev/null; then
-      $DRY_RUN_CMD cp "${opencodeConfigFile}" "$_oc_dir/opencode.json"
-      $DRY_RUN_CMD chmod u+w "$_oc_dir/opencode.json"
-    fi
-  '';
 
   # Entries the canonical programs.opencode module does not yet
   # support. `recursive = true` keeps the parent directory real so
   # opencode can drop files alongside the managed symlinks.
-  xdg.configFile = {
-    "opencode/plugins" = {
-      source = ./presets/opencode/plugins;
-      recursive = true;
-    };
-  };
+  # xdg.configFile = {
+  #   "opencode/plugins" = {
+  #     source = ./presets/opencode/plugins;
+  #     recursive = true;
+  #   };
+  # };
 }
