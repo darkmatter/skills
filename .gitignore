@@ -7,3 +7,4 @@ personal/
 .beads-credential-key
 .sisyphus
 .ruff_cache
+/result
