@@ -224,6 +224,8 @@ Alchemy rules:
 - Use `alchemy.run.ts` as the default infra entrypoint.
 - Run Alchemy with Bun: `bunx alchemy dev`, `bunx alchemy deploy`, `bunx alchemy deploy --stage production`, `bunx alchemy destroy`.
 - Always call `await app.finalize()` so orphaned resources are reconciled.
+- Use `Cloudflare.state()` as the state store for Cloudflare stacks, including local development and tests. Do not switch to filesystem/local state just because a stack runs locally.
+- Toggle local Worker execution with Alchemy's dev mode (`bunx alchemy dev`, test harness `dev: true`, or `ALCHEMY_DEV=1`), not by changing the state backend. See the Alchemy local dev docs: https://v2.alchemy.run/tutorial/part-4/
 - Bind infrastructure resources into the runtime environment; then adapt those bindings into Effect services at the worker/app boundary.
 - Keep deploy state and resource names stage-aware. Avoid hard-coded production names in shared examples.
 - Do not hide application logic in `alchemy.run.ts`; keep it in `src/` and test it independently.
@@ -241,6 +243,7 @@ Alchemy rules:
 - Are tests using `it.effect`, Layers, and `TestClock` where appropriate?
 - Are commands written for Bun rather than pnpm?
 - Is deployable infra expressed with Alchemy and finalized?
+- Do Cloudflare stacks keep `Cloudflare.state()` while using dev mode for local execution?
 
 ## Common Mistakes
 
@@ -256,3 +259,4 @@ Alchemy rules:
 - Using real time in tests instead of `TestClock`.
 - Copying upstream `pnpm` commands into darkmatter projects instead of adapting to Bun.
 - Deploying Cloudflare or AWS resources ad hoc instead of encoding them in Alchemy.
+- Replacing `Cloudflare.state()` with filesystem/local state for local dev or PR previews; use Alchemy dev mode instead.
