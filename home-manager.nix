@@ -1,5 +1,5 @@
 { agent-skills }:
-{ lib, personalAgentSkillsPath ? null, ... }:
+{ lib, personalAgentSkillsPath ? null, personalOpencodeSettings ? { }, ... }:
 let
   # Each subdirectory is one skill. Non-directory entries (.DS_Store,
   # README.md, etc) are skipped so they don't get wrapped as SKILL.md.
@@ -54,7 +54,7 @@ in
     # whole module (configs included). We can't set `package = null`
     # here due to an upstream HM bug in the warnings block (calls
     # versionAtLeast on a null version).
-    settings = import ./presets/opencode/opencode.nix;
+    settings = lib.recursiveUpdate (import ./presets/opencode/opencode.nix) personalOpencodeSettings;
 
     tui = {
       diff_style = "auto";
