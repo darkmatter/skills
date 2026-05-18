@@ -1,16 +1,4 @@
  {
-   instructions = [ "AGENTS.md" ];
-
-   permission = {
-     "*" = "allow";
-     edit = "allow";
-     bash = "allow";
-     skill."*" = "allow";
-   };
-
-   share = "auto";
-   autoupdate = "notify";
-
    provider = {
      litellm = {
        npm = "@ai-sdk/openai-compatible";
@@ -83,9 +71,9 @@
      "opencode-beads"
    ];
 
-   agent = {
-     build = {
-       enable1mContext = true;
-     };
-   };
+   # agent = {
+   #   build = {
+   #     enable1mContext = true;
+   #   };
+   # };
  }
