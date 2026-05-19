@@ -1,5 +1,5 @@
 { agent-skills }:
-{ lib, pkgs, config, personalAgentSkillsPath ? null, personalOpencodeSettings ? { }, ... }:
+{ lib, pkgs, personalAgentSkillsPath ? null, opencodeConfigOverlays ? [ ], ... }:
 let
   # Each subdirectory is one skill. Non-directory entries (.DS_Store,
   # README.md, etc) are skipped so they don't get wrapped as SKILL.md.
@@ -13,6 +13,15 @@ let
   teamSkills = readSkills ./skills;
   personalSkills =
     if personalAgentSkillsPath != null then readSkills personalAgentSkillsPath else { };
+
+  baseOpencodeSettings = import ./presets/opencode/opencode.nix;
+  opencodeSettings = lib.foldl' (
+    previous: overlay:
+      lib.recursiveUpdate previous (overlay previous)
+  ) baseOpencodeSettings opencodeConfigOverlays;
+  opencodeJson = builtins.toJSON opencodeSettings;
+  opencodeJsonFile = pkgs.writeText "darkmatter-opencode.jsonc" opencodeJson;
+  opencodeJsonHash = builtins.hashString "sha256" opencodeJson;
 in
 {
   imports = [
@@ -42,7 +51,7 @@ in
     })
   ];
 
-  # opencode.json is written as a mutable copy (not an HM symlink) via
+  # opencode.jsonc is written as a mutable copy (not an HM symlink) via
   # home.activation so opencode can modify it at runtime. We still use
   # programs.opencode for everything else (tui, context, commands, etc.).
   programs.opencode = {
@@ -53,7 +62,7 @@ in
     # whole module (configs included). We can't set `package = null`
     # here due to an upstream HM bug in the warnings block (calls
     # versionAtLeast on a null version).
-    # settings is intentionally NOT set — opencode.json is written by
+    # settings is intentionally NOT set — opencode.jsonc is written by
     # home.activation.opencodeJson below so opencode can write back to it.
 
     # tui = {
@@ -71,6 +80,46 @@ in
     # documented in this module's history.
     skills = teamSkills // personalSkills;
   };
+
+  home.activation.opencodeJson = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+    _oc_src="${opencodeJsonFile}"
+    _oc_dst="$HOME/.config/opencode/opencode.json"
+    _oc_marker="$HOME/.config/opencode/.opencode-json.source-hash"
+    _oc_hash="${opencodeJsonHash}"
+
+    mkdir -p "$(dirname "$_oc_dst")"
+
+    _oc_file_hash() {
+      ${pkgs.coreutils}/bin/sha256sum "$1" | cut -d ' ' -f 1
+    }
+
+    if [ -L "$_oc_dst" ]; then
+      rm -f "$_oc_dst"
+      cp -f "$_oc_src" "$_oc_dst"
+      printf '%s\n' "$_oc_hash" > "$_oc_marker"
+    elif [ ! -e "$_oc_dst" ]; then
+      cp -f "$_oc_src" "$_oc_dst"
+      printf '%s\n' "$_oc_hash" > "$_oc_marker"
+    else
+      _oc_current_hash="$(_oc_file_hash "$_oc_dst")"
+      _oc_previous_hash=""
+      if [ -f "$_oc_marker" ]; then
+        _oc_previous_hash="$(cat "$_oc_marker")"
+      fi
+
+      if [ "$_oc_current_hash" = "$_oc_hash" ]; then
+        printf '%s\n' "$_oc_hash" > "$_oc_marker"
+      elif [ -n "$_oc_previous_hash" ] && [ "$_oc_current_hash" = "$_oc_previous_hash" ]; then
+        cp -f "$_oc_src" "$_oc_dst"
+        printf '%s\n' "$_oc_hash" > "$_oc_marker"
+      else
+        _oc_backup="$_oc_dst.bak.$(${pkgs.coreutils}/bin/date +%Y%m%d%H%M%S)"
+        mv -f "$_oc_dst" "$_oc_backup"
+        cp -f "$_oc_src" "$_oc_dst"
+        printf '%s\n' "$_oc_hash" > "$_oc_marker"
+      fi
+    fi
+  '';
 
   # tools = ./presets/opencode/tools is intentionally NOT set here.
   #

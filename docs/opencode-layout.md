@@ -7,7 +7,7 @@ client, but the repo root is not itself an OpenCode config directory.
 
 | OpenCode target | Source path | Purpose |
 |---|---|---|
-| `~/.config/opencode/opencode.jsonc` | `presets/opencode/opencode.jsonc` | Runtime config: models, permissions, agents, MCP servers, instructions, plugins, formatters. |
+| `~/.config/opencode/opencode.jsonc` | `presets/opencode/opencode.nix` via Home Manager overlays; `presets/opencode/opencode.jsonc` for shell sync | Runtime config: models, permissions, agents, MCP servers, instructions, plugins, formatters. Installed as a mutable file so OpenCode can write runtime changes. |
 | `~/.config/opencode/tui.json` | `presets/opencode/tui.json` | TUI-only config: theme, keybinds, diff style, mouse behavior. |
 | `~/.config/opencode/AGENTS.md` | `presets/base/AGENTS.md` | Global shared instructions. |
 | `~/.config/opencode/agents/` | `presets/opencode/agents/` | Markdown agent definitions. |
@@ -21,6 +21,11 @@ client, but the repo root is not itself an OpenCode config directory.
 
 ## What goes where
 
+- `presets/opencode/opencode.nix` is the canonical OpenCode base config for
+  Home Manager installs. Consumers can pass `opencodeConfigOverlays` as
+  functions from the previous config to a recursive override attrset.
+- `presets/opencode/opencode.jsonc` mirrors the base config for non-Nix shell
+  syncs and should be kept in sync with `opencode.nix`.
 - `commands/` are slash-invoked prompts. They start workflows.
 - `tools/` are deterministic functions the model can call during workflows.
 - `plugins/` are event-driven extensions that react to OpenCode lifecycle events.

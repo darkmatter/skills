@@ -96,13 +96,26 @@ The flake exports a Home Manager module that installs all team-wide skills into 
         inherit inputs;
         # Optional — only set on machines where a private skills checkout exists:
         personalAgentSkillsPath = /Users/me/personal/skills;
+        # Optional — customize the shared OpenCode base config:
+        opencodeConfigOverlays = [
+          (prev: {
+            plugin = prev.plugin ++ [ "my-personal-plugin" ];
+            mcp = prev.mcp // {
+              local-tool = {
+                type = "local";
+                command = [ "my-tool" ];
+                enabled = true;
+              };
+            };
+          })
+        ];
       };
     };
   };
 }
 ```
 
-The module enables every `darkmatter/*` skill and syncs them to Claude, Codex, and the generic `$HOME/.agents/skills` target. The Home Manager module also links the OpenCode preset into `~/.config/opencode`. Personal skills (when `personalAgentSkillsPath` is set) sync alongside.
+The module enables every `darkmatter/*` skill and syncs them to Claude, Codex, and the generic `$HOME/.agents/skills` target. The Home Manager module also installs the OpenCode preset into `~/.config/opencode`, writing `opencode.jsonc` as a mutable file generated from `presets/opencode/opencode.nix` plus any `opencodeConfigOverlays`. Personal skills (when `personalAgentSkillsPath` is set) sync alongside.
 
 ## Adding a new shared skill
 

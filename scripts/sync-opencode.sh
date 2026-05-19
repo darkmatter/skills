@@ -12,6 +12,7 @@
 #   --help, -h      Show this help text.
 #
 # Backs up conflicting non-symlink files as <name>.bak.<timestamp>.
+# opencode.jsonc is always copied so OpenCode can mutate it at runtime.
 # Never deletes user data.
 set -euo pipefail
 
@@ -92,8 +93,16 @@ install_one() {
 	fi
 }
 
+install_mutable() {
+	local src="$1"
+	local dst="$2"
+	ensure_parent "$dst"
+	backup_conflict "$dst"
+	run cp -f "$src" "$dst"
+}
+
 install_one "$BASE/AGENTS.md" "$TARGET/AGENTS.md"
-install_one "$OC/opencode.jsonc" "$TARGET/opencode.jsonc"
+install_mutable "$OC/opencode.jsonc" "$TARGET/opencode.jsonc"
 install_one "$OC/tui.json" "$TARGET/tui.json"
 install_one "$OC/package.json" "$TARGET/package.json"
 install_one "$OC/agents" "$TARGET/agents"
