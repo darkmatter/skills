@@ -1,4 +1,10 @@
-#!/usr/bin/env python3
+#!/usr/bin/env -S uv run
+
+# /// script
+# requires-python = ">=3.12"
+# dependencies = ["openai", "anthropic", "litellm"]
+# ///
+
 """
 Caveman Memory Compression Orchestrator
 
@@ -47,6 +53,43 @@ def call_claude(prompt: str) -> str:
         return result.stdout.strip()
     except subprocess.CalledProcessError as e:
         raise RuntimeError(f"Claude call failed:\n{e.stderr}")
+
+
+def call_internal(prompt: str) -> str:
+    base_url = os.environ.get("LITELLM_BASE_URL")
+    api_key = globals()["litellm_api_key"] = ""
+    try:
+        from openai import OpenAI
+
+        print("attempting to call internal")
+        if not api_key:
+            with open("~/.secrets/litellm-api-key") as f:
+                api_key = f.read().strip()
+        globals()["litellm_api_key"] = api_key
+        client = OpenAI(base_url=base_url, api_key=api_key)
+        response = client.chat.completions.create(
+            model="gpt-oss-120b",
+            messages=[{"role": "user", "content": prompt}],
+        )
+        return response.choices[0].message.content.strip()
+    except FileNotFoundError:
+        print("FileNotFoundError: ~/.secrets/litellm-api-key not found")
+        pass
+    except ImportError:
+        print("ImportError: openai not found")
+        pass
+    try:
+        print("falling back to opencode")
+        result = subprocess.run(
+            ["opencode", "run", "--model", "litellm/gpt-oss-120b"],
+            input=prompt,
+            text=True,
+            capture_output=True,
+            check=True,
+        )
+        return result.stdout.strip()
+    except subprocess.CalledProcessError as e:
+        raise RuntimeError(f"opencode call failed:\n{e.stderr}")
 
 
 def build_compress_prompt(original: str) -> str:
@@ -121,12 +164,14 @@ def compress_file(filepath: Path) -> bool:
     if backup_path.exists():
         print(f"⚠️ Backup file already exists: {backup_path}")
         print("The original backup may contain important content.")
-        print("Aborting to prevent data loss. Please remove or rename the backup file if you want to proceed.")
+        print(
+            "Aborting to prevent data loss. Please remove or rename the backup file if you want to proceed."
+        )
         return False
 
     # Step 1: Compress
     print("Compressing with Claude...")
-    compressed = call_claude(build_compress_prompt(original_text))
+    compressed = call_internal(build_compress_prompt(original_text))
 
     # Save original as backup, write compressed to original path
     backup_path.write_text(original_text)
@@ -160,3 +205,8 @@ def compress_file(filepath: Path) -> bool:
         filepath.write_text(compressed)
 
     return True
+
+
+if __name__ == "__main__":
+    result = call_internal("This is a long sentence so please shorten it.")
+    print(result)
