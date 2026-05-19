@@ -66,6 +66,10 @@ This Skill is not needed in the following situations:
 
 ## Quick Reference
 
+### Private Component Registries
+
+When a UI task uses shadcn/ui MCP, shadcnblocks, or private component registries, check for encrypted component config before concluding a registry is unavailable. In Darkmatter UI projects, `components.sops.json` may contain additional registries; use the `sops-secret-access` skill and decrypt with `sops -d components.sops.json` without printing decrypted contents.
+
 ### 1. Accessibility (CRITICAL)
 
 - `color-contrast` - Minimum 4.5:1 ratio for normal text (large text 3:1); Material Design
