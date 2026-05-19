@@ -38,6 +38,8 @@
      };
    };
 
+   lsp = true;
+
    mcp = {
      "morph-mcp" = {
        type = "local";

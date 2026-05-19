@@ -117,6 +117,45 @@ In flake-parts repos, `perSystem` often owns `packages`, `apps`, `checks`, and `
 - Changing public output names during a move-only refactor.
 - Skipping verification because the change looks like only path shuffling.
 
+## Templated scripts
+
+When packaging shell scripts, keep reusable script logic in its own source file instead of embedding long scripts inline in Nix strings. Use Nix only to substitute package-specific defaults.
+
+Prefer nixpkgs-style `@name@` placeholders with `replaceVars`:
+
+```nix
+writeTextFile {
+  name = "tool";
+  destination = "/bin/tool";
+  executable = true;
+  text = builtins.readFile (replaceVars ./tool.sh {
+    default_config = builtins.toJSON config;
+  });
+}
+```
+
+In the script, group all Nix substitutions at the top and make runtime values overrideable by arguments or environment variables:
+
+```sh
+default_config() {
+  cat <<'JSON'
+@default_config@
+JSON
+}
+
+: "${TOOL_JQ:=jq}"
+
+tool_config() {
+  if [ -n "${TOOL_CONFIG_JSON:-}" ]; then
+    printf '%s\n' "$TOOL_CONFIG_JSON"
+  else
+    default_config
+  fi
+}
+```
+
+This keeps scripts usable outside Nix, makes the Nix coupling easy to audit, avoids quote-heavy inline shell strings, and matches current nixpkgs conventions now that `substituteAll` has been replaced by `replaceVars`.
+
 ## Review checklist
 
 - `flake/` files are mostly imports, attr names, re-exports, and compatibility glue.
@@ -124,6 +163,7 @@ In flake-parts repos, `perSystem` often owns `packages`, `apps`, `checks`, and `
 - Existing public output names still work or have deliberate migration notes.
 - Module families are separated: `home-manager`, `darwin`, `nixos`, and `flake-parts` do not leak platform-specific logic into each other.
 - Verification commands cover both system-specific outputs and module evaluation paths.
+- Templated scripts live in standalone files, use `@name@` placeholders via `replaceVars`, and keep Nix-specific defaults grouped at the top with environment/argument overrides for reusable behavior.
 
 ## Tools
 
