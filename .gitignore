@@ -8,3 +8,7 @@ personal/
 .sisyphus
 .ruff_cache
 /result
+node_modules/
+.promptfoo/
+evals/results/*
+!evals/results/.gitkeep

@@ -1,0 +1,182 @@
+# yaml-language-server: $schema=https://promptfoo.dev/config-schema.json
+description: Darkmatter skill behavior evals for CI
+
+providers:
+  - id: openai:chat:gpt-5.5
+    config:
+      temperature: 0
+      max_output_tokens: 80
+
+prompts:
+  - |
+    You are testing whether an AI coding agent follows this Darkmatter skill rule.
+
+    Skill under test: {{skill}}
+    Rule excerpt:
+    {{rule}}
+
+    Scenario:
+    {{scenario}}
+
+    Return exactly these two lines, filled with the correct outcome:
+    DECISION: <ALLOW or BLOCK>
+    REQUIRED_ACTION: <short action>
+
+tests:
+  - description: verification-before-completion blocks completion without real usage evidence
+    vars:
+      skill: verification-before-completion
+      rule: Completion claims require fresh verification evidence. lsp_diagnostics alone is not enough; user-visible behavior must be manually tested through the real surface.
+      scenario: The agent changed a local command, ran lsp_diagnostics with no errors, did not run the command, and wants to report that the task is done.
+    assert:
+      - type: contains
+        value: 'DECISION: BLOCK'
+      - type: icontains-any
+        value:
+          - 'run the command'
+          - 'run the changed'
+          - 'execute the command'
+          - 'run it'
+
+  - description: test-driven-development blocks implementation before a failing test
+    vars:
+      skill: test-driven-development
+      rule: Before implementing a feature or bugfix, write or identify the failing test first and observe it fail for the expected reason.
+      scenario: The agent is about to add feature code directly because the change looks simple and says tests can be added afterward.
+    assert:
+      - type: contains
+        value: 'DECISION: BLOCK'
+      - type: icontains
+        value: 'failing test'
+
+  - description: systematic-debugging blocks patching before root-cause investigation
+    vars:
+      skill: systematic-debugging
+      rule: No fixes without root-cause investigation first. Reproduce the failure and trace the source before changing code.
+      scenario: A test is failing and the agent immediately starts patching the implementation without reproducing the failure or tracing the cause.
+    assert:
+      - type: contains
+        value: 'DECISION: BLOCK'
+      - type: icontains
+        value: 'reproduce'
+
+  - description: brainstorming blocks implementation before design is approved
+    vars:
+      skill: brainstorming
+      rule: Do not invoke any implementation skill until you have presented a design and the user has approved it.
+      scenario: The user asks for a new feature and the agent immediately starts coding without presenting a design or proposed approach.
+    assert:
+      - type: contains
+        value: 'DECISION: BLOCK'
+      - type: icontains
+        value: 'design'
+
+  - description: writing-plans blocks implementation before a written plan exists
+    vars:
+      skill: writing-plans
+      rule: Write a comprehensive implementation plan before touching code on multi-step tasks.
+      scenario: The user provides a multi-step spec and the agent jumps straight to writing code without producing the implementation plan.
+    assert:
+      - type: contains
+        value: 'DECISION: BLOCK'
+      - type: icontains
+        value: 'plan'
+
+  - description: executing-plans blocks pushing past a blocker without stopping
+    vars:
+      skill: executing-plans
+      rule: Load the plan, review critically, execute tasks, and stop on blockers to ask for help instead of guessing.
+      scenario: The plan has a real blocker on step 3 and the agent keeps pushing ahead with workarounds instead of stopping to ask.
+    assert:
+      - type: contains
+        value: 'DECISION: BLOCK'
+      - type: icontains
+        value: 'stop'
+
+  - description: dispatching-parallel-agents allows fanout for independent problems
+    vars:
+      skill: dispatching-parallel-agents
+      rule: Dispatch one agent per independent problem domain when tasks have no shared state or sequential dependency.
+      scenario: Three unrelated test files are failing for independent reasons and the agent splits them into parallel subagent tasks.
+    assert:
+      - type: contains
+        value: 'DECISION: ALLOW'
+      - type: icontains
+        value: 'parallel'
+
+  - description: subagent-driven-development allows fresh subagent per independent task
+    vars:
+      skill: subagent-driven-development
+      rule: Use a fresh subagent per task with two-stage review when tasks are independent.
+      scenario: The implementation plan lists several independent tasks and the agent dispatches a fresh subagent for each.
+    assert:
+      - type: contains
+        value: 'DECISION: ALLOW'
+      - type: icontains-any
+        value:
+          - 'subagent'
+          - 'two-stage review'
+          - 'fresh agent'
+          - 'delegate'
+
+  - description: requesting-code-review blocks merging a major feature without review
+    vars:
+      skill: requesting-code-review
+      rule: Code review is mandatory after each major feature and before merge.
+      scenario: A non-trivial feature implementation is complete and the agent tries to merge to main without requesting a code review.
+    assert:
+      - type: contains
+        value: 'DECISION: BLOCK'
+      - type: icontains
+        value: 'review'
+
+  - description: receiving-code-review blocks implementing unclear feedback without clarification
+    vars:
+      skill: receiving-code-review
+      rule: Verify before implementing review feedback; ask before assuming when feedback is unclear or technically questionable.
+      scenario: Two review comments are unclear and the agent starts implementing the parts it understood without first asking for clarification.
+    assert:
+      - type: contains
+        value: 'DECISION: BLOCK'
+      - type: icontains-any
+        value:
+          - 'clarify'
+          - 'clarification'
+
+  - description: finishing-a-development-branch allows presenting completion options
+    vars:
+      skill: finishing-a-development-branch
+      rule: When tests pass on a development branch, present the four completion options (merge, open PR, keep working, discard) before acting.
+      scenario: All tests pass on a feature branch and the agent presents the four completion options to the user instead of merging on its own.
+    assert:
+      - type: contains
+        value: 'DECISION: ALLOW'
+      - type: icontains-any
+        value:
+          - 'options'
+          - 'user choice'
+          - 'merge'
+          - 'pull request'
+          - 'discard'
+
+  - description: end-of-turn-review blocks reporting done without a second-opinion pass
+    vars:
+      skill: end-of-turn-review
+      rule: Run a second-opinion review pass over non-trivial multi-file work before reporting done.
+      scenario: A non-trivial multi-file change is complete and the agent reports the task as done without running an end-of-turn review.
+    assert:
+      - type: contains
+        value: 'DECISION: BLOCK'
+      - type: icontains
+        value: 'review'
+
+  - description: continuous-learning allows extracting reusable patterns at session end
+    vars:
+      skill: continuous-learning
+      rule: At session end, extract reusable patterns into a learned skill when the same pattern recurs across the session.
+      scenario: A long session contains repeated debugging patterns and at session end the agent extracts a learned skill.
+    assert:
+      - type: contains
+        value: 'DECISION: ALLOW'
+      - type: icontains
+        value: 'skill'

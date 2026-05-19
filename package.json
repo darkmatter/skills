@@ -1,0 +1,12 @@
+{
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "eval:validate": "promptfoo validate config -c evals/skills/promptfooconfig.yaml -c evals/e2e/promptfooconfig.yaml",
+    "eval:ci": "promptfoo eval -c evals/skills/promptfooconfig.yaml --no-share --output evals/results/skills.json --output evals/results/skills.html",
+    "eval:e2e": "promptfoo eval -c evals/e2e/promptfooconfig.yaml --no-share --output evals/results/e2e.json --output evals/results/e2e.html"
+  },
+  "devDependencies": {
+    "promptfoo": "0.121.9"
+  }
+}

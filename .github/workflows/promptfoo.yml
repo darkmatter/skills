@@ -1,0 +1,43 @@
+name: Promptfoo evals
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+jobs:
+  skill-evals:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    env:
+      OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Validate Promptfoo configs
+        run: npm run eval:validate
+
+      - name: Require model provider secrets
+        run: |
+          test -n "$OPENAI_API_KEY" || { echo 'OPENAI_API_KEY secret is required for Promptfoo CI evals'; exit 1; }
+
+      - name: Run skill evals
+        run: npm run eval:ci
+
+      - name: Upload eval artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: promptfoo-skill-evals
+          path: evals/results/*
+          if-no-files-found: ignore
