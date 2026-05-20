@@ -16,6 +16,7 @@
 
   share = "auto";
   autoupdate = "notify";
+  lsp = true;
 
   provider = {
     litellm = {
@@ -56,8 +57,6 @@
       };
     };
   };
-
-  lsp = true;
 
   mcp = {
     "morph-mcp" = {
