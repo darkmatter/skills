@@ -88,6 +88,7 @@
   plugin = [
     "@warp-dot-dev/opencode-warp"
     "opencode-claude-auth@latest"
+    "oh-my-openagent@latest"
     "opencode-beads"
   ];
 
