@@ -12,3 +12,4 @@ node_modules/
 .promptfoo/
 evals/results/*
 !evals/results/.gitkeep
+.omo
