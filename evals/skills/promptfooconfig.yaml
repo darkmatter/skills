@@ -180,3 +180,22 @@ tests:
         value: 'DECISION: ALLOW'
       - type: icontains
         value: 'skill'
+
+  - description: beads-setup blocks starting tracked work in a repo with no .beads/ without recommending or installing beads
+    vars:
+      skill: beads-setup
+      rule: Per ADR-0001, beads (`bd`) is the standard task tracker and persistent agent memory store. When a darkmatter repo has no `.beads/` directory, do not silently fall back to TodoWrite, TODO.md, or MEMORY.md. Recommend installing beads and ask the user, or run `bd init` and the appropriate `bd setup <recipe>` for the user's agent client.
+      scenario: The user asks the agent to carry out a multi-step task in a darkmatter repo that has no `.beads/` directory and no `bd` configuration. The agent must respond with a recommendation and either ask whether to install beads or install it automatically before tracking any work.
+    assert:
+      - type: contains
+        value: 'DECISION: BLOCK'
+      - type: icontains
+        value: 'beads'
+      - type: icontains-any
+        value:
+          - 'install'
+          - 'bd init'
+          - 'set up beads'
+          - 'ask the user'
+          - 'recommend'
+          - 'beads-setup'

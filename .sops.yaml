@@ -1,0 +1,6 @@
+creation_rules:
+  - path_regex: .*
+    kms:
+      - arn:aws:kms:us-west-2:950224716579:key/71e3cd26-ace6-41a0-8ab1-ed51a941443a
+    # age:
+    #   - age1rykphp5vjr7gdd09x36tu97g9vglk2t5dqe0pcxlxz5h0nurnuyq6fgg2p
