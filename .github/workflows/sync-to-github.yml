@@ -23,4 +23,6 @@ jobs:
           access_token: ${{ secrets.COPYBARA_GH_TOKEN }}
           sot_repo: darkmatter/skills
           destination_repo: darkmatter/.github
+          # Sync only the shared skills catalog and ADRs; exclude template/, scripts/, and
+          # other infrastructure-only directories that are specific to this repo.
           push_include: "skills/** docs/adr/**"
