@@ -1,0 +1,28 @@
+name: Sync skills and ADRs to darkmatter/.github
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "skills/**"
+      - "docs/adr/**"
+  workflow_dispatch:
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: olivr/copybara-action@v1.2.5
+        with:
+          ssh_key: ${{ secrets.COPYBARA_SSH_KEY }}
+          access_token: ${{ secrets.COPYBARA_GH_TOKEN }}
+          sot_repo: darkmatter/skills
+          destination_repo: darkmatter/.github
+          # Sync only the shared skills catalog and ADRs; exclude template/, scripts/, and
+          # other infrastructure-only directories that are specific to this repo.
+          push_include: "skills/** docs/adr/**"
