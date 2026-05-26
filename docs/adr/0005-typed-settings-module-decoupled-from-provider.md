@@ -1,4 +1,4 @@
-# 0004 — Application configuration lives in one typed settings module, decoupled from its provider and runtime
+# 0005 — Application configuration lives in one typed settings module, decoupled from its provider and runtime
 
 - **Status:** accepted
 - **Date:** 2026-05-25
