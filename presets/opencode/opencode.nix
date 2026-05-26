@@ -14,7 +14,7 @@
     };
   };
 
-  share = "off";
+  share = "manual";
   autoupdate = "notify";
   lsp = true;
 
