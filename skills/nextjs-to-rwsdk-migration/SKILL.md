@@ -143,6 +143,21 @@ These cost real time on the first migration and are worth checking up front:
 
 10. **The sticky PR comment action (`marocchino/sticky-pull-request-comment@v2`) needs `pull-requests: write` in the workflow `permissions:` block.** GitHub silently drops the comment if the token doesn't have it.
 
+11. **`bun run dev` intermittently dies at cold startup with `(ssr) No module found for '/node_modules/lucide-react/dist/esm/Icon.mjs' in module lookup for "use client" directive`.** This is a race between rwsdk's directive scanner (which walks the dep graph from `src/` and registers `"use client"` files into a lookup map) and the Cloudflare vite plugin's worker-entry probe (which queries that map before the scanner has finished). It happens with any package that has a deep transitive `"use client"` chain — lucide-react is the most common in our codebases because it reaches `dist/esm/Icon.mjs` (the actual `"use client"` boundary) through several layers of barrel re-exports. **Fix:** pre-register the boundary modules with rwsdk's `forceClientPaths` so they end up in the lookup map before the scanner runs:
+
+    ```ts
+    // vite.config.mts
+    redwood({
+      forceClientPaths: [
+        "node_modules/lucide-react/dist/esm/Icon.mjs",
+        "node_modules/lucide-react/dist/esm/context.mjs",
+        "node_modules/lucide-react/dist/esm/DynamicIcon.mjs",
+      ],
+    }),
+    ```
+
+    See `reference/vite-config.md` for the full list of packages with similar transitive `"use client"` boundaries. One-shot recovery on an already-broken cache: `rm -rf node_modules/.vite && bun run dev`.
+
 ## Tools
 
 `scripts/port-page.ts` — one-shot codegen that strips Next.js App Router exports and renames the default export. Copy into the target repo's `scripts/` and invoke per page:

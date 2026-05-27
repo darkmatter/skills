@@ -39,7 +39,19 @@ export default defineConfig({
   plugins: [
     cloudflare({ viteEnvironment: { name: "worker" } }),
     tailwindcss(),
-    redwood(),
+    redwood({
+      forceClientPaths: [
+        // lucide-react has a deep transitive "use client" boundary at
+        // dist/esm/Icon.mjs that the rwsdk scanner sometimes misses on cold
+        // start, causing "No module found for ... Icon.mjs in module lookup"
+        // when the Cloudflare vite plugin probes the worker entry before
+        // the scan finishes. Pre-registering it forces it into the lookup
+        // map before the race window opens. See "Known traps" in SKILL.md.
+        "node_modules/lucide-react/dist/esm/Icon.mjs",
+        "node_modules/lucide-react/dist/esm/context.mjs",
+        "node_modules/lucide-react/dist/esm/DynamicIcon.mjs",
+      ],
+    }),
   ],
 });
 ```
@@ -47,6 +59,16 @@ export default defineConfig({
 Plugin order is load-bearing. `cloudflare` first (it defines the worker environment), `tailwindcss` (needs the environments stub to be in place), `redwood` last (it layers RSC environments on top).
 
 Don't add a second cloudflare plugin (e.g. via `Cloudflare.Vite` from alchemy) — they conflict.
+
+## `forceClientPaths` catalog
+
+Add globs for any package that ships a `"use client"` boundary inside `node_modules` AND is reached through enough barrel-re-export hops that the scanner races on cold start. Confirmed examples:
+
+| Package | Files to register |
+| --- | --- |
+| `lucide-react@^1.16` | `dist/esm/Icon.mjs`, `dist/esm/context.mjs`, `dist/esm/DynamicIcon.mjs` |
+
+If you hit `No module found for '/node_modules/<pkg>/...'` for a different package, grep that package's `dist/` (or `build/`) for `"use client"` and add each matching file path. Cheap to over-register; expensive to under-register.
 
 ---
 
