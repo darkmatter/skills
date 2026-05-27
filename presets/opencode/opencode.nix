@@ -77,12 +77,6 @@
       url = "https://docs.mcp.cloudflare.com/sse";
       enabled = true;
     };
-    shadcn = {
-      type = "local";
-      command = [ "npx" "-y" "shadcn@latest" "mcp" ];
-      enabled = true;
-      environment = { };
-    };
   };
 
   plugin = [

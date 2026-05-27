@@ -199,6 +199,81 @@ export const Worker = Cloudflare.Worker("Worker", {
 
 For Effect-native runtimes, keep runtime services and deploy wiring separate. Alchemy owns cloud resources and bindings; Effect services own runtime behavior. Use Layers at the stack boundary when the resource requires a runtime implementation.
 
+### Capability shape: `Binding.Service` + `Binding.Policy`
+
+Every Alchemy capability ships as a pair of layers:
+
+- `Binding.Service` — runtime SDK wrapper, provided on the **Function/Worker** Effect (bundled into the deployed artifact).
+- `Binding.Policy` — deploy-time IAM/binding attachment, provided on the **Stack** via `AWS.providers()()`, never bundled.
+
+For Cloudflare, the worker `bindings: { ... }` field handles both sides automatically. For AWS, the Service layer goes on the Function and the Policy layer must be enabled at the stack level. The default `AWS.providers()` already enables the common policy layers; only reach for `AWS.providers()(extraLayers)` when you author or override a capability.
+
+### `Alchemy.RuntimeContext` on runtime-only methods
+
+Bindings expose a typed callable whose inner Effect carries an `Alchemy.RuntimeContext` requirement. Treat that as a colored function:
+
+- The **outer** Effect (setup at function init) does NOT require `RuntimeContext`.
+- The **inner** Effect (the actual SDK call) MUST require `RuntimeContext` and only runs inside a deployed Function/Worker.
+
+If a service wraps a binding and accidentally leaks `WorkerEnvironment` / `Lambda.FunctionEnvironment` into its interface, that service becomes cloud-coupled. Resolve cloud env services once during Layer construction and close over them — do not expose them as requirements on consumer Effects.
+
+## Effect platform rules in app/runtime code
+
+Alchemy stacks and Worker/Function bodies run as Effect programs. Do not reach for raw async or Node primitives inside `Effect.gen`:
+
+| Don't                                       | Do                                                   |
+| ------------------------------------------- | ---------------------------------------------------- |
+| `import fs from "node:fs/promises"`         | `const fs = yield* FileSystem.FileSystem`            |
+| `await fs.readFile(p, "utf8")`              | `yield* fs.readFileString(p)`                        |
+| `import path from "pathe"` / `node:path`    | `const path = yield* Path.Path`                      |
+| `await fetch(...)`                          | `yield* HttpClient.HttpClient` + `HttpClientRequest` |
+| `new Promise((res) => setTimeout(res, ms))` | `yield* Effect.sleep(Duration.millis(ms))`           |
+| `Effect.promise(() => listSqlFiles(dir))`   | Make the helper itself return an `Effect`            |
+
+Sync, CPU-only Node APIs (`crypto.createHash`, `process.cwd`, `Buffer`, `TextEncoder`) must still be wrapped in `Effect.sync(() => …)` (or `Effect.try` if they can throw) so the call participates in the Effect runtime — tracing, interruption, and the error channel all depend on it.
+
+```ts
+const hash = yield* Effect.sync(() =>
+  crypto.createHash("sha256").update(input).digest("hex"),
+);
+const cwd = yield* Effect.sync(() => process.cwd());
+```
+
+This applies to **stack bodies, custom resource helpers, and tests**. Tests must use `FileSystem.FileSystem` / `Path.Path` for any file/path access.
+
+Polling rules for deploy/runtime tests:
+
+- Use `Effect.repeat` with `Schedule` + an `until` predicate and a bounded `times: N` cap.
+- Do not write `while (Date.now() < deadline)` loops — they ignore interruption and leak into the vitest timeout.
+
+```ts
+// good — declarative, bounded, interruption-safe
+const value = yield* fetchValue.pipe(
+  Effect.repeat({
+    schedule: Schedule.spaced("5 seconds"),
+    until: (v) => v.ready,
+    times: 36,
+  }),
+);
+```
+
+## Build and type checking
+
+Always type-check before committing changes that touch a stack, custom resource, or runtime binding:
+
+```bash
+bun tsc -b
+```
+
+This runs the workspace build in project-reference mode. CI fails on type errors, so this is non-negotiable. When stale artifacts or dependency drift cause unexplained failures, fall back to a clean rebuild:
+
+```bash
+bun run build       # clean + tsc + build the alchemy package
+bun build:clean     # full reset: clean . + bun i + build + download env
+```
+
+`bun build:clean` removes untracked files (preserving `.env`), reinstalls dependencies, rebuilds, and refreshes environment files. Treat it as a recovery command, not a routine one.
+
 ## Secrets and config
 
 Do not commit provider tokens, API keys, generated profiles, or state files unless the repo explicitly owns a remote state backend and the file is designed for version control.
@@ -275,7 +350,23 @@ For Effect-native workers/functions, prefer a deployed fixture or smoke route ov
 - Preview deploys have a destroy path.
 - Effect code uses typed errors, Layers, and `Schedule` for retries instead of raw promises, bare SDK calls inside business logic, or `Date.now()` polling.
 
+## Contributing back to `alchemy-effect`
+
+If a darkmatter repo needs a missing provider feature, the path is usually a PR upstream rather than a local fork. Two conventions matter when you open that PR:
+
+- **PR title** uses conventional commits (`feat(aws/s3): add bucket lifecycle rules`, `fix(website): mobile theme metas`).
+- **PR description** never starts with a `#` or `##` heading — GitHub already renders the title above it. Use `###` at most, and only when the description genuinely has multiple sections. Lead with a short prose summary or a code snippet that shows the new shape; cut anything that restates what the diff already shows. Never include a "Test plan" or checklist.
+- **Outstanding work** belongs in the PR-creation chat, not in the PR body. If something is unfinished or needs manual verification, mark the PR as draft and tell the user what is outstanding.
+- **Body delivery**: write the body to a temp file and pass `--body-file` to `gh pr create` / `gh pr edit`. Heredoc/`--body "$(cat …)"` mangles backticks across `gh` versions.
+
+If you edit tutorial docs under `website/src/content/docs/tutorial/`, one concept gets one `##` heading, one diff snippet, and one prose paragraph. "Two/three things just happened" + a numbered list is the smell that says split the snippet.
+
+If you edit resource JSDoc, run `bun generate:api-reference` to refresh `website/src/content/docs/providers/{Cloud}/{Resource}.md`. The generated markdown is overwritten on every regeneration — never hand-edit it.
+
+`reference/provider-implementation.md` has the detailed conventions you need before touching anything under `packages/alchemy/src/` upstream.
+
 ## References
 
-- `reference/upstream-concepts.md` summarizes the relevant Alchemy v2 and `alchemy-effect` concepts to apply during deploy work.
-- `reference/examples.md` maps `alchemy-run/alchemy-effect/examples` directories to common deploy scenarios.
+- `reference/upstream-concepts.md` — Alchemy v2 and `alchemy-effect` concepts applied during app/deploy work.
+- `reference/examples.md` — `alchemy-run/alchemy-effect/examples` directories mapped to common deploy scenarios.
+- `reference/provider-implementation.md` — file system, reconciler doctrine, capability shape, tags, runtime context, test fixtures, JSDoc/docs, and tutorial standards for upstream provider contributions.
