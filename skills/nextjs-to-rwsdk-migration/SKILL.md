@@ -76,13 +76,16 @@ These eight phases are how the `darkmatter/web` port landed in 4 commits + 1 fix
 
    Without the `?url` import + explicit `<link>`, vite emits the CSS into `dist/worker/assets/` (used during SSR only) and the client renders unstyled. This is the most common "production looks broken" trap. See `reference/document-and-css.md` for the full Document template.
 
-5. **Worker + routing.** Build `src/worker.tsx` as a single `defineApp([…])` array: `setCommonHeaders()`, ctx-populating middleware, then one `route()` per top-level path, with all page routes wrapped in `render(Document, [...])`. See `reference/worker-and-routing.md`. Key conversions:
+5. **Worker + routing.** Build `src/worker.tsx` as a single `defineApp([…])` array: `setCommonHeaders()`, ctx-populating middleware, then one `route()` per top-level path, with all page routes wrapped in `render(Document, [...])`. **Group route families with `layout()`** (from `rwsdk/router`) when the same chrome applies to multiple routes — site header + footer on the public pages, no chrome on a `/wiki/*` section, etc. Layouts are server components and the route-table structure makes the chrome decision explicit instead of a regex inside `Document`. See `reference/worker-and-routing.md` and `reference/layouts.md`. Key conversions:
    - `app/foo/page.tsx` → `src/app/pages/Foo.tsx` (named export, not default)
    - `app/foo/[slug]/page.tsx` → `src/app/pages/Foo.tsx` taking `{ params: { slug: string } }` (NOT `Promise<>`)
    - `app/foo/[[...slug]]/page.tsx` → `src/app/pages/Foo.tsx` taking `{ params: { $0?: string } }` — convert with `params.$0?.split("/").filter(Boolean)` when the page expects `string[]`
    - `app/feed.xml/route.ts` → `src/app/routes/feed.ts`, called from `route("/feed.xml", feedHandler)` at the top of `defineApp` (outside `render(Document, …)`)
    - `app/sitemap.ts` → `src/app/routes/sitemap.ts` returning a `Response` with `Content-Type: application/xml`
    - `middleware.ts` → a function inside `defineApp([…])` that takes `({ request, ctx })` and either returns nothing (continue) or returns a `Response` (short-circuit)
+   - `app/(group)/layout.tsx` → `src/app/layouts/X.tsx` exported as a React FC and wired with `layout(X, [...])`. `app/layout.tsx` stays as `src/app/Document.tsx` because it owns the `<html>` shell.
+
+   **Route order inside `layout()` groups matters.** rwsdk matches routes in registration order; literal paths beat `:param` captures. If you have both `/internal/wiki` (literal, often in a no-chrome `WikiLayout`) and `/internal/:slug` (parametric, often in `SiteLayout`), register the `WikiLayout` group FIRST or `/internal/wiki` will be captured as `slug="wiki"` and 404.
 
 6. **Mechanical page port.** Use `scripts/port-page.ts` from this skill (copy it into the target repo's `scripts/`) to strip Next-specific exports from each copied `app/**/page.tsx`:
    - `import type { Metadata } from "next"`
@@ -174,6 +177,7 @@ It's idempotent and editable — read the source before running on a tree of fil
 - `reference/vite-config.md` — annotated `vite.config.mts` + `tsconfig.json` + `package.json` deltas.
 - `reference/document-and-css.md` — `Document.tsx` template, font loading, the `?url` CSS pattern, theming integration.
 - `reference/worker-and-routing.md` — `defineApp`, route patterns (static / `:param` / `*`), middleware, `setCommonHeaders`, redirect helpers.
+- `reference/layouts.md` — `layout()` from `rwsdk/router`, mapping Next.js `app/(group)/layout.tsx` files to server-component layouts, route-order rules when literal + parametric routes coexist across layouts.
 - `reference/per-page-port-checklist.md` — what to strip / convert per `app/**/page.tsx`, plus the cases the codegen script doesn't cover.
 - `reference/alchemy-deploy.md` — `alchemy.run.ts` template with `Cloudflare.Worker`, stage-aware domains, env injection, plus the `Cloudflare.Vite` gotcha writeup.
 - `reference/preview-ci.md` — `.github/workflows/preview-deploy.yml` + `preview-cleanup.yml` templates with secrets, smoke tests, and the sticky comment.
