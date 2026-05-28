@@ -22,6 +22,7 @@ let
   opencodeJson = builtins.toJSON opencodeSettings;
   opencodeJsonFile = pkgs.writeText "darkmatter-opencode.jsonc" opencodeJson;
   opencodeJsonHash = builtins.hashString "sha256" opencodeJson;
+  jsonFormat = pkgs.formats.json {};
 in
 {
   imports = [
@@ -68,6 +69,7 @@ in
     # tui = {
     #   diff_style = "auto";
     #   mouse = true;
+    #   theme = "aura";
     # };
 
     context = ./presets/base/AGENTS.md;
@@ -151,4 +153,5 @@ in
   #     recursive = true;
   #   };
   # };
+  xdg.configFile."opencode/oh-my-openagent.jsonc".source = ./oh-my-openagent.jsonc;
 }
