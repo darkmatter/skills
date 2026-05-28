@@ -36,7 +36,7 @@
           variants = {
             thinking = {
               thinking = {
-                type = "enabled";
+                reasoningEffort = "high";
               };
             };
             nothink = {
