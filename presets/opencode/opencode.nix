@@ -3,6 +3,7 @@
 
   instructions = [
     "AGENTS.md"
+    "https://raw.githubusercontent.com/nvk/llm-wiki/master/plugins/llm-wiki-opencode/skills/wiki-manager/SKILL.md"
   ];
 
   permission = {
@@ -27,6 +28,28 @@
         apiKey = "{file:~/.secrets/litellm-api-key}";
       };
       models = {
+        "glm-5.1-fp8" = {
+          name = "GLM 5.1 (darkmatter)";
+          reasoning = true;
+          temperature = true;
+          tool_call = true;
+          variants = {
+            thinking = {
+              thinking = {
+                type = "enabled";
+              };
+            };
+            nothink = {
+              thinking = {
+                type = "disabled";
+              };
+            };
+          };
+          limit = {
+            context = 200000;
+            output = 128000;
+          };
+        };
         "gpt-oss-120b" = {
           name = "GPT-OSS-120B (darkmatter)";
           reasoning = true;
