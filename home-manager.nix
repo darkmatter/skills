@@ -153,5 +153,5 @@ in
   #     recursive = true;
   #   };
   # };
-  xdg.configFile."opencode/oh-my-openagent.jsonc".source = ./pressets/opencode/oh-my-openagent.jsonc;
+  xdg.configFile."opencode/oh-my-openagent.jsonc".source = ./presets/opencode/oh-my-openagent.jsonc;
 }
