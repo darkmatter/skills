@@ -24,9 +24,6 @@ let
   opencodeJsonHash = builtins.hashString "sha256" opencodeJson;
   jsonFormat = pkgs.formats.json {};
 
-  ohMyOpenagentContent = builtins.readFile ./presets/opencode/oh-my-openagent.jsonc;
-  ohMyOpenagentFile = pkgs.writeText "oh-my-openagent.jsonc" ohMyOpenagentContent;
-  ohMyOpenagentHash = builtins.hashString "sha256" ohMyOpenagentContent;
 in
 {
   imports = [
@@ -148,47 +145,16 @@ in
     touch "$_oc_dst/.gitkeep"
   '';
 
-  # oh-my-openagent.json is written as a mutable copy (not a Nix symlink) so
-  # the plugin can write back to it at runtime. Uses the same hash-based
-  # idempotency pattern as opencodeJson: only overwrite when the nix source
-  # changes, and back up if the user has made local modifications.
+  # oh-my-openagent.json is written as a regular writable file, but reset from
+  # the curated preset on every activation. This lets the plugin mutate it at
+  # runtime without preserving drift across rebuilds.
   home.activation.ohMyOpenagentJson = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
-    _oma_src="${ohMyOpenagentFile}"
+    _oma_src="${toString ./presets/opencode/oh-my-openagent.jsonc}"
     _oma_dst="$HOME/.config/opencode/oh-my-openagent.json"
-    _oma_marker="$HOME/.config/opencode/.oh-my-openagent-json.source-hash"
-    _oma_hash="${ohMyOpenagentHash}"
 
     mkdir -p "$(dirname "$_oma_dst")"
-
-    _oma_file_hash() {
-      ${pkgs.coreutils}/bin/sha256sum "$1" | cut -d ' ' -f 1
-    }
-
-    if [ -L "$_oma_dst" ]; then
-      rm -f "$_oma_dst"
-      cp -f "$_oma_src" "$_oma_dst"
-      printf '%s\n' "$_oma_hash" > "$_oma_marker"
-    elif [ ! -e "$_oma_dst" ]; then
-      cp -f "$_oma_src" "$_oma_dst"
-      printf '%s\n' "$_oma_hash" > "$_oma_marker"
-    else
-      _oma_current_hash="$(_oma_file_hash "$_oma_dst")"
-      _oma_previous_hash=""
-      if [ -f "$_oma_marker" ]; then
-        _oma_previous_hash="$(cat "$_oma_marker")"
-      fi
-
-      if [ "$_oma_current_hash" = "$_oma_hash" ]; then
-        printf '%s\n' "$_oma_hash" > "$_oma_marker"
-      elif [ -n "$_oma_previous_hash" ] && [ "$_oma_current_hash" = "$_oma_previous_hash" ]; then
-        cp -f "$_oma_src" "$_oma_dst"
-        printf '%s\n' "$_oma_hash" > "$_oma_marker"
-      else
-        _oma_backup="$_oma_dst.bak.$(${pkgs.coreutils}/bin/date +%Y%m%d%H%M%S)"
-        mv -f "$_oma_dst" "$_oma_backup"
-        cp -f "$_oma_src" "$_oma_dst"
-        printf '%s\n' "$_oma_hash" > "$_oma_marker"
-      fi
-    fi
+    rm -f "$_oma_dst"
+    cp -f "$_oma_src" "$_oma_dst"
+    chmod u+w "$_oma_dst"
   '';
 }
