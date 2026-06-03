@@ -1,6 +1,6 @@
 ---
 name: coding-standards
-description: Universal coding standards, best practices, and patterns for TypeScript, JavaScript, React, and Node.js development.
+description: Use when writing, reviewing, or refactoring TS/JS/React/Node code for readability, modular file organization, computational complexity, type safety, testing, and maintainability.
 ---
 
 # Coding Standards & Best Practices
@@ -29,8 +29,8 @@ Universal coding standards applicable across all projects.
 
 - Simplest solution that works
 - Avoid over-engineering
-- No premature optimization
-- Easy to understand > clever code
+- Do not hide algorithmic blowups behind “premature optimization”
+- Easy to understand > clever code, but scalable enough for expected input sizes
 
 ### 3. DRY (Don't Repeat Yourself)
 
@@ -45,6 +45,15 @@ Universal coding standards applicable across all projects.
 - Avoid speculative generality
 - Add complexity only when required
 - Start simple, refactor when needed
+
+### 5. Complexity Is a Design Constraint
+
+- Know the expected input size and write code whose Big-O behavior fits it
+- Avoid accidental `O(n²)` work in render paths, request handlers, CLIs over repo files, reconciliation loops, and migrations
+- Build indexes (`Map`, `Set`, grouped objects) once when code repeatedly searches the same collection
+- Prefer streaming, pagination, batching, and bounded concurrency for untrusted or large inputs
+- Optimize asymptotic shape first; micro-optimizations come only after measurement
+- Document non-obvious complexity choices when the simple-looking code is deliberately avoided
 
 ## TypeScript/JavaScript Standards
 
@@ -92,10 +101,12 @@ function similarity(a, b) {}
 function email(e) {}
 ```
 
-### Immutability Pattern (CRITICAL)
+### Immutability by Default
+
+Use immutable updates at API, state, props, cache, and shared-data boundaries. Local mutation is acceptable only when it is private to the function, improves clarity or performance, and cannot leak to callers.
 
 ```typescript
-// ✅ ALWAYS use spread operator
+// ✅ GOOD: Preserve caller-owned data
 const updatedUser = {
   ...user,
   name: "New Name",
@@ -103,9 +114,15 @@ const updatedUser = {
 
 const updatedArray = [...items, newItem];
 
-// ❌ NEVER mutate directly
-user.name = "New Name"; // BAD
-items.push(newItem); // BAD
+// ✅ GOOD: Local mutation that cannot leak
+const byId = new Map<string, User>();
+for (const user of users) {
+  byId.set(user.id, user);
+}
+
+// ❌ BAD: Mutates caller-owned data
+user.name = "New Name";
+items.push(newItem);
 ```
 
 ### Error Handling
@@ -189,9 +206,25 @@ GET /api/markets?status=active&limit=10&offset=0
 
 ## File Organization
 
-### Project Structure
+Keep files small enough that an agent or human can hold the whole module in context. Large files are usually a boundary smell, not a badge of simplicity.
 
-See Codemaps in DOCS/CODEMAPS
+### Module Boundaries
+
+- One file should have one primary responsibility: resource contract, provider lifecycle, HTTP client, schema, pure selection logic, UI component, hook, or test helper
+- Split when a file mixes trust-boundary decoding, business rules, I/O clients, UI rendering, and orchestration
+- Prefer a directory with focused siblings plus `index.ts` over a “god file” with many unrelated sections
+- Keep pure helpers separate from I/O so they can be tested without mocks
+- Keep public APIs narrow; use barrel exports intentionally, not as a dump of internals
+- Do not create tiny files for every three-line helper. Split around concepts and dependency boundaries, not line-count alone
+
+### Size Heuristics
+
+These are review triggers, not hard limits:
+
+- ~150-250 lines: check whether the file still has one clear responsibility
+- ~300+ lines: strongly consider extracting types, schemas, clients, pure helpers, or subcomponents
+- ~50+ line function: split unless it is a flat declarative table/config or a simple provider lifecycle body
+- 4+ levels of nesting: flatten with guard clauses or extracted helpers
 
 ### File Naming
 
@@ -211,8 +244,8 @@ types/market.types.ts         # camelCase with .types suffix
 // Use exponential backoff to avoid overwhelming the API during outages
 const delay = Math.min(1000 * Math.pow(2, retryCount), 30000);
 
-// Deliberately using mutation here for performance with large arrays
-items.push(newItem);
+// Build an index once to avoid repeated O(n) scans
+const byId = new Map(items.map((item) => [item.id, item]));
 
 // ❌ BAD: Stating the obvious
 // Increment counter by 1
@@ -247,7 +280,26 @@ export async function searchMarkets(
 }
 ````
 
-## Performance Best Practices
+## Performance & Computational Complexity
+
+### Algorithmic Shape
+
+```typescript
+// ❌ BAD: O(n²) lookup inside a loop
+const enriched = orders.map((order) => ({
+  ...order,
+  customer: customers.find((customer) => customer.id === order.customerId),
+}));
+
+// ✅ GOOD: O(n + m), explicit index
+const customersById = new Map(customers.map((customer) => [customer.id, customer]));
+const enriched = orders.map((order) => ({
+  ...order,
+  customer: customersById.get(order.customerId),
+}));
+```
+
+Use comments for complexity only when the tradeoff is non-obvious, e.g. “pre-index by id because this runs for every page render over thousands of rows.”
 
 ### Memoization
 
@@ -256,7 +308,7 @@ import { useMemo, useCallback } from "react";
 
 // ✅ GOOD: Memoize expensive computations
 const sortedMarkets = useMemo(() => {
-  return markets.sort((a, b) => b.volume - a.volume);
+  return [...markets].sort((a, b) => b.volume - a.volume);
 }, [markets]);
 
 // ✅ GOOD: Memoize callbacks
@@ -330,7 +382,23 @@ test("test search", () => {});
 
 Watch for these anti-patterns:
 
-### 1. Long Functions
+### 1. Large Files and Long Functions
+
+Large files make review, agent edits, and tests less reliable. Split around concepts and dependency boundaries before the file becomes a grab bag.
+
+```typescript
+// ❌ BAD: One file owns resource type, HTTP client, wire schemas, selection, and lifecycle
+// src/Provider/GpuInstance.ts (800 lines)
+
+// ✅ GOOD: Focused siblings with explicit boundaries
+// src/Provider/GpuInstance.ts          # resource contract
+// src/Provider/GpuInstanceProvider.ts  # lifecycle
+// src/Provider/Client.ts               # HTTP service
+// src/Provider/Wire.ts                 # schemas
+// src/Provider/Selection.ts            # pure logic
+```
+
+### 2. Long Functions
 
 ```typescript
 // ❌ BAD: Function > 50 lines
@@ -346,7 +414,7 @@ function processMarketData() {
 }
 ```
 
-### 2. Deep Nesting
+### 3. Deep Nesting
 
 ```typescript
 // ❌ BAD: 5+ levels of nesting
@@ -372,7 +440,7 @@ if (!hasPermission) return;
 // Do something
 ```
 
-### 3. Magic Numbers
+### 4. Magic Numbers
 
 ```typescript
 // ❌ BAD: Unexplained numbers
@@ -389,4 +457,21 @@ if (retryCount > MAX_RETRIES) {
 setTimeout(callback, DEBOUNCE_DELAY_MS);
 ```
 
-**Remember**: Code quality is not negotiable. Clear, maintainable code enables rapid development and confident refactoring.
+### 5. Accidental Quadratic Work
+
+```typescript
+// ❌ BAD: Repeated scan
+for (const file of files) {
+  const owner = owners.find((owner) => owner.path === file.path);
+  // ...
+}
+
+// ✅ GOOD: Build the lookup once
+const ownersByPath = new Map(owners.map((owner) => [owner.path, owner]));
+for (const file of files) {
+  const owner = ownersByPath.get(file.path);
+  // ...
+}
+```
+
+**Remember**: Code quality is not negotiable. Clear, modular, complexity-aware code enables rapid development and confident refactoring.

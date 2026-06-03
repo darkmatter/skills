@@ -21,7 +21,7 @@ This skill adapts guidance from `effect-smol` to darkmatter conventions: use Bun
 
 ## When NOT to use
 
-- A small one-off script can be obvious plain TypeScript: read one file, transform pure data, write one file, no retries, no injected dependencies, no long-lived resources.
+- A small one-off script can be obvious plain TypeScript: read one file, transform pure data, write one file, no retries, no injected dependencies, no long-lived resources. Keep this exception genuinely small; if the file starts accumulating schemas, clients, orchestration, retries, or reusable helpers, split it around those boundaries instead of growing a monolith.
 - Pure functions, simple data mappers, UI-local state, or tiny glue code do not need Effect wrappers.
 - A project has no Effect dependency and the feature does not benefit from typed errors, Layers, resource safety, retries, or observability.
 - The team only needs a tactical fix in plain async code. Do not introduce Effect as a drive-by refactor.

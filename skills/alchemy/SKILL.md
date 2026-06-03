@@ -126,6 +126,22 @@ The load-bearing pieces are:
 - State: choose deliberately. Cloudflare deploys commonly use `Cloudflare.state()`; simple AWS examples may use `Alchemy.localState()`.
 - Effect body: declare resources with `yield*`, compose dependencies through references and bindings, and return useful outputs for smoke checks.
 
+## Effect-native provider module layout
+
+When authoring or refactoring an Alchemy provider in a Darkmatter app/repo, mirror the canonical `alchemy-run/alchemy-effect/packages/alchemy/src/Cloudflare` organization instead of putting resource contracts, HTTP clients, schemas, helpers, and provider lifecycle in one large file. Before writing provider code, inspect the relevant upstream provider directory (for example `Cloudflare/Providers.ts`, `Cloudflare/KV/KVNamespace.ts`, and adjacent `*Binding.ts`/`index.ts` files) and keep the same separation of concerns.
+
+Canonical shape for a provider namespace such as `src/Verda/`:
+
+- `ResourceName.ts` contains only the public `Resource` type, props, attributes, JSDoc/examples, and `Resource<ResourceName>("Namespace.ResourceName")`. It should not contain the HTTP client or reconcile helpers.
+- `ResourceNameProvider.ts` contains `Provider.effect(ResourceName, Effect.gen(...))` and the lifecycle methods (`read`, `diff`, `reconcile`, `delete`). Keep provider-local adoption/reconcile logic readable and delegate API calls/selection/status helpers to sibling modules.
+- `Providers.ts` defines `class Providers extends Provider.ProviderCollection<Providers>()("Namespace") {}`, `ProviderRequirements`, and `providers()`. The `Provider.collection([...])` list contains resource tokens/policies (for example `GpuInstance`), while implementation layers are supplied with `.pipe(Layer.provide(...))`, matching Cloudflare's `Providers.ts`. Do not put already-provided provider layers inside `Provider.collection`.
+- `Client.ts` / provider SDK modules expose Effect `Context.Service` clients and `Layer.effect` live implementations. Decode all unknown provider responses with `Schema` at this boundary and return typed domain objects.
+- `Config.ts` / `Credentials.ts` centralize `Config.string`, `Config.redacted`, defaults, and auth/profile resolution. Secrets stay redacted and are provided through layers, not resource props or physical names.
+- `Errors.ts`, `Types.ts`, `Wire.ts`, `Mapping.ts`, `Status.ts`, `Selection.ts`, and other focused helpers are preferred over multi-hundred-line resource files when they isolate typed errors, wire schemas, pure selection logic, and domain mapping.
+- `index.ts` re-exports the namespace's public surface so app code imports `./ProviderNamespace/index.ts` rather than a monolithic resource file.
+
+Testing convention for provider refactors: extract pure helpers where possible (selection, name normalization, status classification, mapping) and write focused Vitest tests for them before moving production code. For Effect-dependent provider lifecycle, test through Layers/fakes where practical; otherwise typecheck with `bun tsc -b` and avoid changing behavior during layout-only refactors.
+
 ## Local development
 
 Use `alchemy dev` for the default local loop when the app can run through Alchemy:
@@ -256,6 +272,65 @@ const value = yield* fetchValue.pipe(
   }),
 );
 ```
+
+## Provider lifecycle tests
+
+When authoring custom Alchemy providers/resources, add provider-style tests with `alchemy/Test/Vitest` rather than only unit-testing helper functions. These tests exercise the real Alchemy plan/apply engine, private scratch state, repeated deploys, and destroy behavior in one Effect program.
+
+Use this shape for resource lifecycle tests:
+
+```ts
+import * as Test from "alchemy/Test/Vitest";
+import { expect } from "@effect/vitest";
+import * as Effect from "effect/Effect";
+import * as ProviderNamespace from "../src/ProviderNamespace/index.ts";
+
+const { test } = Test.make({ providers: ProviderNamespace.providers() });
+
+test.provider("create, update, and delete resource", (stack) =>
+  Effect.gen(function* () {
+    const client = yield* ProviderNamespace.Client;
+
+    const created = yield* stack.deploy(
+      Effect.gen(function* () {
+        return yield* ProviderNamespace.Resource("TestResource", {
+          name: "v1",
+        });
+      }),
+    );
+    expect(created.resourceId).toBeDefined();
+
+    // Verify live provider state through the provider SDK/client, not only
+    // through returned attributes.
+    const live1 = yield* client.get(created.resourceId);
+    expect(live1.name).toBe("v1");
+
+    const updated = yield* stack.deploy(
+      Effect.gen(function* () {
+        return yield* ProviderNamespace.Resource("TestResource", {
+          name: "v2",
+        });
+      }),
+    );
+    expect(updated.resourceId).toBe(created.resourceId);
+
+    const live2 = yield* client.get(updated.resourceId);
+    expect(live2.name).toBe("v2");
+
+    yield* stack.destroy();
+  }),
+);
+```
+
+Provider test rules:
+
+- Configure providers once per file with `const { test } = Test.make({ providers: Namespace.providers() })`.
+- Prefer real provider SDK/client assertions for integration tests. If live credentials or real resources are expensive/dangerous, use a fake service layer but still run through `test.provider`, `stack.deploy(...)`, repeated deploy, and `stack.destroy()`.
+- Test create → update/noop/replace as appropriate → destroy in the same `test.provider` body so Alchemy state is shared across deploys.
+- Use the scratch stack handed to the test; do not write to `.alchemy/` or shared state from provider tests.
+- Provider implementations should close over services at provider construction (`const client = yield* Client` before returning lifecycle methods), matching Cloudflare providers. Do not leave `yield* Client` requirements inside `read`/`diff`/`reconcile`/`delete` unless the effect is explicitly provided there; `test.provider` should catch this with a “Service not found” failure.
+- For live provider tests that need credentials, resolve them through the same AuthProvider/config path as `alchemy deploy` (for example env-method credentials or an `alchemy login` test profile). Skip or gate the test when credentials are absent; do not commit secrets.
+- Keep pure helper tests too. Use unit tests for selection/name/status/mapping logic, and provider tests for Alchemy lifecycle semantics.
 
 ## Build and type checking
 
