@@ -108,7 +108,7 @@ tests:
     vars:
       skill: subagent-driven-development
       rule: Use a fresh subagent per task with two-stage review when tasks are independent.
-      scenario: The implementation plan lists several independent tasks and the agent dispatches a fresh subagent for each.
+      scenario: The implementation plan lists several independent tasks and the agent dispatches a fresh subagent for each, running a two-stage spec-then-quality review after every task.
     assert:
       - type: contains
         value: 'DECISION: ALLOW'
