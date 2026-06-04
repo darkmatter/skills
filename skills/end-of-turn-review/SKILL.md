@@ -46,7 +46,7 @@ scripts/review.sh --kind=turn < /tmp/turn-context.txt
 
 - `REVIEW_MODEL` — model alias to call (default `gpt-5.5`). Must be configured in LiteLLM at `LITELLM_BASE_URL`.
 - `LITELLM_BASE_URL` — defaults to `https://litellm.drkmttr.dev/v1`
-- `LITELLM_API_KEY` — required; read from `~/.config/litellm/key` if unset
+- `LITELLM_API_KEY` — required; read from `~/.secrets/litellm-api-key` if unset
 - `REVIEW_CONTEXT` — optional path to a file with extra context (the user prompt, prior plan, etc.) the reviewer should consider
 
 **Output format** — first line is one of:
