@@ -2,9 +2,12 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "eval:validate": "promptfoo validate config -c evals/skills/promptfooconfig.yaml -c evals/e2e/promptfooconfig.yaml",
+    "eval:validate": "promptfoo validate config -c evals/skills/promptfooconfig.yaml -c evals/e2e/promptfooconfig.yaml -c evals/repo-diff/promptfooconfig.yaml",
     "eval:ci": "promptfoo eval -c evals/skills/promptfooconfig.yaml --no-share --output evals/results/skills.json --output evals/results/skills.html",
-    "eval:e2e": "promptfoo eval -c evals/e2e/promptfooconfig.yaml --no-share --output evals/results/e2e.json --output evals/results/e2e.html"
+    "eval:e2e": "promptfoo eval -c evals/e2e/promptfooconfig.yaml --no-share --output evals/results/e2e.json --output evals/results/e2e.html",
+    "test:repo-diff": "node --test evals/repo-diff/assertions.test.js",
+    "eval:repo-diff": "promptfoo eval -c evals/repo-diff/promptfooconfig.yaml --no-share --output evals/results/repo-diff.json --output evals/results/repo-diff.html",
+    "eval:repo-diff:agent": "PROMPTFOO_REPO_DIFF_AGENT=1 npm run eval:repo-diff"
   },
   "devDependencies": {
     "promptfoo": "0.121.9"

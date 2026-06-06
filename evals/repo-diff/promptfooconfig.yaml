@@ -1,0 +1,81 @@
+# Repo-diff Promptfoo evaluation config
+#
+# Uses the Python provider in stub mode (no API keys needed).
+# Set PROMPTFOO_REPO_DIFF_AGENT=1 to enable real-agent mode.
+
+providers:
+  - id: file://provider.py
+    config:
+      # agentCommand: "your-agent-command-here"  # only used when PROMPTFOO_REPO_DIFF_AGENT=1
+
+prompts:
+  - "Apply the {{skill}} skill to the {{fixture}} project."
+
+tests:
+  - description: "TDD skill produces test file and refactors index.js"
+    vars:
+      fixture: mini-js-project
+      skill: test-driven-development
+      stub_patch: tdd.patch
+    assert:
+      # Diff must touch index.js
+      - type: javascript
+        value: "output.includes('diff --git a/index.js b/index.js')"
+
+      # Diff must create a new test file
+      - type: javascript
+        value: "output.includes('diff --git a/index.test.js b/index.test.js')"
+
+      # Diff must add a function definition
+      - type: javascript
+        value: "output.split('\\n').some(l => l.startsWith('+') && !l.startsWith('+++') && l.includes('function'))"
+
+      # Diff must add module.exports
+      - type: javascript
+        value: "output.split('\\n').some(l => l.startsWith('+') && !l.startsWith('+++') && l.includes('module.exports'))"
+
+      # Metadata: stub mode
+      - type: javascript
+        value: "context.providerResponse.metadata.mode === 'stub'"
+
+      # Metadata: correct fixture
+      - type: javascript
+        value: "context.providerResponse.metadata.fixture === 'mini-js-project'"
+
+      # Metadata: changed_file_count is 2
+      - type: javascript
+        value: "context.providerResponse.metadata.changed_file_count === 2"
+
+  - description: "Coding-standards skill adds error handling"
+    vars:
+      fixture: mini-js-project
+      skill: coding-standards
+      stub_patch: coding-standards.patch
+    assert:
+      # Diff must touch index.js
+      - type: javascript
+        value: "output.includes('diff --git a/index.js b/index.js')"
+
+      # Diff must NOT create new files (only modifies index.js)
+      - type: javascript
+        value: "!output.includes('diff --git a/index.test.js') && output.split('\\n').filter(l => l.startsWith('diff --git')).length === 1"
+
+      # Diff must add a try/catch block
+      - type: javascript
+        value: "output.split('\\n').some(l => l.startsWith('+') && !l.startsWith('+++') && l.includes('try'))"
+
+      # Diff must add error handling (catch)
+      - type: javascript
+        value: "output.split('\\n').some(l => l.startsWith('+') && !l.startsWith('+++') && l.includes('catch'))"
+
+      # Diff must add a function wrapping the read
+      - type: javascript
+        value: "output.split('\\n').some(l => l.startsWith('+') && !l.startsWith('+++') && l.includes('function'))"
+
+      # Metadata: stub mode
+      - type: javascript
+        value: "context.providerResponse.metadata.mode === 'stub'"
+
+      # Metadata: changed_file_count is 1
+      - type: javascript
+        value: "context.providerResponse.metadata.changed_file_count === 1"

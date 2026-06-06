@@ -41,3 +41,35 @@ jobs:
           name: promptfoo-skill-evals
           path: evals/results/*
           if-no-files-found: ignore
+
+  repo-diff-evals:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Validate Promptfoo configs
+        run: npm run eval:validate
+
+      - name: Run repo-diff assertion tests
+        run: npm run test:repo-diff
+
+      - name: Run repo-diff evals
+        run: npm run eval:repo-diff
+
+      - name: Upload eval artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: promptfoo-repo-diff-evals
+          path: evals/results/repo-diff.*
+          if-no-files-found: ignore

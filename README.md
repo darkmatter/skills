@@ -27,6 +27,10 @@ darkmatter/skills/
 ├── scripts/
 │   ├── new-project.sh       ← stamp template/ into a target dir
 │   └── validate-skill.sh    ← sanity-check skills/ catalog
+├── evals/
+│   ├── e2e/                 ← Promptfoo local workflow smoke evals
+│   ├── skills/              ← Promptfoo behavior evals (LLM decision checks)
+│   └── repo-diff/           ← structural evals (diff-based, no API keys)
 └── docs/
     ├── catalog.md           ← what's in skills/
     └── new-project-guide.md ← walkthrough for bootstrapping a project
