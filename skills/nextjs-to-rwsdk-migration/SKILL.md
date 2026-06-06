@@ -44,6 +44,10 @@ bunx create-rwsdk@latest create reference-app -f
 
 Copy that app's `src/{worker.tsx, client.tsx, app/document.tsx}`, `vite.config.mts`, `wrangler.jsonc`, `tsconfig.json`, and `types/` into your target as the starting point. Everything else in the target repo is layered on top.
 
+## UI source of truth
+
+Migration work should preserve the existing UI and component tree by default. If the migration exposes new UI choices, first check whether the target repo already has a design system. For Darkmatter new projects without a design system, the `darkmatter.io` website, and one-off UIs, use https://shadcn.darkmatter.io as the component and style reference. Flagship apps usually have their own design system; follow that system first.
+
 ## Migration roadmap
 
 These eight phases are how the `darkmatter/web` port landed in 4 commits + 1 fix-up:

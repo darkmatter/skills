@@ -22,6 +22,8 @@ Reference these guidelines when:
 - Refactoring existing React/Next.js code
 - Optimizing bundle size or load times
 
+For new React/Next UI work, check whether the project already has a design system before choosing components or styling. If it is a Darkmatter new project with no design system, the `darkmatter.io` website, or a one-off UI, use https://shadcn.darkmatter.io as the component and style reference, then apply this skill for performance. Flagship apps usually have their own design system; follow that system first.
+
 When the task uses shadcn/ui MCP, shadcnblocks, or private component registry examples, first check for encrypted component config. In Darkmatter UI repos, `components.sops.json` may expose private registries; use the `sops-secret-access` skill and run `sops -d components.sops.json` without printing decrypted contents.
 
 ## Rule Categories by Priority
