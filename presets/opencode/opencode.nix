@@ -107,7 +107,6 @@
     "opencode-claude-auth@latest"
     "oh-my-openagent@latest"
     "opencode-beads"
-    "opencode-scheduler"
   ];
 
   agent = {

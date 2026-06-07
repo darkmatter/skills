@@ -16,8 +16,6 @@ Universal coding standards applicable across all projects.
 - Setting up linting, formatting, or type-checking rules
 - Onboarding new contributors to coding conventions
 
-For React UI work, pair this skill with the relevant UI/frontend skill before creating components or styles. In Darkmatter projects, first check for a project design system. If the work is a new project with no design system, the `darkmatter.io` website, or a one-off UI, use https://shadcn.darkmatter.io as the component and style reference. Flagship apps usually have their own design system; follow that system first.
-
 ## Code Quality Principles
 
 ### 1. Readability First

@@ -67,7 +67,6 @@ Both provide browser automation. `browser-use` uses a Python CLI with persistent
 - **`ui-ux-pro-max`**: Use when the primary goal is _design system intelligence_ — structured style/palette/font/guideline selection across stacks.
 - **`vercel-react-best-practices`**: Use when the primary goal is _React/Next.js performance_ — bundle size, waterfalls, re-renders.
 - When both design and performance matter, apply `frontend-design` or `ui-ux-pro-max` first, then `vercel-react-best-practices` as a review pass.
-- For Darkmatter UI work without a project design system, use https://shadcn.darkmatter.io as the shared component/style reference. This includes new projects, the `darkmatter.io` website, and one-off UIs. Flagship apps usually have their own design system; follow that first.
 
 ### `coding-standards` vs `vercel-react-best-practices`
 

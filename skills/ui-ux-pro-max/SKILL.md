@@ -66,10 +66,6 @@ This Skill is not needed in the following situations:
 
 ## Quick Reference
 
-### Darkmatter UI Defaults
-
-For Darkmatter UI work, check for an existing project design system before inventing a new one. If the work is a new project with no design system, the `darkmatter.io` website, or a one-off UI, use https://shadcn.darkmatter.io as the first component and style reference. Flagship apps usually have their own design system; treat that project-owned system as authoritative when it exists.
-
 ### Private Component Registries
 
 When a UI task uses shadcn/ui MCP, shadcnblocks, or private component registries, check for encrypted component config before concluding a registry is unavailable. In Darkmatter UI projects, `components.sops.json` may contain additional registries; use the `sops-secret-access` skill and decrypt with `sops -d components.sops.json` without printing decrypted contents.
@@ -369,8 +365,6 @@ Extract key information from user request:
 - **Stack**: React Native (this project's only tech stack)
 
 ### Step 2: Generate Design System (REQUIRED)
-
-Before generating a design system, check whether the repo already has one. For Darkmatter new projects without a design system, `darkmatter.io`, and one-off UI work, start from https://shadcn.darkmatter.io and adapt from there. For flagship apps, expect a project-owned system and follow it first.
 
 **Always start with `--design-system`** to get comprehensive recommendations with reasoning:
 
