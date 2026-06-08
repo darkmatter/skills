@@ -145,6 +145,19 @@ in
     touch "$_oc_dst/.gitkeep"
   '';
 
+  home.activation.opencodePlugins = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+    _oc_src="${toString ./presets/opencode/plugins}"
+    _oc_dst="$HOME/.config/opencode/plugins"
+    mkdir -p "$_oc_dst"
+    for _entry in "$_oc_src"/*; do
+      _name=$(basename "$_entry")
+      [ "$_name" = ".DS_Store" ] && continue
+      rm -rf "$_oc_dst/$_name"
+      cp -Rf "$_entry" "$_oc_dst/$_name"
+    done
+    touch "$_oc_dst/.gitkeep"
+  '';
+
   # oh-my-openagent.json is written as a regular writable file, but reset from
   # the curated preset on every activation. This lets the plugin mutate it at
   # runtime without preserving drift across rebuilds.
