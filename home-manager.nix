@@ -152,8 +152,13 @@ in
     for _entry in "$_oc_src"/*; do
       _name=$(basename "$_entry")
       [ "$_name" = ".DS_Store" ] && continue
+      # Files/dirs copied from the nix store are read-only; make them writable
+      # before removal so rm -rf can traverse and delete subdirectories.
+      chmod -Rf u+w "$_oc_dst/$_name" 2>/dev/null || true
       rm -rf "$_oc_dst/$_name"
       cp -Rf "$_entry" "$_oc_dst/$_name"
+      # Ensure the copy is writable so future activations can remove it.
+      chmod -Rf u+w "$_oc_dst/$_name" 2>/dev/null || true
     done
     touch "$_oc_dst/.gitkeep"
   '';
