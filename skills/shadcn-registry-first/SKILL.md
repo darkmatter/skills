@@ -161,6 +161,29 @@ of `components.json`. In darkmatter repos this is handled per-project:
   or a SOPS-encrypted secret). A small `scripts/setup-components-json.sh` renders
   the template with the key.
 
+### Before running any `bunx shadcn` command
+
+The rendered `components.json` must exist **and be fresh** — a stale one from a
+previous session may carry an expired key. Always do these two steps first:
+
+1. **Build components.json**: run `scripts/setup-components-json.sh` from the repo
+   root. This reads the current key from himitsu and writes the gitignored
+   `components.json`. Skip this and you'll get 401 auth failures.
+2. **`cd` into the app directory** (e.g. `apps/web/`) before running
+   `bunx shadcn@latest add ...`. The CLI resolves registries from `components.json`
+   in the current working directory. Running from the monorepo root will fail.
+3. **Use `--overwrite`** flag to skip interactive prompts about existing files
+   (`utils.ts`, `button.tsx`, etc.) that the block may depend on but already exist
+   in the project.
+
+Typical invocation:
+```bash
+# From repo root:
+scripts/setup-components-json.sh
+cd apps/web
+bunx shadcn@latest add @shadcnblocks/hero253 --overwrite
+```
+
 If a registry call fails with a missing-env-var or auth error, the fix is to
 populate the key from the secret store — not to abandon the registry and
 hand-roll the component. See the `sops-secret-access` skill for the encrypted-
