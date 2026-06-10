@@ -79,3 +79,59 @@ tests:
       # Metadata: changed_file_count is 1
       - type: javascript
         value: "context.providerResponse.metadata.changed_file_count === 1"
+
+  - description: "Coding-standards skill replaces O(n^2) find-in-loop with a Map index"
+    vars:
+      fixture: enrich-loop
+      skill: coding-standards
+      stub_patch: coding-standards-nplusone.patch
+    assert:
+      # Diff must touch enrich.js and only enrich.js
+      - type: javascript
+        value: "output.includes('diff --git a/enrich.js b/enrich.js')"
+      - type: javascript
+        value: "output.split('\\n').filter(l => l.startsWith('diff --git')).length === 1"
+
+      # Diff must add a Map-based index
+      - type: javascript
+        value: "output.split('\\n').some(l => l.startsWith('+') && !l.startsWith('+++') && l.includes('new Map('))"
+
+      # Diff must use the index for lookup
+      - type: javascript
+        value: "output.split('\\n').some(l => l.startsWith('+') && !l.startsWith('+++') && l.includes('customersById.get'))"
+
+      # Diff must remove the linear .find() scan inside the loop
+      - type: javascript
+        value: "output.split('\\n').some(l => l.startsWith('-') && !l.startsWith('---') && l.includes('.find('))"
+
+      # Metadata: stub mode, single file changed
+      - type: javascript
+        value: "context.providerResponse.metadata.mode === 'stub'"
+      - type: javascript
+        value: "context.providerResponse.metadata.changed_file_count === 1"
+
+  - description: "Alchemy skill removes Date.now() from a physical resource name"
+    vars:
+      fixture: alchemy-run
+      skill: alchemy
+      stub_patch: alchemy-deterministic-name.patch
+    assert:
+      # Diff must touch alchemy.run.ts and only that file
+      - type: javascript
+        value: "output.includes('diff --git a/alchemy.run.ts b/alchemy.run.ts')"
+      - type: javascript
+        value: "output.split('\\n').filter(l => l.startsWith('diff --git')).length === 1"
+
+      # Diff must remove a line that used Date.now()
+      - type: javascript
+        value: "output.split('\\n').some(l => l.startsWith('-') && !l.startsWith('---') && l.includes('Date.now('))"
+
+      # Diff must NOT reintroduce Date.now() on any added line
+      - type: javascript
+        value: "!output.split('\\n').some(l => l.startsWith('+') && !l.startsWith('+++') && l.includes('Date.now('))"
+
+      # Metadata: stub mode, single file changed
+      - type: javascript
+        value: "context.providerResponse.metadata.mode === 'stub'"
+      - type: javascript
+        value: "context.providerResponse.metadata.changed_file_count === 1"

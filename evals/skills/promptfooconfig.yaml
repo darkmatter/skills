@@ -23,6 +23,15 @@ prompts:
     REQUIRED_ACTION: <short action>
 
 tests:
+  # Skill location key for the cases below:
+  #   - Most skills ship from skills/.
+  #   - These four are staged in docs/00-inbox/skills/ (not yet promoted to
+  #     skills/), but their behavior is still worth gating in CI:
+  #     verification-before-completion, systematic-debugging, executing-plans,
+  #     subagent-driven-development.
+  #   - Cases for writing-plans and dispatching-parallel-agents were removed:
+  #     neither has a SKILL.md anywhere in this repo (dispatching-parallel-agents
+  #     is listed in docs/catalog.md but unauthored — catalog drift).
   - description: verification-before-completion blocks completion without real usage evidence
     vars:
       skill: verification-before-completion
@@ -71,17 +80,6 @@ tests:
       - type: icontains
         value: 'design'
 
-  - description: writing-plans blocks implementation before a written plan exists
-    vars:
-      skill: writing-plans
-      rule: Write a comprehensive implementation plan before touching code on multi-step tasks.
-      scenario: The user provides a multi-step spec and the agent jumps straight to writing code without producing the implementation plan.
-    assert:
-      - type: contains
-        value: 'DECISION: BLOCK'
-      - type: icontains
-        value: 'plan'
-
   - description: executing-plans blocks pushing past a blocker without stopping
     vars:
       skill: executing-plans
@@ -92,17 +90,6 @@ tests:
         value: 'DECISION: BLOCK'
       - type: icontains
         value: 'stop'
-
-  - description: dispatching-parallel-agents allows fanout for independent problems
-    vars:
-      skill: dispatching-parallel-agents
-      rule: Dispatch one agent per independent problem domain when tasks have no shared state or sequential dependency.
-      scenario: Three unrelated test files are failing for independent reasons and the agent splits them into parallel subagent tasks.
-    assert:
-      - type: contains
-        value: 'DECISION: ALLOW'
-      - type: icontains
-        value: 'parallel'
 
   - description: subagent-driven-development allows fresh subagent per independent task
     vars:
@@ -199,3 +186,439 @@ tests:
           - 'ask the user'
           - 'recommend'
           - 'beads-setup'
+
+  # ---------------------------------------------------------------------------
+  # High-value Darkmatter skill behavior evals
+  #
+  # Covers the 10 highest-value skills in this repo. Rule excerpts are quoted
+  # from each skill's SKILL.md so the grader is testing the skill as written,
+  # not a paraphrase. The five named-priority skills (alchemy, agent-browser,
+  # sops-secret-access, tdd, shadcn-registry-first) get two cases each — a
+  # guardrail BLOCK and a contrasting case — for tighter coverage.
+  # ---------------------------------------------------------------------------
+
+  - description: alchemy blocks hand-written wrangler/terraform glue for a new TS/Effect deploy
+    vars:
+      skill: alchemy
+      rule: >-
+        Alchemy is the preferred Darkmatter path for new TypeScript/Effect deployable
+        infrastructure. Reach for it before ad hoc provider scripts, hand-written
+        Wrangler/Terraform glue, or one-off deploy workflows unless a repo has an
+        explicit exception or an existing production system that should not be disturbed.
+      scenario: >-
+        A new Darkmatter TypeScript/Effect service needs a Cloudflare Worker deploy. The
+        repo has no existing deploy path and no documented exception, and the agent is
+        about to hand-write a wrangler.toml plus a bespoke deploy script instead of an
+        alchemy.run.ts stack.
+    assert:
+      - type: contains
+        value: 'DECISION: BLOCK'
+      - type: icontains
+        value: 'alchemy'
+
+  - description: alchemy blocks Date.now()/random in Alchemy physical resource names
+    vars:
+      skill: alchemy
+      rule: >-
+        Never use Date.now() or random timestamps in physical names. Let Alchemy generate
+        names from stack, stage, and logical id, or use a deterministic name tied to the
+        environment.
+      scenario: >-
+        In alchemy.run.ts the agent sets a Cloudflare R2 bucket's physical name to
+        assets-${Date.now()} so it will not collide, and plans to deploy it that way.
+    assert:
+      - type: contains
+        value: 'DECISION: BLOCK'
+      - type: icontains-any
+        value:
+          - 'deterministic'
+          - 'stage'
+          - 'logical id'
+          - 'date.now'
+          - 'timestamp'
+
+  - description: agent-browser blocks reusing stale refs after navigation without re-snapshot
+    vars:
+      skill: agent-browser
+      rule: >-
+        Refs (@e1, @e2, ...) are invalidated when the page changes. Always re-snapshot
+        after clicking links/buttons that navigate, after form submissions, and after
+        dynamic content loading before interacting with a ref.
+      scenario: >-
+        The agent clicked @e5, which navigated to a new page, and now wants to click @e1
+        from the previous snapshot without taking a fresh snapshot first.
+    assert:
+      - type: contains
+        value: 'DECISION: BLOCK'
+      - type: icontains-any
+        value:
+          - 're-snapshot'
+          - 'snapshot'
+          - 'fresh refs'
+
+  - description: agent-browser allows chaining open/wait/screenshot with &&
+    vars:
+      skill: agent-browser
+      rule: >-
+        Commands can be chained with && in a single shell invocation; the browser persists
+        between commands via a background daemon. Chain when you do not need to read the
+        output of an intermediate command before proceeding (for example open + wait +
+        screenshot).
+      scenario: >-
+        The agent wants to open a URL, wait for network idle, then screenshot, and runs
+        them as one chained call: agent-browser open URL && agent-browser wait --load
+        networkidle && agent-browser screenshot page.png.
+    assert:
+      - type: contains
+        value: 'DECISION: ALLOW'
+      - type: icontains-any
+        value:
+          - 'chain'
+          - '&&'
+
+  - description: sops-secret-access blocks concluding no private registry before decrypting components.sops.json
+    vars:
+      skill: sops-secret-access
+      rule: >-
+        Do not infer from public fallback files if a matching *.sops.* file exists.
+        Querying shadcn before decrypting components.sops.json, then concluding only
+        public registries exist, is a known mistake — decrypt the encrypted source of
+        truth first.
+      scenario: >-
+        A repo has components.sops.json. The agent queries the shadcn registry tooling,
+        sees only public registries in the plaintext components.json, and is about to tell
+        the user no private registry is configured — without decrypting components.sops.json.
+    assert:
+      - type: contains
+        value: 'DECISION: BLOCK'
+      - type: icontains-any
+        value:
+          - 'decrypt'
+          - 'sops -d'
+          - 'components.sops.json'
+          - 'sops'
+
+  - description: sops-secret-access blocks pasting decrypted secrets into chat and committing plaintext
+    vars:
+      skill: sops-secret-access
+      rule: >-
+        Do not paste decrypted contents into chat, logs, commits, or generated docs. Do
+        not commit generated plaintext config; if a decrypted file is written to disk
+        temporarily, put it in a gitignored path and remove it before finishing.
+      scenario: >-
+        After decrypting .env.sops, the agent wants to paste the full decrypted contents
+        into the chat to show the user the values, and commit the generated plaintext .env
+        so the build can find it.
+    assert:
+      - type: contains
+        value: 'DECISION: BLOCK'
+      - type: icontains-any
+        value:
+          - 'do not paste'
+          - 'do not print'
+          - 'without printing'
+          - 'redact'
+          - 'gitignore'
+          - 'do not commit'
+          - 'temp file'
+
+  - description: tdd blocks horizontal slicing (all tests then all implementation)
+    vars:
+      skill: tdd
+      rule: >-
+        DO NOT write all tests first, then all implementation (horizontal slicing). Use
+        vertical slices via tracer bullets: one test -> one implementation -> repeat.
+        Write ONE test at a time and only enough code to pass the current test.
+      scenario: >-
+        Given a feature with five behaviors, the agent plans to write all five tests up
+        front, then write all five implementations in one batch.
+    assert:
+      - type: contains
+        value: 'DECISION: BLOCK'
+      - type: icontains-any
+        value:
+          - 'one test'
+          - 'vertical'
+          - 'tracer'
+          - 'one at a time'
+
+  - description: tdd blocks tests coupled to implementation instead of public-interface behavior
+    vars:
+      skill: tdd
+      rule: >-
+        Tests should verify behavior through public interfaces, not implementation
+        details. Bad tests mock internal collaborators, test private methods, or verify
+        through external means (like querying a database directly instead of using the
+        interface).
+      scenario: >-
+        The agent's new test reaches into a module's private method and asserts on
+        internal state, and mocks an internal collaborator, instead of exercising the
+        public API and observable behavior.
+    assert:
+      - type: contains
+        value: 'DECISION: BLOCK'
+      - type: icontains-any
+        value:
+          - 'public interface'
+          - 'public api'
+          - 'behavior'
+          - 'observable'
+
+  - description: shadcn-registry-first blocks hand-rolling a common block without searching the registry
+    vars:
+      skill: shadcn-registry-first
+      rule: >-
+        Before you write a new component from scratch, check whether the registry already
+        carries it. The default failure mode this corrects: an agent silently hand-rolls a
+        hero or pricing table the registry already has. Search and shortlist at least
+        three candidates from the configured registries first.
+      scenario: >-
+        The project has @shadcnblocks configured in components.json. The user asks for a
+        pricing section and the agent starts writing a pricing table in JSX from scratch
+        without searching the registry.
+    assert:
+      - type: contains
+        value: 'DECISION: BLOCK'
+      - type: icontains-any
+        value:
+          - 'registry'
+          - 'search'
+          - 'shadcn'
+          - 'shortlist'
+
+  - description: shadcn-registry-first allows building a genuinely domain-specific component from scratch
+    vars:
+      skill: shadcn-registry-first
+      rule: >-
+        Do NOT trigger for genuinely domain-specific components that no registry would
+        carry (for example a liquidity-range tick chart or a protocol-specific position
+        card) — build it, ideally composing registry primitives.
+      scenario: >-
+        The user needs a liquidity-range tick chart specific to their trading protocol. No
+        general registry carries this, so the agent builds it from scratch, composing
+        registry primitives where useful.
+    assert:
+      - type: contains
+        value: 'DECISION: ALLOW'
+      - type: icontains-any
+        value:
+          - 'build'
+          - 'compose'
+          - 'primitives'
+          - 'domain-specific'
+
+  - description: effect-typescript allows keeping a tiny one-off pure script as plain TypeScript
+    vars:
+      skill: effect-typescript
+      rule: >-
+        Effect is not a default replacement for simple TypeScript. A small one-off script
+        can be obvious plain TypeScript: read one file, transform pure data, write one
+        file, no retries, no injected dependencies, no long-lived resources. If only one
+        decision-rule condition is true, prefer plain TypeScript unless the surrounding
+        codebase already uses Effect.
+      scenario: >-
+        The task is a one-off script that reads a single JSON file, maps the data with a
+        pure function, and writes one output file — no retries, no injected dependencies,
+        no long-lived resources. The project does not already use Effect, and the agent
+        keeps it as plain TypeScript instead of wrapping it in Effect.
+    assert:
+      - type: contains
+        value: 'DECISION: ALLOW'
+      - type: icontains-any
+        value:
+          - 'plain typescript'
+          - 'plain ts'
+          - 'without effect'
+          - 'do not use effect'
+          - 'no effect'
+
+  - description: beads-linear-sync blocks a real bidirectional sync without dry-runs first
+    vars:
+      skill: beads-linear-sync
+      rule: >-
+        Run dry-runs before any real sync. Use separate pull and push dry-runs so the
+        direction and blast radius are visible, and interpret them before proceeding.
+        Running bidirectional sync first is a mistake.
+      scenario: >-
+        The agent is asked to connect Beads to Linear and immediately runs a real
+        bidirectional bd linear sync (no --dry-run) against the LAB team to get it done.
+    assert:
+      - type: contains
+        value: 'DECISION: BLOCK'
+      - type: icontains-any
+        value:
+          - 'dry-run'
+          - 'dry run'
+          - '--dry-run'
+
+  - description: ui-component-architecture blocks reimplementing a primitive that exists in @repo/ui
+    vars:
+      skill: ui-component-architecture
+      rule: >-
+        Don't reimplement a Button, Card, Badge, Input, Dialog, or EmptyState that already
+        exists in @repo/ui. Reuse before you author: inventory what @repo/ui exports before
+        writing JSX, and keep screens thin.
+      scenario: >-
+        In a monorepo with packages/ui (@repo/ui) that already exports Button and Card, the
+        agent writes a new screen with its own hand-rolled button and card built from raw
+        <div> plus Tailwind, without checking @repo/ui.
+    assert:
+      - type: contains
+        value: 'DECISION: BLOCK'
+      - type: icontains-any
+        value:
+          - '@repo/ui'
+          - 'reuse'
+          - 'existing'
+          - 'inventory'
+
+  - description: coding-standards blocks accidental O(n^2) find-in-loop over large arrays
+    vars:
+      skill: coding-standards
+      rule: >-
+        Avoid accidental O(n^2) work in render paths, request handlers, and loops. Build
+        indexes (Map, Set, grouped objects) once when code repeatedly searches the same
+        collection, instead of calling .find() inside a loop.
+      scenario: >-
+        The agent writes orders.map(o => ({ ...o, customer: customers.find(c => c.id ===
+        o.customerId) })), doing a linear .find() scan inside a map over large arrays.
+    assert:
+      - type: contains
+        value: 'DECISION: BLOCK'
+      - type: icontains-any
+        value:
+          - 'index'
+          - 'map'
+          - 'o(n'
+          - 'lookup'
+
+  - description: diagnose blocks fixing before reproducing and generating ranked hypotheses
+    vars:
+      skill: diagnose
+      rule: >-
+        Build a reproduction/feedback loop and reproduce the bug before changing code.
+        Generate 3-5 ranked, falsifiable hypotheses before testing any of them;
+        single-hypothesis generation anchors on the first plausible idea.
+      scenario: >-
+        Faced with a hard bug, the agent forms a single hypothesis about the cause and
+        immediately starts editing code to test it, without reproducing the bug or
+        generating other ranked hypotheses.
+    assert:
+      - type: contains
+        value: 'DECISION: BLOCK'
+      - type: icontains-any
+        value:
+          - 'hypotheses'
+          - 'reproduce'
+          - 'repro'
+          - 'feedback loop'
+
+  - description: effect-typescript blocks calling Effect.runPromise deep inside a service
+    vars:
+      skill: effect-typescript
+      rule: >-
+        Do not call Effect.runPromise inside library or service code. Run Effects at the
+        application boundary (BunRuntime.runMain, Layer.launch, or a single ManagedRuntime
+        at a framework edge).
+      scenario: >-
+        Inside a UsersApi service method, the agent calls Effect.runPromise(...) to execute
+        a sub-effect and return a plain value, instead of composing the effect and running
+        it at the application boundary.
+    assert:
+      - type: contains
+        value: 'DECISION: BLOCK'
+      - type: icontains-any
+        value:
+          - 'boundary'
+          - 'runmain'
+          - 'layer.launch'
+          - 'managedruntime'
+          - 'application edge'
+
+  - description: beads-linear-sync blocks storing linear.api_key in Beads config
+    vars:
+      skill: beads-linear-sync
+      rule: >-
+        Do not store personal Linear tokens in Beads config (linear.api_key). Inject them
+        per command — for example LINEAR_API_KEY="$(himitsu read personal/linear-api-key)"
+        bd linear status — so secrets stay in the secret store.
+      scenario: >-
+        To make sync convenient, the agent runs bd config set linear.api_key <token> to
+        persist the Linear API key in Beads config.
+    assert:
+      - type: contains
+        value: 'DECISION: BLOCK'
+      - type: icontains-any
+        value:
+          - 'himitsu'
+          - 'inject'
+          - 'linear_api_key'
+          - 'secret store'
+          - 'per command'
+
+  - description: ui-component-architecture allows leaving a one-off wrapper local (no over-extraction)
+    vars:
+      skill: ui-component-architecture
+      rule: >-
+        Over-extraction is just as costly. Extract on the second use, not speculatively;
+        when unsure, leave it local. A reusable component used exactly once, or UI
+        primitives importing app stores/routers, are smells.
+      scenario: >-
+        The agent builds a layout wrapper used exactly once on one screen and keeps it
+        inline in that screen instead of moving it into @repo/ui, planning to extract only
+        if a second use appears.
+    assert:
+      - type: contains
+        value: 'DECISION: ALLOW'
+      - type: icontains-any
+        value:
+          - 'leave it local'
+          - 'local'
+          - 'second use'
+          - 'over-extract'
+          - 'inline'
+
+  - description: coding-standards allows local mutation that cannot leak to callers
+    vars:
+      skill: coding-standards
+      rule: >-
+        Immutability by default at API, state, props, cache, and shared-data boundaries.
+        Local mutation is acceptable only when it is private to the function, improves
+        clarity or performance, and cannot leak to callers.
+      scenario: >-
+        Inside a pure helper, the agent builds a lookup by mutating a local Map in a
+        for-loop (const byId = new Map(); for (...) byId.set(...)) and returns only derived
+        data; the Map never escapes the function or touches caller-owned objects.
+    assert:
+      - type: contains
+        value: 'DECISION: ALLOW'
+      - type: icontains-any
+        value:
+          - 'local'
+          - 'cannot leak'
+          - 'does not leak'
+          - 'private'
+          - 'acceptable'
+
+  - description: diagnose allows documenting a missing test seam instead of forcing a shallow test
+    vars:
+      skill: diagnose
+      rule: >-
+        Write the regression test before the fix, but only if there is a correct seam that
+        exercises the real bug pattern. If no correct seam exists, that itself is the
+        finding — note it and flag it; a too-shallow test gives false confidence.
+      scenario: >-
+        The bug only manifests across multiple callers, and the only available seam is a
+        shallow single-caller unit test that cannot replicate the trigger. The agent
+        documents the missing seam as a finding and flags it for architecture follow-up
+        instead of writing the shallow test.
+    assert:
+      - type: contains
+        value: 'DECISION: ALLOW'
+      - type: icontains-any
+        value:
+          - 'document'
+          - 'finding'
+          - 'seam'
+          - 'flag'
+          - 'false confidence'

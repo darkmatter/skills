@@ -1,0 +1,17 @@
+{
+  "name": "darkmatter",
+  "owner": {
+    "name": "Darkmatter",
+    "email": "cooper@darkmatter.io"
+  },
+  "description": "Darkmatter team plugin marketplace, served from the darkmatter/skills repo.",
+  "plugins": [
+    {
+      "name": "darkmatter-skills",
+      "source": "./",
+      "description": "Darkmatter's team-wide shared skills catalog: TypeScript/Effect, Alchemy deploys, Nix, shadcn-first UI, code quality, debugging, and agent workflow discipline.",
+      "category": "productivity",
+      "keywords": ["skills", "darkmatter", "effect", "alchemy", "nix", "shadcn", "tdd"]
+    }
+  ]
+}

@@ -1,0 +1,21 @@
+diff --git a/enrich.js b/enrich.js
+index bd9544a..57aa695 100644
+--- a/enrich.js
++++ b/enrich.js
+@@ -8,10 +8,14 @@ const customers = [
+   { id: "c2", name: "Linus" },
+ ];
+ 
+-// Enrich each order with its customer record.
++// Build an index once to avoid an O(n^2) scan inside the loop.
++const customersById = new Map(
++  customers.map((customer) => [customer.id, customer]),
++);
++
+ const enriched = orders.map((order) => ({
+   ...order,
+-  customer: customers.find((customer) => customer.id === order.customerId),
++  customer: customersById.get(order.customerId),
+ }));
+ 
+ module.exports = { enriched };

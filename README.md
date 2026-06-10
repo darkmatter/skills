@@ -8,7 +8,7 @@ locations as needed.
 This repo ships four things:
 
 1. **OpenCode-first presets** (`presets/`) — installable source packs for LLM clients.
-2. **A catalog of shared skills** (`skills/`) — installed across all darkmatter projects via Nix Home Manager.
+2. **A catalog of shared skills** (`skills/`) — installed across all darkmatter projects via Nix Home Manager, or as a Claude Code plugin (see [Claude Code plugin marketplace](#claude-code-plugin-marketplace)).
 3. **A project template** (`template/`) — `.agent/`, config, and shims to stamp into a new project repo.
 4. **Tooling** (`scripts/`) — generators, installers, sync scripts, and validation helpers.
 
@@ -18,6 +18,7 @@ It is **provider-agnostic**. Skills and `.agent/` content target any agent tool 
 
 ```
 darkmatter/skills/
+├── .claude-plugin/          ← Claude Code marketplace + plugin manifests
 ├── README.md                ← this file
 ├── flake.nix                ← Nix entry; exports the Home Manager module
 ├── home-manager.nix         ← HM module that wires skills/ into agent CLIs
@@ -35,6 +36,26 @@ darkmatter/skills/
     ├── catalog.md           ← what's in skills/
     └── new-project-guide.md ← walkthrough for bootstrapping a project
 ```
+
+## Claude Code plugin marketplace
+
+The skills catalog is also installable as a Claude Code plugin — no Nix required.
+Inside Claude Code:
+
+```
+/plugin marketplace add darkmatter/skills
+/plugin install darkmatter-skills@darkmatter
+```
+
+`.claude-plugin/marketplace.json` defines the marketplace and lists the repo root
+(`./`) as a single plugin; `.claude-plugin/plugin.json` is that plugin's manifest.
+Claude Code auto-discovers every `skills/<name>/SKILL.md`, so adding a skill to the
+catalog adds it to the plugin with no extra registration. Validate changes with
+`claude plugin validate .`.
+
+The Nix Home Manager module remains the primary distribution path on darkmatter
+machines; the marketplace is for Claude Code users outside that setup (or for
+trying the catalog before wiring up Nix).
 
 ## OpenCode presets
 
