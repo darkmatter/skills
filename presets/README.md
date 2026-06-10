@@ -9,6 +9,7 @@ directories without making the repo root itself a client config directory.
 ## Packs
 
 - `base/` - cross-client instructions and shared policy for all clients.
+- `claude/` - Claude Code-native config; currently custom themes installed to `~/.claude/themes/`.
 - `opencode/` - OpenCode-native config, commands, agents, plugins, tools, and TUI settings.
 
 Shared skills stay in the repository-level `skills/` catalog so they can be

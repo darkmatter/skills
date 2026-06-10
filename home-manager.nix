@@ -163,6 +163,23 @@ in
     touch "$_oc_dst/.gitkeep"
   '';
 
+  # Claude Code custom themes (~/.claude/themes/<name>.json, selected via
+  # /theme → custom:<name>). Copied as real files rather than symlinked:
+  # Claude Code treats this directory as user-writable (the /theme picker
+  # creates and edits themes here), and cp -f tolerates pre-existing
+  # unmanaged copies where a home.file symlink would fail activation.
+  # Team themes are reset from the preset on every rebuild.
+  home.activation.claudeThemes = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+    _ct_src="${toString ./presets/claude/themes}"
+    _ct_dst="$HOME/.claude/themes"
+    mkdir -p "$_ct_dst"
+    for _f in "$_ct_src"/*.json; do
+      _name=$(basename "$_f")
+      cp -Lf "$_f" "$_ct_dst/$_name"
+      chmod u+w "$_ct_dst/$_name"
+    done
+  '';
+
   # oh-my-openagent.json is written as a regular writable file, but reset from
   # the curated preset on every activation. This lets the plugin mutate it at
   # runtime without preserving drift across rebuilds.
