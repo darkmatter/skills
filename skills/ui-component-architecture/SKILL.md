@@ -37,7 +37,7 @@ imported as `@repo/ui`.
 
 - Non-React code, or a single-package app with no shared UI package to reuse into
   (still keep components small, but there's nothing to graduate to).
-- A genuinely one-off layout wrapper used exactly once — extract on the *second*
+- A genuinely one-off layout wrapper used exactly once — extract on the _second_
   use, not speculatively.
 - Editing the internals of one existing component, not adding a new surface.
 
@@ -58,7 +58,7 @@ Don't reimplement a `Button`, `Card`, `Badge`, `Input`, `Dialog`, or
 
 ### Keep screens thin
 
-A screen should read as *composition*: a handful of named components plus data
+A screen should read as _composition_: a handful of named components plus data
 wiring. If a route file is a wall of Tailwind, that's the smell. The target is
 that a page's JSX is mostly `<NamedThing .../>` calls and the visual detail lives
 inside those components. The moment you're writing the same cluster of divs a
@@ -73,7 +73,7 @@ The load-bearing heuristic for what moves into the shared package:
   `Skeleton`, `Input`, `Dialog`.
 - **Stays in the app:** app-specific composition (a particular dashboard's
   layout), one-off glue, and anything carrying data-wiring or business logic.
-- **When unsure, leave it local.** Extract on the *second* use, not the first.
+- **When unsure, leave it local.** Extract on the _second_ use, not the first.
   An `@repo/ui` full of single-use components with app-specific props is its own
   smell (see "Avoiding over-extraction").
 
@@ -95,8 +95,8 @@ grep for candidates). Note the primitives you'll reuse so you don't rebuild them
 ### 2. Sketch the screen as composition
 
 Before writing detail, outline the page as a tree of named components. Tag each
-node: *exists in `@repo/ui`* / *app-specific composition* / *new but looks
-reusable*. This tells you what to import, what to inline, and what to extract.
+node: _exists in `@repo/ui`_ / _app-specific composition_ / _new but looks
+reusable_. This tells you what to import, what to inline, and what to extract.
 
 ### 3. Author the screen thin
 
@@ -124,12 +124,12 @@ For each piece that meets the graduation heuristic:
 
 ## What graduates vs what stays
 
-| Stays in the app                          | Graduates to `@repo/ui`                     |
-| ----------------------------------------- | ------------------------------------------- |
-| The `/dashboard` page layout              | `StatCard`, `Badge`, `EmptyState`           |
-| Route-specific data fetching and wiring   | `Button`, `Input`, `Dialog`, `Skeleton`     |
-| A hero used once on one marketing page    | A hero variant reused across 3+ pages       |
-| Business logic, feature flags, app state  | Presentational primitives that take props   |
+| Stays in the app                         | Graduates to `@repo/ui`                   |
+| ---------------------------------------- | ----------------------------------------- |
+| The `/dashboard` page layout             | `StatCard`, `Badge`, `EmptyState`         |
+| Route-specific data fetching and wiring  | `Button`, `Input`, `Dialog`, `Skeleton`   |
+| A hero used once on one marketing page   | A hero variant reused across 3+ pages     |
+| Business logic, feature flags, app state | Presentational primitives that take props |
 
 ## Avoiding over-extraction
 
@@ -156,8 +156,8 @@ it can't be expressed as presentational props, it isn't a shared primitive yet.
 
 ## Relationship to other skills
 
-- `shadcn-registry-first` — sources *external* blocks from registries. This skill
-  governs *internal* reuse and extraction. They compose: registry → app screen →
+- `shadcn-registry-first` — sources _external_ blocks from registries. This skill
+  governs _internal_ reuse and extraction. They compose: registry → app screen →
   graduate stable pieces into `@repo/ui`.
 - `coding-standards` — general DRY, file-size, and module-boundary guidance. This
   is the React + monorepo specialization of those principles at component

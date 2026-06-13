@@ -62,6 +62,7 @@ Duplicate check: none found
 Safety check: passed with removals
 
 Removed categories:
+
 - Personal life details
 - Gossip-adjacent teammate commentary
 
@@ -69,6 +70,7 @@ Draft:
 <full note>
 
 Reply with:
+
 - submit
 - edit: <changes>
 - discard

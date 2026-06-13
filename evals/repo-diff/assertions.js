@@ -40,16 +40,16 @@ export function getChangedFiles(diff) {
  */
 export function diffTouchesFile(diff, matcher) {
   const files = getChangedFiles(diff);
-  if (typeof matcher === 'string') {
+  if (typeof matcher === "string") {
     return files.includes(matcher);
   }
   if (matcher instanceof RegExp) {
     return files.some((f) => matcher.test(f));
   }
-  if (typeof matcher === 'function') {
+  if (typeof matcher === "function") {
     return files.some(matcher);
   }
-  throw new TypeError('matcher must be string, RegExp, or function');
+  throw new TypeError("matcher must be string, RegExp, or function");
 }
 
 /**
@@ -74,11 +74,11 @@ export function diffDoesNotTouchFile(diff, matcher) {
  */
 export function diffAddsLine(diff, pattern) {
   if (!diff) return false;
-  const lines = diff.split('\n');
+  const lines = diff.split("\n");
   for (const line of lines) {
-    if (line.startsWith('+') && !line.startsWith('+++')) {
+    if (line.startsWith("+") && !line.startsWith("+++")) {
       const content = line.slice(1);
-      if (typeof pattern === 'string') {
+      if (typeof pattern === "string") {
         if (content.includes(pattern)) return true;
       } else {
         if (pattern.test(content)) return true;
@@ -98,11 +98,11 @@ export function diffAddsLine(diff, pattern) {
  */
 export function diffRemovesLine(diff, pattern) {
   if (!diff) return false;
-  const lines = diff.split('\n');
+  const lines = diff.split("\n");
   for (const line of lines) {
-    if (line.startsWith('-') && !line.startsWith('---')) {
+    if (line.startsWith("-") && !line.startsWith("---")) {
       const content = line.slice(1);
-      if (typeof pattern === 'string') {
+      if (typeof pattern === "string") {
         if (content.includes(pattern)) return true;
       } else {
         if (pattern.test(content)) return true;

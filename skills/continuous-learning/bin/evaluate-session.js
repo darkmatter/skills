@@ -207,21 +207,16 @@ function trimTrailingSeparators(input) {
 }
 
 function resolveLearnedStoragePaths(config) {
-  const explicitSkillsRoot = trimTrailingSeparators(
-    expandHome(config.skills_root_path || ""),
-  );
+  const explicitSkillsRoot = trimTrailingSeparators(expandHome(config.skills_root_path || ""));
   const explicitMetadataRoot = trimTrailingSeparators(
     expandHome(config.learned_metadata_path || ""),
   );
-  const legacyLearnedRoot = trimTrailingSeparators(
-    expandHome(config.learned_skills_path || ""),
-  );
+  const legacyLearnedRoot = trimTrailingSeparators(expandHome(config.learned_skills_path || ""));
 
   if (explicitSkillsRoot) {
     return {
       skillsRoot: explicitSkillsRoot,
-      learnedMetadataRoot:
-        explicitMetadataRoot || path.join(explicitSkillsRoot, "learned"),
+      learnedMetadataRoot: explicitMetadataRoot || path.join(explicitSkillsRoot, "learned"),
     };
   }
 
@@ -409,12 +404,8 @@ function buildTranscriptFromOpencodeSqlite(sessionId) {
     const parts = partsByMessageID.get(messageID);
     const content = Array.isArray(parts)
       ? parts
-          .filter(
-            (part) => part && typeof part === "object" && part.type === "text",
-          )
-          .map((part) =>
-            typeof part.text === "string" ? part.text.trim() : "",
-          )
+          .filter((part) => part && typeof part === "object" && part.type === "text")
+          .map((part) => (typeof part.text === "string" ? part.text.trim() : ""))
           .filter((value) => value.length > 0)
           .join("\n\n")
       : "";
@@ -466,23 +457,15 @@ function renderPartToText(part) {
 
   if (part.type === "tool" && typeof part.tool === "string") {
     const state = part.state;
-    if (
-      state &&
-      typeof state === "object" &&
-      typeof state.status === "string"
-    ) {
+    if (state && typeof state === "object" && typeof state.status === "string") {
       if (state.status === "completed") {
         const title = typeof state.title === "string" ? state.title : "";
-        return title
-          ? `[tool:${part.tool}] ${title}`
-          : `[tool:${part.tool}] completed`;
+        return title ? `[tool:${part.tool}] ${title}` : `[tool:${part.tool}] completed`;
       }
 
       if (state.status === "error") {
         const error = typeof state.error === "string" ? state.error : "";
-        return error
-          ? `[tool:${part.tool}] error: ${error}`
-          : `[tool:${part.tool}] error`;
+        return error ? `[tool:${part.tool}] error: ${error}` : `[tool:${part.tool}] error`;
       }
 
       if (state.status === "running") {
@@ -532,8 +515,7 @@ async function buildTranscriptFromOpencodeStorage(sessionId) {
       if (msg.sessionID !== sessionId) continue;
       if (typeof msg.id !== "string" || typeof msg.role !== "string") continue;
 
-      const created =
-        msg.time && typeof msg.time.created === "number" ? msg.time.created : 0;
+      const created = msg.time && typeof msg.time.created === "number" ? msg.time.created : 0;
       messages.push({
         id: msg.id,
         role: msg.role,
@@ -612,12 +594,7 @@ function normalizeTranscript(raw) {
   }
 
   if (payload && typeof payload === "object") {
-    const candidates = [
-      payload.messages,
-      payload.events,
-      payload.transcript,
-      payload.items,
-    ];
+    const candidates = [payload.messages, payload.events, payload.transcript, payload.items];
     const firstArray = candidates.find(Array.isArray);
     if (firstArray) {
       const merged = firstArray
@@ -627,9 +604,7 @@ function normalizeTranscript(raw) {
           }
           if (entry && typeof entry === "object") {
             const role = String(entry.role || entry.type || "message");
-            const text = String(
-              entry.content || entry.message || entry.text || "",
-            );
+            const text = String(entry.content || entry.message || entry.text || "");
             return `${role}: ${text}`;
           }
           return "";
@@ -690,9 +665,7 @@ function collectExamples(text, keywords) {
   const picks = [];
   for (const line of lines) {
     const lower = line.toLowerCase();
-    const hit = keywords.some((keyword) =>
-      lower.includes(keyword.toLowerCase()),
-    );
+    const hit = keywords.some((keyword) => lower.includes(keyword.toLowerCase()));
     if (hit) {
       picks.push(line);
     }
@@ -702,14 +675,10 @@ function collectExamples(text, keywords) {
   }
 
   if (picks.length === 0) {
-    return [
-      "No direct excerpt available; inferred from recurring session flow.",
-    ];
+    return ["No direct excerpt available; inferred from recurring session flow."];
   }
 
-  return picks.map((line) =>
-    line.length > 160 ? `${line.slice(0, 157)}...` : line,
-  );
+  return picks.map((line) => (line.length > 160 ? `${line.slice(0, 157)}...` : line));
 }
 
 /**
@@ -998,9 +967,7 @@ async function main() {
     try {
       rawTranscript = await fs.readFile(transcriptPath, "utf8");
     } catch {
-      process.stdout.write(
-        "Transcript file not readable; skipping extraction\n",
-      );
+      process.stdout.write("Transcript file not readable; skipping extraction\n");
       return;
     }
   } else if (sessionId) {
@@ -1016,9 +983,7 @@ async function main() {
 
   const normalized = normalizeTranscript(rawTranscript);
   if (normalized.messageCount < Number(config.min_session_length || 10)) {
-    process.stdout.write(
-      `Session too short (${normalized.messageCount} messages); skipping\n`,
-    );
+    process.stdout.write(`Session too short (${normalized.messageCount} messages); skipping\n`);
     return;
   }
 
@@ -1042,10 +1007,7 @@ async function main() {
     return;
   }
 
-  const indexPath = path.join(
-    learnedMetadataRoot,
-    ".continuous-learning-index.json",
-  );
+  const indexPath = path.join(learnedMetadataRoot, ".continuous-learning-index.json");
   const indexData = await readJsonFile(indexPath, {
     session_history: [],
     skill_signatures: [],
@@ -1057,9 +1019,7 @@ async function main() {
   );
 
   if (alreadyProcessed) {
-    process.stdout.write(
-      "Session already processed; skipping duplicate extraction\n",
-    );
+    process.stdout.write("Session already processed; skipping duplicate extraction\n");
     return;
   }
 
@@ -1068,11 +1028,7 @@ async function main() {
   for (const item of ranked) {
     const def = PATTERN_DEFS[item.name];
     const signatureBase = `${item.name}:${sessionFingerprint}`;
-    const signature = crypto
-      .createHash("sha1")
-      .update(signatureBase)
-      .digest("hex")
-      .slice(0, 12);
+    const signature = crypto.createHash("sha1").update(signatureBase).digest("hex").slice(0, 12);
 
     const existing = (indexData.skill_signatures || []).some(
       (entry) => entry && entry.signature === signature,
@@ -1081,11 +1037,7 @@ async function main() {
       continue;
     }
 
-    const descriptiveSlug = deriveDescriptiveSlug(
-      normalized.text,
-      item.name,
-      def.keywords,
-    );
+    const descriptiveSlug = deriveDescriptiveSlug(normalized.text, item.name, def.keywords);
 
     const skillDirectoryName = await pickLearnedSkillDirectoryName({
       skillsRoot,
@@ -1140,9 +1092,7 @@ async function main() {
   const dedupeWindow = Number(config.dedupe_window_sessions || 20);
   if (Number.isFinite(dedupeWindow) && dedupeWindow > 0) {
     indexData.session_history = indexData.session_history.slice(-dedupeWindow);
-    indexData.skill_signatures = indexData.skill_signatures.slice(
-      -dedupeWindow * 3,
-    );
+    indexData.skill_signatures = indexData.skill_signatures.slice(-dedupeWindow * 3);
   }
 
   await fs.writeFile(indexPath, JSON.stringify(indexData, null, 2), "utf8");
@@ -1152,9 +1102,7 @@ async function main() {
     return;
   }
 
-  process.stdout.write(
-    `Generated ${created.length} learned skill(s):\n${created.join("\n")}\n`,
-  );
+  process.stdout.write(`Generated ${created.length} learned skill(s):\n${created.join("\n")}\n`);
 }
 
 if (require.main === module) {

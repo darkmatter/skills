@@ -1,6 +1,6 @@
 # Wiring the reviewer into your end-of-turn hooks
 
-The skill ships logic; the hook decides *when* it fires. The wrapper script is `scripts/diff-review-hook.sh` — it's client-agnostic and works with any caller that:
+The skill ships logic; the hook decides _when_ it fires. The wrapper script is `scripts/diff-review-hook.sh` — it's client-agnostic and works with any caller that:
 
 - runs it with cwd inside a git repo
 - captures its stdout and either surfaces it to the next agent turn or prints it to the user
@@ -39,7 +39,9 @@ The `Stop` event fires when the assistant finishes a turn. Stdout from the hook 
 {
   "hooks": {
     "session.idle": {
-      "command": ["/Users/cm/git/darkmatter/skills/skills/end-of-turn-review/scripts/diff-review-hook.sh"]
+      "command": [
+        "/Users/cm/git/darkmatter/skills/skills/end-of-turn-review/scripts/diff-review-hook.sh"
+      ]
     }
   }
 }
@@ -93,8 +95,8 @@ The diff hook only handles code. To review a plan, invoke the skill explicitly:
 cat plan.md | /path/to/skills/end-of-turn-review/scripts/review.sh --kind=plan
 ```
 
-Or instruct your planner agent to end its output with: *"Run end-of-turn-review on this plan before executing."* — the orchestrator picks up the skill and routes the plan through it.
+Or instruct your planner agent to end its output with: _"Run end-of-turn-review on this plan before executing."_ — the orchestrator picks up the skill and routes the plan through it.
 
 ## Why the wrapper is client-agnostic
 
-Everything client-specific lives in the *config snippet* (settings.json, hooks.json, etc.) — that's just a path pointing to the wrapper. The wrapper itself only depends on `git`, `bash`, and `review.sh`. Swapping editors or agent runtimes doesn't require touching the skill.
+Everything client-specific lives in the _config snippet_ (settings.json, hooks.json, etc.) — that's just a path pointing to the wrapper. The wrapper itself only depends on `git`, `bash`, and `review.sh`. Swapping editors or agent runtimes doesn't require touching the skill.

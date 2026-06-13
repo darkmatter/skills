@@ -53,10 +53,7 @@ import type { ImgHTMLAttributes, CSSProperties } from "react";
 
 type StaticImageData = { src: string };
 
-type ImageProps = Omit<
-  ImgHTMLAttributes<HTMLImageElement>,
-  "src" | "width" | "height"
-> & {
+type ImageProps = Omit<ImgHTMLAttributes<HTMLImageElement>, "src" | "width" | "height"> & {
   src: string | StaticImageData;
   alt: string;
   width?: number | string;
@@ -138,10 +135,7 @@ export function usePathname(): string {
     window.addEventListener("rwsdk:navigation", onChange as EventListener);
     return () => {
       window.removeEventListener("popstate", onChange);
-      window.removeEventListener(
-        "rwsdk:navigation",
-        onChange as EventListener,
-      );
+      window.removeEventListener("rwsdk:navigation", onChange as EventListener);
     };
   }, []);
 
@@ -150,24 +144,18 @@ export function usePathname(): string {
 
 export function useSearchParams(): URLSearchParams | null {
   const [params, setParams] = useState<URLSearchParams | null>(() =>
-    typeof window === "undefined"
-      ? null
-      : new URLSearchParams(window.location.search),
+    typeof window === "undefined" ? null : new URLSearchParams(window.location.search),
   );
 
   useEffect(() => {
     if (typeof window === "undefined") return;
     setParams(new URLSearchParams(window.location.search));
-    const onChange = () =>
-      setParams(new URLSearchParams(window.location.search));
+    const onChange = () => setParams(new URLSearchParams(window.location.search));
     window.addEventListener("popstate", onChange);
     window.addEventListener("rwsdk:navigation", onChange as EventListener);
     return () => {
       window.removeEventListener("popstate", onChange);
-      window.removeEventListener(
-        "rwsdk:navigation",
-        onChange as EventListener,
-      );
+      window.removeEventListener("rwsdk:navigation", onChange as EventListener);
     };
   }, []);
 

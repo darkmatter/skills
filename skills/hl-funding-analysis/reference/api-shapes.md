@@ -60,6 +60,7 @@ Hourly funding rate history per coin.
 ```
 
 **Important constraints:**
+
 - Maximum 500 records per call (~20.8 days hourly)
 - Paginate by setting next call's `startTime` to `last_record.time + 1`
 - Stop when chunk returns < 500 records
@@ -69,6 +70,7 @@ Hourly funding rate history per coin.
 Price candles per coin.
 
 **Request:**
+
 ```json
 {
   "type": "candleSnapshot",
@@ -109,6 +111,7 @@ Account state for a user.
 **Response shape:** see [HL docs](https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint).
 
 Key fields used by daily reports:
+
 - `marginSummary.accountValue`
 - `marginSummary.totalNtlPos`
 - `marginSummary.totalMarginUsed`

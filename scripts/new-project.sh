@@ -21,14 +21,14 @@
 set -euo pipefail
 
 usage() {
-	sed -n '2,18p' "$0" | sed 's/^# \{0,1\}//'
-	exit 1
+  sed -n '2,18p' "$0" | sed 's/^# \{0,1\}//'
+  exit 1
 }
 
 FORCE=0
 if [[ "${1-}" == "--force" ]]; then
-	FORCE=1
-	shift
+  FORCE=1
+  shift
 fi
 
 TARGET="${1-}"
@@ -41,8 +41,8 @@ REPO_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 TEMPLATE="$REPO_ROOT/template"
 
 if [[ ! -d "$TEMPLATE" ]]; then
-	echo "error: template directory not found at $TEMPLATE" >&2
-	exit 1
+  echo "error: template directory not found at $TEMPLATE" >&2
+  exit 1
 fi
 
 mkdir -p "$TARGET"
@@ -51,17 +51,17 @@ TARGET_ABS="$(cd "$TARGET" && pwd)"
 DATE="$(date +%Y-%m-%d)"
 # 3 months out by default for review_by; portable across BSD/GNU date.
 if date -v+3m +%Y-%m-%d >/dev/null 2>&1; then
-	REVIEW_DATE="$(date -v+3m +%Y-%m-%d)"
+  REVIEW_DATE="$(date -v+3m +%Y-%m-%d)"
 else
-	REVIEW_DATE="$(date -d '+3 months' +%Y-%m-%d)"
+  REVIEW_DATE="$(date -d '+3 months' +%Y-%m-%d)"
 fi
 
 substitute() {
-	sed \
-		-e "s|{{project}}|${PROJECT}|g" \
-		-e "s|{{project_description}}|${PROJECT_DESCRIPTION}|g" \
-		-e "s|{{date}}|${DATE}|g" \
-		-e "s|{{review_date}}|${REVIEW_DATE}|g"
+  sed \
+    -e "s|{{project}}|${PROJECT}|g" \
+    -e "s|{{project_description}}|${PROJECT_DESCRIPTION}|g" \
+    -e "s|{{date}}|${DATE}|g" \
+    -e "s|{{review_date}}|${REVIEW_DATE}|g"
 }
 
 # Walk template/ and copy each file, substituting placeholders in text files.
@@ -71,34 +71,34 @@ skipped=0
 # Files that should be treated as binary (no substitution). Currently none in
 # the template, but keep the hook for the future.
 is_text() {
-	case "$1" in
-	*.md | *.yaml | *.yml | *.sh | *.cursorrules | *.gitkeep | *.gitignore | *.txt | *.toml | *.json) return 0 ;;
-	*) return 1 ;;
-	esac
+  case "$1" in
+    *.md | *.yaml | *.yml | *.sh | *.cursorrules | *.gitkeep | *.gitignore | *.txt | *.toml | *.json) return 0 ;;
+    *) return 1 ;;
+  esac
 }
 
 while IFS= read -r -d '' src; do
-	rel="${src#$TEMPLATE/}"
-	dst="$TARGET_ABS/$rel"
-	mkdir -p "$(dirname "$dst")"
+  rel="${src#"$TEMPLATE"/}"
+  dst="$TARGET_ABS/$rel"
+  mkdir -p "$(dirname "$dst")"
 
-	if [[ -e "$dst" && "$FORCE" -eq 0 ]]; then
-		echo "skip (exists): $rel"
-		skipped=$((skipped + 1))
-		continue
-	fi
+  if [[ -e "$dst" && "$FORCE" -eq 0 ]]; then
+    echo "skip (exists): $rel"
+    skipped=$((skipped + 1))
+    continue
+  fi
 
-	if is_text "$src"; then
-		substitute <"$src" >"$dst"
-	else
-		cp "$src" "$dst"
-	fi
+  if is_text "$src"; then
+    substitute <"$src" >"$dst"
+  else
+    cp "$src" "$dst"
+  fi
 
-	# Preserve executable bit
-	[[ -x "$src" ]] && chmod +x "$dst"
+  # Preserve executable bit
+  [[ -x "$src" ]] && chmod +x "$dst"
 
-	echo "  wrote: $rel"
-	written=$((written + 1))
+  echo "  wrote: $rel"
+  written=$((written + 1))
 done < <(find "$TEMPLATE" -type f -print0)
 
 echo

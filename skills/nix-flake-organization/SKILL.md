@@ -58,18 +58,18 @@ Feature-oriented means grouping by domain concept, not by output type. If a conc
 
 ## Thin layer rule
 
-| Location | Allowed | Not allowed |
-|---|---|---|
-| `flake.nix` | Inputs, minimal `outputs`, import `./flake` | Package/module implementation |
-| `flake/apps` | App output names and imports | Shell scripts, wrappers, runtime behavior |
-| `flake/packages` | Package output names and imports | `mkDerivation`, overlays, build logic |
-| `flake/lib` | Public helper re-exports | Long helper implementations |
-| `flake/checks` | Check output names and imports | Test harness implementation |
-| `flake/devShells` | Dev shell output names and imports | Tool setup logic, shell hooks |
-| `flake/overlays` | Overlay output names and imports | Package overrides and build logic |
-| `flake/modules/flake-parts` | flake-parts imports and module composition | `perSystem` build logic, derivations, app scripts |
-| `flake/modules/*` | Public module exports and imports | Options, `config`, assertions, services |
-| `src/<name>/...` | All implementation details | Public output schema decisions |
+| Location                    | Allowed                                     | Not allowed                                       |
+| --------------------------- | ------------------------------------------- | ------------------------------------------------- |
+| `flake.nix`                 | Inputs, minimal `outputs`, import `./flake` | Package/module implementation                     |
+| `flake/apps`                | App output names and imports                | Shell scripts, wrappers, runtime behavior         |
+| `flake/packages`            | Package output names and imports            | `mkDerivation`, overlays, build logic             |
+| `flake/lib`                 | Public helper re-exports                    | Long helper implementations                       |
+| `flake/checks`              | Check output names and imports              | Test harness implementation                       |
+| `flake/devShells`           | Dev shell output names and imports          | Tool setup logic, shell hooks                     |
+| `flake/overlays`            | Overlay output names and imports            | Package overrides and build logic                 |
+| `flake/modules/flake-parts` | flake-parts imports and module composition  | `perSystem` build logic, derivations, app scripts |
+| `flake/modules/*`           | Public module exports and imports           | Options, `config`, assertions, services           |
+| `src/<name>/...`            | All implementation details                  | Public output schema decisions                    |
 
 Thin does not mean empty. A thin file can adapt calling conventions, pass `inputs`, `self`, or `pkgs`, and preserve public attribute names. It should be understandable without reading implementation details.
 

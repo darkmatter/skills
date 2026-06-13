@@ -6,11 +6,11 @@ This is the most judgment-heavy pass. The bar for a high-confidence finding here
 
 ## Goal
 
-Consolidate duplicated logic *only* where the consolidation reduces complexity. Three identical lines is sometimes the right code. A premature abstraction is always the wrong code. Your job is to find the cases where unification clearly wins and to leave everything else alone.
+Consolidate duplicated logic _only_ where the consolidation reduces complexity. Three identical lines is sometimes the right code. A premature abstraction is always the wrong code. Your job is to find the cases where unification clearly wins and to leave everything else alone.
 
 ## What counts as a hit
 
-- Two or more places implementing the *same operation* on the *same domain* with the *same edge cases* — and where a single function would naturally name what they're doing
+- Two or more places implementing the _same operation_ on the _same domain_ with the _same edge cases_ — and where a single function would naturally name what they're doing
 - Repeated boilerplate that has no semantic value (`if (!user) throw new Error('unauthenticated')` at the top of N handlers — middleware, not a helper)
 - Copy-paste blocks (literally character-for-character identical) of >5 lines, where the duplication wasn't intentional
 - Repeated type-narrowing patterns that already have a natural helper name (`assertIsUser(x)` vs inline `if (!x.id || !x.email) throw`)
@@ -20,18 +20,18 @@ Consolidate duplicated logic *only* where the consolidation reduces complexity. 
 
 - **Code that looks similar but means different things**. Two functions that both do `total += item.price` aren't duplicates if one is summing line items and the other is summing taxes — even if the code is identical, they'll evolve in different directions.
 - **Premature abstraction candidates**. Three callsites is rarely enough to abstract. Wait for the fourth where the duplication causes pain.
-- **Test code**. Test repetition is often *the point* — explicit, self-contained tests are easier to read than a DRY test framework. Don't DRY tests unless the duplication is mechanical setup that's clearly orthogonal to what's being tested.
+- **Test code**. Test repetition is often _the point_ — explicit, self-contained tests are easier to read than a DRY test framework. Don't DRY tests unless the duplication is mechanical setup that's clearly orthogonal to what's being tested.
 - **Configuration values**. Two configs with the same fields are not duplicates; configs are data, not logic.
 - **Boilerplate that the language requires**. Constructor argument lists, getter/setter pairs, etc. — language-imposed, not real duplication.
 - **Code intentionally kept separate for blast-radius reasons** — service A and service B both compute hashes the same way, but unifying them creates a deploy-coupling neither team wants.
 
-The rule: code is duplicated if and only if changes to one *should* always be made to the other. If they'd evolve independently, they're not duplicates — they're parallel.
+The rule: code is duplicated if and only if changes to one _should_ always be made to the other. If they'd evolve independently, they're not duplicates — they're parallel.
 
 ## Process per candidate
 
 1. Read all candidate occurrences. Are they really doing the same thing semantically, not just textually?
 2. If you abstracted them, what would the function be called? If the name is honest and obvious (`computeShippingCost`), good sign. If the name is generic (`processItem`, `handleData`, `doThing`), the duplication is probably superficial.
-3. Would the abstraction make the call sites *easier or harder* to read? If callers now need to understand a generic helper to know what's happening locally, the abstraction loses.
+3. Would the abstraction make the call sites _easier or harder_ to read? If callers now need to understand a generic helper to know what's happening locally, the abstraction loses.
 4. Is the proposed abstraction stable? Do the callsites all want the same parameters today? Will they tomorrow?
 5. If you can't answer #2 with a clean name, walk away.
 
@@ -42,7 +42,7 @@ The rule: code is duplicated if and only if changes to one *should* always be ma
 - `simian` (cross-language)
 - Manual: search for distinctive lines / comments and see if they appear elsewhere
 
-Use these tools to *find candidates*. They cannot tell you whether deduplication is the right answer.
+Use these tools to _find candidates_. They cannot tell you whether deduplication is the right answer.
 
 ## High-confidence threshold
 
@@ -59,7 +59,7 @@ If you're unsure, leave it duplicated. The cost of a missed dedup is low. The co
 
 ## Output shape
 
-Per the protocol. In your assessment, include a "considered but rejected" section with at least as many entries as your "applied" section — DRY is the pass where saying *no* is most of the work, and showing your reasoning is the value-add.
+Per the protocol. In your assessment, include a "considered but rejected" section with at least as many entries as your "applied" section — DRY is the pass where saying _no_ is most of the work, and showing your reasoning is the value-add.
 
 ## Out-of-scope
 

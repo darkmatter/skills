@@ -65,9 +65,9 @@ On each load:
 
 1. `metaAndAssetCtxs` → universe snapshot (mark, OI, vol, current APR, day Δ).
 2. For top-N by absolute current APR + watchlist coins: paired `fundingHistory`
-   + `candleSnapshot` calls over the last 7d. Concurrency capped at 4, with
-   exponential backoff on 429s. Stores both aggregate stats and the raw
-   series per coin so sparklines and the detail chart can use them.
+   - `candleSnapshot` calls over the last 7d. Concurrency capped at 4, with
+     exponential backoff on 429s. Stores both aggregate stats and the raw
+     series per coin so sparklines and the detail chart can use them.
 3. If a wallet address is configured (localStorage): `clearinghouseState`
    for the positions panel.
 
@@ -86,11 +86,11 @@ are CORS-open.
 
 ## Data flow at a glance
 
-| Surface                 | Where data comes from                          | When fresh        |
-|-------------------------|------------------------------------------------|-------------------|
-| `--report` (CLI)        | on-disk caches (synced by `--sync`)            | As of last `--sync` |
-| dashboard_data.py JSON  | live `metaAndAssetCtxs` + on-disk funding cache | Snapshot live, 7d as fresh as cache |
-| Standalone HTML         | live API only — no cache dependency             | Live each load    |
+| Surface                | Where data comes from                           | When fresh                          |
+| ---------------------- | ----------------------------------------------- | ----------------------------------- |
+| `--report` (CLI)       | on-disk caches (synced by `--sync`)             | As of last `--sync`                 |
+| dashboard_data.py JSON | live `metaAndAssetCtxs` + on-disk funding cache | Snapshot live, 7d as fresh as cache |
+| Standalone HTML        | live API only — no cache dependency             | Live each load                      |
 
 ## Extending the standalone HTML
 

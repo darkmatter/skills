@@ -1,3 +1,3 @@
-const fs = require('fs');
-const data = fs.readFileSync('data.txt');
+const fs = require("fs");
+const data = fs.readFileSync("data.txt");
 console.log(data);

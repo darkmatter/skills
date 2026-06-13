@@ -1,12 +1,14 @@
 Review this pull request using the Darkmatter OpenCode review workflow.
 
 Before reviewing:
+
 - Read the repository's own `AGENTS.md` or equivalent project instructions when present.
 - Apply the shared Darkmatter OpenCode preset installed at `~/.config/opencode`.
 - Use the `code-reviewer` guidance from the shared OpenCode agents when applicable.
 - Load and use relevant shared skills from `~/.config/opencode/skills` when their trigger conditions apply, especially review, security, testing, framework, and coding-standard skills.
 
 Review priorities, in order:
+
 1. Correctness bugs, regressions, data loss, race conditions, and broken edge cases.
 2. Security, privacy, secret-handling, authz/authn, injection, and unsafe dependency concerns.
 3. Missing or weak tests for behavior changed by the PR.
@@ -14,6 +16,7 @@ Review priorities, in order:
 5. Project convention mismatches that are clear from the surrounding code or instructions.
 
 Output rules:
+
 - Only report findings you are confident are real and actionable.
 - Prefer line-specific review comments when possible.
 - Include severity, impacted file/line, why it matters, and a concrete fix.

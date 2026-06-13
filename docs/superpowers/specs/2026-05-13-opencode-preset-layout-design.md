@@ -67,20 +67,20 @@ darkmatter/skills/
 
 ## Directory Mapping
 
-| OpenCode target | Source path | Purpose |
-|---|---|---|
+| OpenCode target                     | Source path                       | Purpose                                                                                      |
+| ----------------------------------- | --------------------------------- | -------------------------------------------------------------------------------------------- |
 | `~/.config/opencode/opencode.jsonc` | `presets/opencode/opencode.jsonc` | Runtime config: models, permissions, agents, MCP servers, instructions, plugins, formatters. |
-| `~/.config/opencode/tui.json` | `presets/opencode/tui.json` | TUI-only config: theme, keybinds, diff style, mouse behavior. |
-| `~/.config/opencode/AGENTS.md` | `presets/base/AGENTS.md` | Global shared instructions for OpenCode and compatible clients. |
-| `~/.config/opencode/agents/` | `presets/opencode/agents/` | Markdown agent definitions for primary agents and subagents. |
-| `~/.config/opencode/commands/` | `presets/opencode/commands/` | Slash-command prompt templates. |
-| `~/.config/opencode/plugins/` | `presets/opencode/plugins/` | JS/TS OpenCode lifecycle hooks and event extensions. |
-| `~/.config/opencode/tools/` | `presets/opencode/tools/` | JS/TS custom tools callable by the model. |
-| `~/.config/opencode/themes/` | `presets/opencode/themes/` | Optional OpenCode TUI themes. |
-| `~/.config/opencode/skills/` | `skills/` | Shared on-demand skills with `SKILL.md`. |
-| project root `AGENTS.md` | `template/AGENTS.md` | Project-local generated instruction shim. |
-| project root `CLAUDE.md` | `template/CLAUDE.md` | Claude Code compatibility shim. |
-| project `.agent/` | `template/.agent/` | Project-local canonical context and memory. |
+| `~/.config/opencode/tui.json`       | `presets/opencode/tui.json`       | TUI-only config: theme, keybinds, diff style, mouse behavior.                                |
+| `~/.config/opencode/AGENTS.md`      | `presets/base/AGENTS.md`          | Global shared instructions for OpenCode and compatible clients.                              |
+| `~/.config/opencode/agents/`        | `presets/opencode/agents/`        | Markdown agent definitions for primary agents and subagents.                                 |
+| `~/.config/opencode/commands/`      | `presets/opencode/commands/`      | Slash-command prompt templates.                                                              |
+| `~/.config/opencode/plugins/`       | `presets/opencode/plugins/`       | JS/TS OpenCode lifecycle hooks and event extensions.                                         |
+| `~/.config/opencode/tools/`         | `presets/opencode/tools/`         | JS/TS custom tools callable by the model.                                                    |
+| `~/.config/opencode/themes/`        | `presets/opencode/themes/`        | Optional OpenCode TUI themes.                                                                |
+| `~/.config/opencode/skills/`        | `skills/`                         | Shared on-demand skills with `SKILL.md`.                                                     |
+| project root `AGENTS.md`            | `template/AGENTS.md`              | Project-local generated instruction shim.                                                    |
+| project root `CLAUDE.md`            | `template/CLAUDE.md`              | Claude Code compatibility shim.                                                              |
+| project `.agent/`                   | `template/.agent/`                | Project-local canonical context and memory.                                                  |
 
 ## Conceptual Boundaries
 

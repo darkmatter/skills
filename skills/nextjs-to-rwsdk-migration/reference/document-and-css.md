@@ -13,9 +13,7 @@ From [docs.rwsdk.com/guides/frontend/tailwind/](https://docs.rwsdk.com/guides/fr
 import type React from "react";
 import styles from "./globals.css?url";
 
-export const Document: React.FC<{ children: React.ReactNode }> = ({
-  children,
-}) => (
+export const Document: React.FC<{ children: React.ReactNode }> = ({ children }) => (
   <html lang="en" suppressHydrationWarning>
     <head>
       <meta charSet="utf-8" />
@@ -91,10 +89,10 @@ Imports tailwind + fontsource fonts + the existing legacy stylesheet:
 }
 
 :root {
-  --font-monospace: "Monaspace Neon", ui-monospace, SFMono-Regular, Menlo,
-    Monaco, Consolas, monospace;
-  --font-inter: "Inter Variable", ui-sans-serif, system-ui, -apple-system,
-    "Segoe UI", Roboto, sans-serif;
+  --font-monospace:
+    "Monaspace Neon", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  --font-inter:
+    "Inter Variable", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
 }
 ```
 
@@ -132,9 +130,7 @@ export function BlogDetail({ params }: { params: { slug: string } }) {
     <>
       <title>{`${post.title} | darkmatter`}</title>
       <meta name="description" content={post.excerpt} />
-      <meta property="og:title" content={post.title} />
-      …
-      <article>{/* body */}</article>
+      <meta property="og:title" content={post.title} />…<article>{/* body */}</article>
     </>
   );
 }

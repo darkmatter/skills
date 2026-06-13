@@ -52,7 +52,7 @@ For dependencies specifically: also check Dockerfile / CI scripts / runtime conf
 
 ## Output shape
 
-Per the protocol. Be especially explicit in "Low-confidence findings" — unused-code analysis has a long tail of false positives, and the value of *flagging* a suspicious item for human review is high even when you don't action it.
+Per the protocol. Be especially explicit in "Low-confidence findings" — unused-code analysis has a long tail of false positives, and the value of _flagging_ a suspicious item for human review is high even when you don't action it.
 
 ## Out-of-scope
 

@@ -5,19 +5,19 @@ client, but the repo root is not itself an OpenCode config directory.
 
 ## Source to install mapping
 
-| OpenCode target | Source path | Purpose |
-|---|---|---|
+| OpenCode target                     | Source path                                                                                                 | Purpose                                                                                                                                                         |
+| ----------------------------------- | ----------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `~/.config/opencode/opencode.jsonc` | `presets/opencode/opencode.nix` via Home Manager overlays; `presets/opencode/opencode.jsonc` for shell sync | Runtime config: models, permissions, agents, MCP servers, instructions, plugins, formatters. Installed as a mutable file so OpenCode can write runtime changes. |
-| `~/.config/opencode/tui.json` | `presets/opencode/tui.json` | TUI-only config: theme, keybinds, diff style, mouse behavior. |
-| `~/.config/opencode/AGENTS.md` | `presets/base/AGENTS.md` | Global shared instructions. |
-| `~/.config/opencode/agents/` | `presets/opencode/agents/` | Markdown agent definitions. |
-| `~/.config/opencode/commands/` | `presets/opencode/commands/` | Slash-command prompt templates. |
-| `~/.config/opencode/plugins/` | `presets/opencode/plugins/` | JS/TS OpenCode lifecycle hooks and event extensions. |
-| `~/.config/opencode/tools/` | `presets/opencode/tools/` | JS/TS custom tools callable by the model. |
-| `~/.config/opencode/themes/` | `presets/opencode/themes/` | Optional TUI themes. |
-| `~/.config/opencode/modes/` | `presets/opencode/modes/` | Optional mode definitions. |
-| `~/.config/opencode/package.json` | `presets/opencode/package.json` | Plugin/tool dependency manifest. |
-| `~/.config/opencode/skills/` | `skills/` | Shared on-demand skills. |
+| `~/.config/opencode/tui.json`       | `presets/opencode/tui.json`                                                                                 | TUI-only config: theme, keybinds, diff style, mouse behavior.                                                                                                   |
+| `~/.config/opencode/AGENTS.md`      | `presets/base/AGENTS.md`                                                                                    | Global shared instructions.                                                                                                                                     |
+| `~/.config/opencode/agents/`        | `presets/opencode/agents/`                                                                                  | Markdown agent definitions.                                                                                                                                     |
+| `~/.config/opencode/commands/`      | `presets/opencode/commands/`                                                                                | Slash-command prompt templates.                                                                                                                                 |
+| `~/.config/opencode/plugins/`       | `presets/opencode/plugins/`                                                                                 | JS/TS OpenCode lifecycle hooks and event extensions.                                                                                                            |
+| `~/.config/opencode/tools/`         | `presets/opencode/tools/`                                                                                   | JS/TS custom tools callable by the model.                                                                                                                       |
+| `~/.config/opencode/themes/`        | `presets/opencode/themes/`                                                                                  | Optional TUI themes.                                                                                                                                            |
+| `~/.config/opencode/modes/`         | `presets/opencode/modes/`                                                                                   | Optional mode definitions.                                                                                                                                      |
+| `~/.config/opencode/package.json`   | `presets/opencode/package.json`                                                                             | Plugin/tool dependency manifest.                                                                                                                                |
+| `~/.config/opencode/skills/`        | `skills/`                                                                                                   | Shared on-demand skills.                                                                                                                                        |
 
 ## What goes where
 

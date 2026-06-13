@@ -1,6 +1,6 @@
 ---
-last_updated: {{date}}
-review_by: {{review_date}}
+last_updated: { { date } }
+review_by: { { review_date } }
 ---
 
 # {{project}} — overview

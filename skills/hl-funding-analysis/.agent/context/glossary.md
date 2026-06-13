@@ -39,7 +39,7 @@ What the harvest trade actually earned over a window, unleveraged, per $100
 notional held continuously. Defined in `funding_history.py`:
 
 - Short PnL = cumulative funding collected − price change of the underlying.
-- Long PnL  = price change of the underlying − cumulative funding paid (or
+- Long PnL = price change of the underlying − cumulative funding paid (or
   equivalently `−cum_funding + price_change`).
 
 A 200% APR short where the coin doubles is a catastrophe, not a win.

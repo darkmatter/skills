@@ -2,7 +2,7 @@
 set -euo pipefail
 
 usage() {
-	cat >&2 <<'USAGE'
+  cat >&2 <<'USAGE'
 usage: validate-registry-access.sh <provider> <registry-url> [token-env-var]
 
 provider: shadcnblocks | aceternity | shadcn-darkmatter
@@ -13,8 +13,8 @@ USAGE
 }
 
 if [[ $# -lt 2 || $# -gt 3 ]]; then
-	usage
-	exit 2
+  usage
+  exit 2
 fi
 
 provider="$1"
@@ -22,27 +22,27 @@ url="$2"
 token_env="${3:-}"
 
 case "$provider" in
-	shadcnblocks | aceternity | shadcn-darkmatter) ;;
-	*)
-		echo "error: unsupported provider '$provider'" >&2
-		usage
-		exit 2
-		;;
+  shadcnblocks | aceternity | shadcn-darkmatter) ;;
+  *)
+    echo "error: unsupported provider '$provider'" >&2
+    usage
+    exit 2
+    ;;
 esac
 
 if [[ "$provider" != "shadcn-darkmatter" && -z "$token_env" ]]; then
-	echo "error: $provider requires a token env var name" >&2
-	exit 1
+  echo "error: $provider requires a token env var name" >&2
+  exit 1
 fi
 
 headers=()
 if [[ -n "$token_env" ]]; then
-	token="${!token_env:-}"
-	if [[ -z "$token" ]]; then
-		echo "error: $token_env is not set" >&2
-		exit 1
-	fi
-	headers=(-H "Authorization: Bearer $token")
+  token="${!token_env:-}"
+  if [[ -z "$token" ]]; then
+    echo "error: $token_env is not set" >&2
+    exit 1
+  fi
+  headers=(-H "Authorization: Bearer $token")
 fi
 
 tmp="$(mktemp)"
@@ -57,15 +57,15 @@ status="$(
 )"
 
 case "$status" in
-	2* | 3*)
-		echo "ok: $provider registry reachable ($status)"
-		;;
-	401 | 403)
-		echo "error: $provider registry rejected credentials ($status)" >&2
-		exit 1
-		;;
-	*)
-		echo "error: $provider registry fetch failed ($status)" >&2
-		exit 1
-		;;
+  2* | 3*)
+    echo "ok: $provider registry reachable ($status)"
+    ;;
+  401 | 403)
+    echo "error: $provider registry rejected credentials ($status)" >&2
+    exit 1
+    ;;
+  *)
+    echo "error: $provider registry fetch failed ($status)" >&2
+    exit 1
+    ;;
 esac

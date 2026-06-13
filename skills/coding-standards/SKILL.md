@@ -155,11 +155,7 @@ async function fetchData(url) {
 
 ```typescript
 // ✅ GOOD: Parallel execution when possible
-const [users, markets, stats] = await Promise.all([
-  fetchUsers(),
-  fetchMarkets(),
-  fetchStats(),
-]);
+const [users, markets, stats] = await Promise.all([fetchUsers(), fetchMarkets(), fetchStats()]);
 
 // ❌ BAD: Sequential when unnecessary
 const users = await fetchUsers();
@@ -272,10 +268,7 @@ name = user.name;
  * console.log(results[0].name) // "Trump vs Biden"
  * ```
  */
-export async function searchMarkets(
-  query: string,
-  limit: number = 10,
-): Promise<Market[]> {
+export async function searchMarkets(query: string, limit: number = 10): Promise<Market[]> {
   // Implementation
 }
 ````
@@ -338,10 +331,7 @@ export function Dashboard() {
 
 ```typescript
 // ✅ GOOD: Select only needed columns
-const { data } = await supabase
-  .from("markets")
-  .select("id, name, status")
-  .limit(10);
+const { data } = await supabase.from("markets").select("id, name, status").limit(10);
 
 // ❌ BAD: Select everything
 const { data } = await supabase.from("markets").select("*");

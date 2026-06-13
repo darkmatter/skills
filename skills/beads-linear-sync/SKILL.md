@@ -28,12 +28,12 @@ Default Darkmatter Linear team: **LAB**. Use another team only when the user exp
 
 ## Core model
 
-| Concept | Owner | Example | Rule |
-|---|---|---|---|
-| Beads prefix | Repository | `infra-*`, `skills-*` | Local namespace only. Do not force it to match Linear. |
-| Linear team key | Linear team | `LAB-*`, `ENG-*` | Determines Linear issue identifiers. |
-| Linear project | Linear planning scope | `Platform Monorepo PoC` | Optional filter/grouping; does not change issue prefix. |
-| Link field | Beads issue | `external_ref` | Durable bridge from Beads issue to Linear issue. |
+| Concept         | Owner                 | Example                 | Rule                                                    |
+| --------------- | --------------------- | ----------------------- | ------------------------------------------------------- |
+| Beads prefix    | Repository            | `infra-*`, `skills-*`   | Local namespace only. Do not force it to match Linear.  |
+| Linear team key | Linear team           | `LAB-*`, `ENG-*`        | Determines Linear issue identifiers.                    |
+| Linear project  | Linear planning scope | `Platform Monorepo PoC` | Optional filter/grouping; does not change issue prefix. |
+| Link field      | Beads issue           | `external_ref`          | Durable bridge from Beads issue to Linear issue.        |
 
 Preferred default:
 

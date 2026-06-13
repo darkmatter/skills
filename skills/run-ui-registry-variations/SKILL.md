@@ -1,6 +1,6 @@
 ---
 name: run-ui-registry-variations
-description: "Manual-invocation skill — run only when the user explicitly asks for \"run-ui-registry-variations\" or invokes it as a slash command. Do not auto-trigger on adjacent topics. Force UI work through shadcnblocks, Aceternity, or https://shadcn.darkmatter.io; validate private registry access before use; build exactly three user-reviewable variations."
+description: 'Manual-invocation skill — run only when the user explicitly asks for "run-ui-registry-variations" or invokes it as a slash command. Do not auto-trigger on adjacent topics. Force UI work through shadcnblocks, Aceternity, or https://shadcn.darkmatter.io; validate private registry access before use; build exactly three user-reviewable variations.'
 ---
 
 # run-ui-registry-variations

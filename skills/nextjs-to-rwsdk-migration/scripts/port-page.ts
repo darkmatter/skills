@@ -32,10 +32,7 @@ function findMatchingBrace(input: string, openIdx: number): number {
 
 /** Remove an `export const NAME = { ... };` declaration. */
 function stripExportConstObject(input: string, name: string): string {
-  const re = new RegExp(
-    `export\\s+const\\s+${name}(?:\\s*:\\s*[^=]+)?\\s*=\\s*`,
-    "g",
-  );
+  const re = new RegExp(`export\\s+const\\s+${name}(?:\\s*:\\s*[^=]+)?\\s*=\\s*`, "g");
   let m: RegExpExecArray | null;
   while ((m = re.exec(input))) {
     const openIdx = input.indexOf("{", m.index + m[0].length - 1);
@@ -52,10 +49,7 @@ function stripExportConstObject(input: string, name: string): string {
 
 /** Remove an `export async? function NAME(...) { ... }` declaration. */
 function stripExportFunction(input: string, name: string): string {
-  const re = new RegExp(
-    `export\\s+(?:async\\s+)?function\\s+${name}\\s*\\(`,
-    "g",
-  );
+  const re = new RegExp(`export\\s+(?:async\\s+)?function\\s+${name}\\s*\\(`, "g");
   let m: RegExpExecArray | null;
   while ((m = re.exec(input))) {
     let i = m.index + m[0].length - 1;
@@ -84,10 +78,7 @@ function stripExportFunction(input: string, name: string): string {
 }
 
 // 1. Remove `import type { Metadata } from "next";`
-src = src.replace(
-  /^import\s+type\s+\{\s*Metadata\s*\}\s+from\s+["']next["'];?\s*\n/gm,
-  "",
-);
+src = src.replace(/^import\s+type\s+\{\s*Metadata\s*\}\s+from\s+["']next["'];?\s*\n/gm, "");
 
 // 2. `export const metadata = {...};` (with or without type annotation)
 src = stripExportConstObject(src, "metadata");
@@ -115,10 +106,7 @@ src = src.replace(
   /export\s+default\s+async\s+function\s+\w+/,
   `export async function ${exportName}`,
 );
-src = src.replace(
-  /export\s+default\s+function\s+\w+/,
-  `export function ${exportName}`,
-);
+src = src.replace(/export\s+default\s+function\s+\w+/, `export function ${exportName}`);
 
 // 10. Collapse multiple blank lines
 src = src.replace(/\n{3,}/g, "\n\n");

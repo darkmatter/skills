@@ -3,7 +3,7 @@ name: continuous-learning
 description: Runtime learning policy — automatically extracts reusable patterns from sessions into learned skills. Not an ordinary task skill; consumed by the agent client at session end.
 ---
 
-> **This is a runtime policy document**, not an ordinary task skill. It configures the agent's learning behavior at session end. The agent client (OpenCode) loads this to enforce pattern-extraction-on-stop discipline. It does not implement the extraction logic itself — it *prescribes* the behavior the client must follow.
+> **This is a runtime policy document**, not an ordinary task skill. It configures the agent's learning behavior at session end. The agent client (OpenCode) loads this to enforce pattern-extraction-on-stop discipline. It does not implement the extraction logic itself — it _prescribes_ the behavior the client must follow.
 
 # Continuous Learning (OpenCode Skill)
 
@@ -30,14 +30,14 @@ This skill runs as a **Stop hook** at the end of each OpenCode session:
 2. **Pattern Detection**
    - Scans transcript for repeated solutions, corrections, debugging flows, and conventions
 3. **Skill Extraction**
-    - Writes one or more skill directories into:
-      - `~/.config/opencode/skills/<descriptive-slug>/SKILL.md`
-    - Stores learning metadata in:
-      - `~/.config/opencode/skills/learned/.continuous-learning-index.json`
-    - Each extracted skill is:
-      - Named deterministically
-      - Tagged by pattern type(s)
-      - Saved with a short “When to use / Steps / Examples / Caveats” template
+   - Writes one or more skill directories into:
+     - `~/.config/opencode/skills/<descriptive-slug>/SKILL.md`
+   - Stores learning metadata in:
+     - `~/.config/opencode/skills/learned/.continuous-learning-index.json`
+   - Each extracted skill is:
+     - Named deterministically
+     - Tagged by pattern type(s)
+     - Saved with a short “When to use / Steps / Examples / Caveats” template
 
 ## Learned File Naming
 

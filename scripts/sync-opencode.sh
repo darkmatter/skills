@@ -21,32 +21,32 @@ DRY_RUN=0
 TARGET="${XDG_CONFIG_HOME:-$HOME/.config}/opencode"
 
 usage() {
-	sed -n '2,14p' "$0" | sed 's/^# \{0,1\}//'
-	exit 1
+  sed -n '2,14p' "$0" | sed 's/^# \{0,1\}//'
+  exit 1
 }
 
 while [[ $# -gt 0 ]]; do
-	case "$1" in
-	--copy)
-		MODE="copy"
-		shift
-		;;
-	--link)
-		MODE="link"
-		shift
-		;;
-	--dry-run)
-		DRY_RUN=1
-		shift
-		;;
-	--target)
-		TARGET="${2-}"
-		[[ -z "$TARGET" ]] && usage
-		shift 2
-		;;
-	--help | -h) usage ;;
-	*) usage ;;
-	esac
+  case "$1" in
+    --copy)
+      MODE="copy"
+      shift
+      ;;
+    --link)
+      MODE="link"
+      shift
+      ;;
+    --dry-run)
+      DRY_RUN=1
+      shift
+      ;;
+    --target)
+      TARGET="${2-}"
+      [[ -z "$TARGET" ]] && usage
+      shift 2
+      ;;
+    --help | -h) usage ;;
+    *) usage ;;
+  esac
 done
 
 REPO_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
@@ -56,49 +56,49 @@ SKILLS="$REPO_ROOT/skills"
 STAMP="$(date +%Y%m%d%H%M%S)"
 
 run() {
-	if [[ "$DRY_RUN" -eq 1 ]]; then
-		printf 'dry-run:'
-		printf ' %q' "$@"
-		printf '\n'
-	else
-		"$@"
-	fi
+  if [[ "$DRY_RUN" -eq 1 ]]; then
+    printf 'dry-run:'
+    printf ' %q' "$@"
+    printf '\n'
+  else
+    "$@"
+  fi
 }
 
 ensure_parent() {
-	run mkdir -p "$(dirname "$1")"
+  run mkdir -p "$(dirname "$1")"
 }
 
 backup_conflict() {
-	local dst="$1"
-	if [[ ! -e "$dst" && ! -L "$dst" ]]; then
-		return 0
-	fi
-	if [[ -L "$dst" ]]; then
-		run rm "$dst"
-		return 0
-	fi
-	run mv "$dst" "$dst.bak.$STAMP"
+  local dst="$1"
+  if [[ ! -e "$dst" && ! -L "$dst" ]]; then
+    return 0
+  fi
+  if [[ -L "$dst" ]]; then
+    run rm "$dst"
+    return 0
+  fi
+  run mv "$dst" "$dst.bak.$STAMP"
 }
 
 install_one() {
-	local src="$1"
-	local dst="$2"
-	ensure_parent "$dst"
-	backup_conflict "$dst"
-	if [[ "$MODE" == "copy" ]]; then
-		run cp -R "$src" "$dst"
-	else
-		run ln -s "$src" "$dst"
-	fi
+  local src="$1"
+  local dst="$2"
+  ensure_parent "$dst"
+  backup_conflict "$dst"
+  if [[ "$MODE" == "copy" ]]; then
+    run cp -R "$src" "$dst"
+  else
+    run ln -s "$src" "$dst"
+  fi
 }
 
 install_mutable() {
-	local src="$1"
-	local dst="$2"
-	ensure_parent "$dst"
-	backup_conflict "$dst"
-	run cp -f "$src" "$dst"
+  local src="$1"
+  local dst="$2"
+  ensure_parent "$dst"
+  backup_conflict "$dst"
+  run cp -f "$src" "$dst"
 }
 
 install_one "$BASE/AGENTS.md" "$TARGET/AGENTS.md"

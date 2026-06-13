@@ -1,5 +1,5 @@
 ---
-last_updated: {{date}}
+last_updated: { { date } }
 update_pattern: append-mostly
 ---
 

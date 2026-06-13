@@ -77,12 +77,15 @@ Run `npm audit` for dependency checks; scan source files for hardcoded secrets a
 ## Report Format
 
 ### Critical Issues
+
 [Issues that must be fixed immediately]
 
 ### High Priority
+
 [Issues that should be fixed before release]
 
 ### Recommendations
+
 [Security improvements to consider]
 
 ---

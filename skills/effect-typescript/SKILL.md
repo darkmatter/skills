@@ -62,19 +62,18 @@ If only one is true, prefer plain TypeScript unless the surrounding codebase alr
 - Attach behavior with combinators: `Effect.catchTag`, `Effect.retry`, `Effect.withSpan`, `Effect.annotateLogs`, `Effect.provide`.
 
 ```ts
-import { Effect, Schema } from "effect"
+import { Effect, Schema } from "effect";
 
-class InvalidPayload extends Schema.TaggedErrorClass<InvalidPayload>()(
-  "InvalidPayload",
-  { message: Schema.String }
-) {}
+class InvalidPayload extends Schema.TaggedErrorClass<InvalidPayload>()("InvalidPayload", {
+  message: Schema.String,
+}) {}
 
-export const parsePayload = Effect.fn("parsePayload")(function*(input: string) {
+export const parsePayload = Effect.fn("parsePayload")(function* (input: string) {
   if (input.length === 0) {
-    return yield* new InvalidPayload({ message: "payload is empty" })
+    return yield* new InvalidPayload({ message: "payload is empty" });
   }
-  return JSON.parse(input) as unknown
-})
+  return JSON.parse(input) as unknown;
+});
 ```
 
 ### Services and Layers
@@ -82,29 +81,32 @@ export const parsePayload = Effect.fn("parsePayload")(function*(input: string) {
 Use `Context.Service` for dependencies. Put the live implementation on `static readonly layer`, and expose test layers separately.
 
 ```ts
-import { Context, Effect, Layer, Schema } from "effect"
+import { Context, Effect, Layer, Schema } from "effect";
 
 class ApiError extends Schema.TaggedErrorClass<ApiError>()("ApiError", {
   message: Schema.String,
-  cause: Schema.Defect
+  cause: Schema.Defect,
 }) {}
 
-export class UsersApi extends Context.Service<UsersApi, {
-  readonly getUser: (id: string) => Effect.Effect<unknown, ApiError>
-}>()("app/UsersApi") {
+export class UsersApi extends Context.Service<
+  UsersApi,
+  {
+    readonly getUser: (id: string) => Effect.Effect<unknown, ApiError>;
+  }
+>()("app/UsersApi") {
   static readonly layer = Layer.effect(
     UsersApi,
-    Effect.gen(function*() {
+    Effect.gen(function* () {
       const getUser = Effect.fn("UsersApi.getUser")((id: string) =>
         Effect.tryPromise({
           try: () => fetch(`https://example.com/users/${id}`).then((r) => r.json()),
-          catch: (cause) => new ApiError({ message: "failed to fetch user", cause })
-        })
-      )
+          catch: (cause) => new ApiError({ message: "failed to fetch user", cause }),
+        }),
+      );
 
-      return UsersApi.of({ getUser })
-    })
-  )
+      return UsersApi.of({ getUser });
+    }),
+  );
 }
 ```
 
@@ -126,7 +128,7 @@ Layer rules:
 
 ```ts
 if (notFound) {
-  return yield* new UserNotFound({ id })
+  return yield * new UserNotFound({ id });
 }
 ```
 
@@ -152,10 +154,7 @@ if (notFound) {
 - Use `Clock` in Effect code and `TestClock` in tests. Avoid `Date.now()` and `new Date()` in Effectful logic unless you are deliberately at a non-Effect edge.
 
 ```ts
-const retryPolicy = Schedule.exponential("250 millis").pipe(
-  Schedule.recurs(5),
-  Schedule.jittered
-)
+const retryPolicy = Schedule.exponential("250 millis").pipe(Schedule.recurs(5), Schedule.jittered);
 ```
 
 ### Resources and Scope
@@ -184,16 +183,16 @@ const retryPolicy = Schedule.exponential("250 millis").pipe(
 - For shared expensive setup, use `layer(...)` from `@effect/vitest`; otherwise provide a test layer per test for isolation.
 
 ```ts
-import { assert, it } from "@effect/vitest"
-import { Effect } from "effect"
+import { assert, it } from "@effect/vitest";
+import { Effect } from "effect";
 
 it.effect("uses a service", () =>
-  Effect.gen(function*() {
-    const service = yield* UsersApi
-    const user = yield* service.getUser("123")
-    assert.isObject(user)
-  }).pipe(Effect.provide(UsersApi.layer))
-)
+  Effect.gen(function* () {
+    const service = yield* UsersApi;
+    const user = yield* service.getUser("123");
+    assert.isObject(user);
+  }).pipe(Effect.provide(UsersApi.layer)),
+);
 ```
 
 ## Alchemy Deployment
@@ -202,21 +201,21 @@ Use Alchemy for infrastructure definitions, especially Cloudflare workers and bo
 
 ```ts
 // alchemy.run.ts
-import alchemy from "alchemy"
-import { Worker } from "alchemy/cloudflare"
+import alchemy from "alchemy";
+import { Worker } from "alchemy/cloudflare";
 
-const app = await alchemy("my-app")
+const app = await alchemy("my-app");
 
 export const worker = await Worker("api", {
   entrypoint: "./src/worker.ts",
   bindings: {
     STAGE: app.stage,
-    API_KEY: alchemy.secret(process.env.API_KEY)
-  }
-})
+    API_KEY: alchemy.secret(process.env.API_KEY),
+  },
+});
 
-console.log({ url: worker.url })
-await app.finalize()
+console.log({ url: worker.url });
+await app.finalize();
 ```
 
 Alchemy rules:

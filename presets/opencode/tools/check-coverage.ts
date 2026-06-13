@@ -67,9 +67,7 @@ export default tool({
     }
 
     const passed = coverageData.total.percentage >= threshold;
-    const uncoveredFiles = coverageData.files.filter(
-      (f) => f.percentage < threshold,
-    );
+    const uncoveredFiles = coverageData.files.filter((f) => f.percentage < threshold);
 
     const result: CoverageResult = {
       success: passed,
@@ -129,19 +127,13 @@ function parseCoverageData(data: unknown): CoverageSummary {
   // Handle istanbul/nyc format
   if (typeof data === "object" && data !== null && "total" in data) {
     const istanbulData = data as Record<string, unknown>;
-    const total = istanbulData.total as Record<
-      string,
-      { total: number; covered: number }
-    >;
+    const total = istanbulData.total as Record<string, { total: number; covered: number }>;
 
     const files: CoverageSummary["files"] = [];
 
     for (const [key, value] of Object.entries(istanbulData)) {
       if (key !== "total" && typeof value === "object" && value !== null) {
-        const fileData = value as Record<
-          string,
-          { total: number; covered: number }
-        >;
+        const fileData = value as Record<string, { total: number; covered: number }>;
         if (fileData.lines) {
           files.push({
             file: key,
@@ -160,9 +152,7 @@ function parseCoverageData(data: unknown): CoverageSummary {
       total: {
         lines: total.lines?.total || 0,
         covered: total.lines?.covered || 0,
-        percentage: total.lines?.total
-          ? (total.lines.covered / total.lines.total) * 100
-          : 0,
+        percentage: total.lines?.total ? (total.lines.covered / total.lines.total) * 100 : 0,
       },
       files,
     };

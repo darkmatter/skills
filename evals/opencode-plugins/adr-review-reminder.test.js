@@ -50,10 +50,7 @@ test("discovers ADR files in numeric order", async () => {
 
   const files = await listAdrFiles(root);
 
-  assert.deepEqual(files, [
-    "docs/adr/0001-beads.md",
-    "docs/adr/0004-no-reinvention.md",
-  ]);
+  assert.deepEqual(files, ["docs/adr/0001-beads.md", "docs/adr/0004-no-reinvention.md"]);
 });
 
 test("builds a direct ADR review prompt with changed-line evidence", () => {
@@ -86,9 +83,7 @@ test("sends one ADR review prompt after significant code changes", async () => {
     adrFiles: ["docs/adr/0004-no-reinvention.md"],
   });
 
-  state.recordDiff("session-1", [
-    { file: "src/app.ts", additions: 8, deletions: 3 },
-  ]);
+  state.recordDiff("session-1", [{ file: "src/app.ts", additions: 8, deletions: 3 }]);
 
   await state.handleIdle({ client, sessionID: "session-1", directory: "/repo" });
   await state.handleIdle({ client, sessionID: "session-1", directory: "/repo" });
@@ -119,19 +114,13 @@ test("prompts again after another threshold-sized code change", async () => {
     adrFiles: ["docs/adr/0004-no-reinvention.md"],
   });
 
-  state.recordDiff("session-1", [
-    { file: "src/app.ts", additions: 10, deletions: 0 },
-  ]);
+  state.recordDiff("session-1", [{ file: "src/app.ts", additions: 10, deletions: 0 }]);
   await state.handleIdle({ client, sessionID: "session-1", directory: "/repo" });
 
-  state.recordDiff("session-1", [
-    { file: "src/app.ts", additions: 15, deletions: 0 },
-  ]);
+  state.recordDiff("session-1", [{ file: "src/app.ts", additions: 15, deletions: 0 }]);
   await state.handleIdle({ client, sessionID: "session-1", directory: "/repo" });
 
-  state.recordDiff("session-1", [
-    { file: "src/app.ts", additions: 21, deletions: 0 },
-  ]);
+  state.recordDiff("session-1", [{ file: "src/app.ts", additions: 21, deletions: 0 }]);
   await state.handleIdle({ client, sessionID: "session-1", directory: "/repo" });
 
   assert.equal(sent.length, 2);

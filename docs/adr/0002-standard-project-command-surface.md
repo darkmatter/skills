@@ -34,15 +34,15 @@ Every darkmatter project repo MUST expose the following commands, available
 either as an executable script at `./scripts/<name>` or as a `justfile`
 recipe runnable via `just <name>`:
 
-| Command           | Purpose                                                              |
-| ----------------- | -------------------------------------------------------------------- |
+| Command           | Purpose                                                                                                                                                                                                                                                                                             |
+| ----------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `install`         | Idempotent installer for **host-level toolchains and system tools** (language runtimes, compilers, version managers like `mise`/`asdf`, system packages via `brew`/`apt`/`nix profile`). Project deps that come from a lockfile (`bun install`, `cargo fetch`, `pip install -r`) belong in `setup`. |
-| `setup`           | Per-checkout setup: install **project deps from lockfiles**, initialize databases, decrypt secrets, scaffold `.env` files, run code generators. Must be re-runnable; second run should be a no-op against an already-set-up checkout. |
-| `server` or `run` | Start the app (`server` for long-running services, `run` for CLIs and one-shots). |
-| `test`            | Run the test suite. Fast inner loop; this is what a dev runs in a tight edit-test cycle. |
-| `build`           | Build the deployable artifact.                                       |
-| `ci`              | Run the full pre-PR gate locally — superset of `test`, typically `lint + typecheck + test + build + drift checks`. SHOULD be the same recipe the CI provider invokes so local and remote results match. |
-| `console`         | Interactive shell into the running app or its environment (REPL, container shell, devshell, SSH-equivalent). |
+| `setup`           | Per-checkout setup: install **project deps from lockfiles**, initialize databases, decrypt secrets, scaffold `.env` files, run code generators. Must be re-runnable; second run should be a no-op against an already-set-up checkout.                                                               |
+| `server` or `run` | Start the app (`server` for long-running services, `run` for CLIs and one-shots).                                                                                                                                                                                                                   |
+| `test`            | Run the test suite. Fast inner loop; this is what a dev runs in a tight edit-test cycle.                                                                                                                                                                                                            |
+| `build`           | Build the deployable artifact.                                                                                                                                                                                                                                                                      |
+| `ci`              | Run the full pre-PR gate locally — superset of `test`, typically `lint + typecheck + test + build + drift checks`. SHOULD be the same recipe the CI provider invokes so local and remote results match.                                                                                             |
+| `console`         | Interactive shell into the running app or its environment (REPL, container shell, devshell, SSH-equivalent).                                                                                                                                                                                        |
 
 The contract is the **command surface**, not the implementation. A repo MAY
 implement these as plain scripts, as `just` recipes, or both. When both
@@ -82,14 +82,14 @@ These names are not required, but when a repo implements one of these
 concepts it SHOULD use the recommended name so muscle memory transfers
 across repos:
 
-| Command   | Purpose                                                          |
-| --------- | ---------------------------------------------------------------- |
-| `lint`    | Run linters (clippy, eslint, ruff, statix, etc.).                |
-| `format`  | Apply formatters (rustfmt, prettier, biome, ruff format, etc.).  |
-| `doctor`  | Diagnose dev-environment health (missing tools, stale deps, broken secrets). |
-| `clean`   | Remove build artifacts, caches, generated code (where regenerable). |
-| `migrate` | Run database migrations forward.                                 |
-| `seed`    | Populate dev/test data.                                          |
+| Command   | Purpose                                                                                       |
+| --------- | --------------------------------------------------------------------------------------------- |
+| `lint`    | Run linters (clippy, eslint, ruff, statix, etc.).                                             |
+| `format`  | Apply formatters (rustfmt, prettier, biome, ruff format, etc.).                               |
+| `doctor`  | Diagnose dev-environment health (missing tools, stale deps, broken secrets).                  |
+| `clean`   | Remove build artifacts, caches, generated code (where regenerable).                           |
+| `migrate` | Run database migrations forward.                                                              |
+| `seed`    | Populate dev/test data.                                                                       |
 | `deploy`  | Deploy to a target environment (semantics are per-repo until a future ADR addresses deploys). |
 
 Repos MAY add other commands beyond this list. The names above are reserved
@@ -118,12 +118,12 @@ wrap their scripts to enter the devshell, so a user can run
 `./scripts/test` from a bare shell without first remembering to run
 `nix develop`. The canonical pattern:
 
-| Script              | Implementation                                |
-| ------------------- | --------------------------------------------- |
-| `./scripts/console` | `exec nix develop` (drops the user into the devshell). |
+| Script              | Implementation                                                 |
+| ------------------- | -------------------------------------------------------------- |
+| `./scripts/console` | `exec nix develop` (drops the user into the devshell).         |
 | `./scripts/server`  | `nix develop -c <runner>` (e.g. `nix develop -c bun run dev`). |
-| `./scripts/test`    | `nix develop -c <test command>`.              |
-| `./scripts/ci`      | `nix develop -c <ci pipeline>`.               |
+| `./scripts/test`    | `nix develop -c <test command>`.                               |
+| `./scripts/ci`      | `nix develop -c <ci pipeline>`.                                |
 
 Scripts SHOULD detect whether they are already inside the devshell (e.g.
 checking `$IN_NIX_SHELL` or a project-specific sentinel) and skip

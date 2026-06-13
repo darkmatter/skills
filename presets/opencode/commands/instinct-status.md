@@ -14,6 +14,7 @@ Read and display instincts from the configured runtime instinct store.
 ## Instinct Location
 
 Shared homunculus store (v2.1):
+
 - Global personal: `~/.claude/homunculus/instincts/personal/`
 - Global inherited: `~/.claude/homunculus/instincts/inherited/`
 - Project-scoped: `~/.claude/homunculus/projects/<project_id>/instincts/{personal,inherited}/`

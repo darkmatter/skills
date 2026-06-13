@@ -17,13 +17,7 @@ const isSerenaStartupTool = (toolName) => {
   return SERENA_STARTUP_TOOL_NAMES.has(normalizedToolName);
 };
 
-export const NotificationPlugin = async ({
-  project,
-  client,
-  $,
-  directory,
-  worktree,
-}) => {
+export const NotificationPlugin = async ({ project, client, $, directory, worktree }) => {
   let hasSubstantiveToolWork = false;
 
   return {

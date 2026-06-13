@@ -132,7 +132,7 @@ Protobuf workflows slot into the standard command surface
    MAY use protobuf internally if they wrap an RPC client, but are not
    required to.
 
-2. **Very small services.** A service that meets *all* of the following is
+2. **Very small services.** A service that meets _all_ of the following is
    exempt:
    - Single language, single first-party client, no foreseeable second
      consumer.
@@ -156,9 +156,8 @@ Protobuf workflows slot into the standard command surface
    client types), Effect Schema, Zod, and similar — protobuf would be
    redundant for the single-language case.
 
-   The decision rule: **do any *typed* clients live outside the language
+   The decision rule: **do any _typed_ clients live outside the language
    where the schema is authored?**
-
    - **No → exempt.** Schema-as-code is sufficient.
    - **Yes → not exempt.** Generate `.proto` from the schema (preferred,
      keeps one source of truth), or maintain `.proto` alongside the
@@ -166,14 +165,14 @@ Protobuf workflows slot into the standard command surface
 
    Worked examples:
 
-   | Setup                                                                  | Status        |
-   | ---------------------------------------------------------------------- | ------------- |
-   | Drizzle schema + Next.js app, only TS consumers                        | Exempt        |
-   | Drizzle schema + Next.js + Swift iOS app                               | NOT exempt    |
-   | Effect Schema in a TS service consumed only by TS clients              | Exempt        |
-   | Effect Schema + Rust ETL job reading the same data                     | NOT exempt    |
-   | Zod-validated TS API with only TS-typed clients                        | Exempt        |
-   | TS API with **untyped** JSON consumers in other languages              | Exempt¹       |
+   | Setup                                                     | Status     |
+   | --------------------------------------------------------- | ---------- |
+   | Drizzle schema + Next.js app, only TS consumers           | Exempt     |
+   | Drizzle schema + Next.js + Swift iOS app                  | NOT exempt |
+   | Effect Schema in a TS service consumed only by TS clients | Exempt     |
+   | Effect Schema + Rust ETL job reading the same data        | NOT exempt |
+   | Zod-validated TS API with only TS-typed clients           | Exempt     |
+   | TS API with **untyped** JSON consumers in other languages | Exempt¹    |
 
    ¹ No typed contract exists to enforce, so there's nothing for the ADR
    to govern. This is a worse engineering posture than having proto, but

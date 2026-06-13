@@ -14,16 +14,19 @@ Import instincts into the configured runtime instinct store.
 ## Import Sources
 
 ### File Import
+
 ```
 /instinct-import path/to/instincts.json
 ```
 
 ### URL Import
+
 ```
 /instinct-import https://example.com/instincts.json
 ```
 
 ### Team Share Import
+
 ```
 /instinct-import @teammate/instincts
 ```
@@ -79,6 +82,7 @@ Imported Instincts:
 ## Conflict Resolution
 
 When importing duplicates:
+
 - Keep higher confidence version
 - Merge application counts
 - Update timestamp

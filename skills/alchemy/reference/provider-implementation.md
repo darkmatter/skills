@@ -41,11 +41,11 @@ Errors split into:
 
 `reconcile` receives `output: Attributes | undefined` and `olds: Props | undefined`:
 
-| `output`    | `olds`      | Meaning                                    |
-| ----------- | ----------- | ------------------------------------------ |
-| `undefined` | `undefined` | Greenfield — no prior physical resource    |
-| defined     | defined     | Routine update — engine-owned              |
-| defined     | `undefined` | Adoption — engine adopted via `read`       |
+| `output`    | `olds`      | Meaning                                 |
+| ----------- | ----------- | --------------------------------------- |
+| `undefined` | `undefined` | Greenfield — no prior physical resource |
+| defined     | defined     | Routine update — engine-owned           |
+| defined     | `undefined` | Adoption — engine adopted via `read`    |
 
 The reconciler MUST work for all three. **Never branch the body on `output === undefined`** — that is rename-and-branch, not reconciliation. One flow:
 
@@ -104,7 +104,13 @@ export const Stream = Resource<Stream>("AWS.Kinesis.Stream");
 export interface Function extends Resource<
   "AWS.Lambda.Function",
   FunctionProps,
-  { functionArn: string; functionName: string; functionUrl: string | undefined; roleName: string; roleArn: string },
+  {
+    functionArn: string;
+    functionName: string;
+    functionUrl: string | undefined;
+    roleName: string;
+    roleArn: string;
+  },
   { env?: Record<string, any>; policyStatements?: PolicyStatement[] }
 > {}
 ```
@@ -153,9 +159,7 @@ export class GetItem extends Binding.Service<
   <T extends Table>(
     table: T,
   ) => Effect.Effect<
-    (
-      request: GetItemRequest,
-    ) => Effect.Effect<
+    (request: GetItemRequest) => Effect.Effect<
       DynamoDB.GetItemOutput,
       DynamoDB.GetItemError,
       RuntimeContext // ← runtime-only
@@ -199,13 +203,13 @@ reconcile: Effect.fn(function* ({ id, news, output, session }) {
 Never roll your own tag diff. Use `diffTags` from [Tags.ts](https://github.com/alchemy-run/alchemy-effect/blob/main/packages/alchemy/src/Tags.ts) and diff against **observed cloud tags** (not `olds.tags` or `output.tags`):
 
 ```ts
-const internalTags = yield* createInternalTags(id);
+const internalTags = yield * createInternalTags(id);
 const newTags = { ...news.tags, ...internalTags };
-const oldTags = yield* fetchObservedTags(/* … */);
+const oldTags = yield * fetchObservedTags(/* … */);
 // Pick the shape that matches the API:
-const { removed, upsert } = diffTags(oldTags, newTags);        // combined create/update
+const { removed, upsert } = diffTags(oldTags, newTags); // combined create/update
 const { removed, added, updated } = diffTags(oldTags, newTags); // separate calls
-const { upsert } = diffTags(oldTags, newTags);                  // PUT/UPDATE only
+const { upsert } = diffTags(oldTags, newTags); // PUT/UPDATE only
 ```
 
 ## Effect platform rules (provider code AND tests)
@@ -225,9 +229,7 @@ Never use `async`/`await`, raw `Promise`, `node:fs/promises`, `node:fs`, `node:o
 Sync, CPU-only Node APIs (`crypto.createHash`, `process.cwd`, `Buffer`, `TextEncoder`) still go through `Effect.sync(...)` or `Effect.try(...)`:
 
 ```ts
-const hash = yield* Effect.sync(() =>
-  crypto.createHash("sha256").update(input).digest("hex"),
-);
+const hash = yield * Effect.sync(() => crypto.createHash("sha256").update(input).digest("hex"));
 ```
 
 Never use `Effect.orDie` inside lifecycle operations — it crashes the whole IaC engine.
@@ -303,9 +305,9 @@ test(
   Effect.gen(function* () {
     const { url } = yield* stack;
     const client = yield* HttpClient.HttpClient;
-    const res = yield* client.get(`${url}/url`).pipe(
-      Effect.retry({ schedule: Schedule.exponential("500 millis"), times: 10 }),
-    );
+    const res = yield* client
+      .get(`${url}/url`)
+      .pipe(Effect.retry({ schedule: Schedule.exponential("500 millis"), times: 10 }));
     expect(res.status).toBe(200);
   }),
   { timeout: 180_000 },
@@ -321,13 +323,15 @@ Rules:
 - **Never use `while (Date.now() < deadline)` loops** to poll for async side effects (workflow status, cron fires, queue drains). Use `Effect.repeat` with `Schedule` + `until` + bounded `times: N`:
 
   ```ts
-  const value = yield* fetchValue.pipe(
-    Effect.repeat({
-      schedule: Schedule.spaced("5 seconds"),
-      until: (v) => v.ready,
-      times: 36,
-    }),
-  );
+  const value =
+    yield *
+    fetchValue.pipe(
+      Effect.repeat({
+        schedule: Schedule.spaced("5 seconds"),
+        until: (v) => v.ready,
+        times: 36,
+      }),
+    );
   ```
 
 - Never use `Date.now()` in physical names — let Alchemy generate the name from app/stage/logical id, or construct a deterministic name unique to the test case.

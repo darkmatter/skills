@@ -19,14 +19,7 @@
  */
 
 import { execFile as execFileCb } from "node:child_process";
-import {
-  appendFile,
-  mkdir,
-  readFile,
-  realpath,
-  rename,
-  stat,
-} from "node:fs/promises";
+import { appendFile, mkdir, readFile, realpath, rename, stat } from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 import { promisify } from "node:util";
@@ -62,10 +55,7 @@ function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null;
 }
 
-function getStringField(
-  record: Record<string, unknown>,
-  key: string,
-): string | undefined {
+function getStringField(record: Record<string, unknown>, key: string): string | undefined {
   const value = record[key];
   return typeof value === "string" ? value : undefined;
 }
@@ -80,11 +70,9 @@ async function tryRealpath(p: string): Promise<string | null> {
 
 async function findGitRoot(dir: string): Promise<string | null> {
   try {
-    const { stdout } = await execFile(
-      "git",
-      ["-C", dir, "rev-parse", "--show-toplevel"],
-      { timeout: 2000 },
-    );
+    const { stdout } = await execFile("git", ["-C", dir, "rev-parse", "--show-toplevel"], {
+      timeout: 2000,
+    });
     const trimmed = stdout.trim();
     return trimmed.length > 0 ? trimmed : null;
   } catch {
@@ -92,10 +80,7 @@ async function findGitRoot(dir: string): Promise<string | null> {
   }
 }
 
-async function resolveProject(
-  directory: string,
-  log: LogFn,
-): Promise<ProjectContext | null> {
+async function resolveProject(directory: string, log: LogFn): Promise<ProjectContext | null> {
   if (!directory) return null;
 
   let resolved = await tryRealpath(directory);
@@ -178,10 +163,7 @@ function errMsg(err: unknown): string {
   return err instanceof Error ? err.message : String(err);
 }
 
-async function rotateIfTooLarge(
-  ctx: ProjectContext,
-  log: LogFn,
-): Promise<void> {
+async function rotateIfTooLarge(ctx: ProjectContext, log: LogFn): Promise<void> {
   let size: number;
   try {
     const s = await stat(ctx.observationsFile);
@@ -203,10 +185,7 @@ async function rotateIfTooLarge(
     .replace(/[-:]/g, "")
     .replace(/\.\d{3}Z$/, "")
     .replace("T", "-");
-  const archivePath = path.join(
-    ctx.archiveDir,
-    `observations-${ts}-${process.pid}.jsonl`,
-  );
+  const archivePath = path.join(ctx.archiveDir, `observations-${ts}-${process.pid}.jsonl`);
 
   try {
     await rename(ctx.observationsFile, archivePath);
@@ -254,27 +233,19 @@ const InstinctObserverPlugin: Plugin = async ({ client, directory }) => {
   const log: LogFn = async (level, message) => {
     // Fire-and-forget: never await the server during plugin init (deadlock),
     // and never let a slow/failed log block observation writes.
-    client.app
-      .log({ body: { service: "instinct-observer", level, message } })
-      .catch(() => {});
+    client.app.log({ body: { service: "instinct-observer", level, message } }).catch(() => {});
   };
 
   const resolvedProject = await resolveProject(directory ?? "", log);
   if (!resolvedProject) {
-    await log(
-      "info",
-      `disabled: could not resolve project for dir=${directory ?? "<none>"}`,
-    );
+    await log("info", `disabled: could not resolve project for dir=${directory ?? "<none>"}`);
     return {};
   }
   const project: ProjectContext = resolvedProject;
 
   const queue = createWriteQueue(project, log);
 
-  await log(
-    "info",
-    `ready: writing to ${project.observationsFile} (project=${project.id})`,
-  );
+  await log("info", `ready: writing to ${project.observationsFile} (project=${project.id})`);
 
   const baseFields = (
     event: "tool_start" | "tool_complete",

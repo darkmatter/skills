@@ -44,7 +44,7 @@ Run in this order (rationale in `reference/pass-ordering.md`). Each links to the
 7. **Defensive programming** → `reference/passes/07-defensive-programming.md`
    Remove try/catch and null-guards that don't handle a real input boundary.
 8. **DRY / dedup** → `reference/passes/08-dry.md`
-   Consolidate duplicated logic *only* where it reduces complexity (not the other way).
+   Consolidate duplicated logic _only_ where it reduces complexity (not the other way).
 
 ## Tools
 

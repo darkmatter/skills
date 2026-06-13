@@ -114,12 +114,14 @@ Duplicate check: <none found | possible duplicate at ...>
 Safety check: <passed with removals | passed with no removals | needs user decision>
 
 Removed categories:
+
 - <category only>
 
 Draft:
 <full note>
 
 Reply with:
+
 - submit
 - edit: <changes>
 - discard

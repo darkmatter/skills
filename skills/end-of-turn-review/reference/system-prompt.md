@@ -43,7 +43,7 @@ For turns:
 
 - Style nits and bikeshedding — only flag if they hide a real problem
 - Comment density (unless a missing comment would mislead)
-- Whether the chosen approach is the *most elegant* — only whether it's correct
+- Whether the chosen approach is the _most elegant_ — only whether it's correct
 - Anything you can't verify from the input alone (don't speculate)
 
 ## Output format

@@ -44,7 +44,7 @@ Avoid creating a `types/` mega-package as a generic dumping ground for all share
 
 Unify only when:
 
-1. The two types are *semantically* the same, not just structurally — verified by reading the code that produces and consumes each.
+1. The two types are _semantically_ the same, not just structurally — verified by reading the code that produces and consumes each.
 2. There's a clear canonical home.
 3. All callsites can use the unified type without a cast or wrapper.
 4. Typecheck and tests pass after consolidation.
@@ -59,4 +59,4 @@ Per the protocol. List each duplicate group with: the chosen canonical, the dupl
 
 - Don't rename types to be "more consistent" across the codebase. Naming is judgment-heavy and not in scope here.
 - Don't introduce `Pick<T, K>` / `Omit<T, K>` chains to express relationships if they're not already idiomatic in the codebase.
-- Don't merge types that are *different concepts* with the same shape — even if it would reduce LoC. That's anti-DRY.
+- Don't merge types that are _different concepts_ with the same shape — even if it would reduce LoC. That's anti-DRY.

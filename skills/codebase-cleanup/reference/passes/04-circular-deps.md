@@ -15,7 +15,7 @@ Detect import cycles between modules / packages and untangle them. Cycles cause:
 
 ## What to skip (false positives)
 
-- Cycles that exist only between *type-only* imports in TypeScript (`import type`) — these are erased at runtime and don't cause the usual cycle pathologies. Flag for cleanliness, but lower priority.
+- Cycles that exist only between _type-only_ imports in TypeScript (`import type`) — these are erased at runtime and don't cause the usual cycle pathologies. Flag for cleanliness, but lower priority.
 - Cycles that the language / module system intentionally permits and resolves cleanly (e.g. mutually-recursive types in Haskell, certain Python lazy imports).
 - Cycles confined entirely to a test directory — these are typically intentional shared fixtures and don't cause runtime issues.
 
@@ -36,7 +36,7 @@ When a cycle exists, the fix is usually one of these:
 4. **Type-only-ize** — if the cycle is purely for types (TS), use `import type` to break the runtime edge.
 5. **Lazy import** — last resort. Defers the problem rather than solving it. Only use when the call site is a slow path and refactoring is out of scope.
 
-Avoid: introducing dependency-injection or interfaces *just* to break a cycle. That's a structural change masquerading as a cleanup.
+Avoid: introducing dependency-injection or interfaces _just_ to break a cycle. That's a structural change masquerading as a cleanup.
 
 ## High-confidence threshold
 

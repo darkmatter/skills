@@ -373,9 +373,7 @@ function extractEventDiff(event) {
 function readThreshold() {
   const raw = process.env.OC_ADR_REVIEW_MIN_CODE_LINES;
   const parsed = Number.parseInt(raw ?? "", 10);
-  return Number.isFinite(parsed) && parsed > 0
-    ? parsed
-    : DEFAULT_SIGNIFICANT_CODE_LINES;
+  return Number.isFinite(parsed) && parsed > 0 ? parsed : DEFAULT_SIGNIFICANT_CODE_LINES;
 }
 
 export const AdrReviewReminderPlugin = async ({ client, directory }) => {

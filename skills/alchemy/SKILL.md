@@ -249,10 +249,8 @@ Alchemy stacks and Worker/Function bodies run as Effect programs. Do not reach f
 Sync, CPU-only Node APIs (`crypto.createHash`, `process.cwd`, `Buffer`, `TextEncoder`) must still be wrapped in `Effect.sync(() => …)` (or `Effect.try` if they can throw) so the call participates in the Effect runtime — tracing, interruption, and the error channel all depend on it.
 
 ```ts
-const hash = yield* Effect.sync(() =>
-  crypto.createHash("sha256").update(input).digest("hex"),
-);
-const cwd = yield* Effect.sync(() => process.cwd());
+const hash = yield * Effect.sync(() => crypto.createHash("sha256").update(input).digest("hex"));
+const cwd = yield * Effect.sync(() => process.cwd());
 ```
 
 This applies to **stack bodies, custom resource helpers, and tests**. Tests must use `FileSystem.FileSystem` / `Path.Path` for any file/path access.
@@ -264,13 +262,15 @@ Polling rules for deploy/runtime tests:
 
 ```ts
 // good — declarative, bounded, interruption-safe
-const value = yield* fetchValue.pipe(
-  Effect.repeat({
-    schedule: Schedule.spaced("5 seconds"),
-    until: (v) => v.ready,
-    times: 36,
-  }),
-);
+const value =
+  yield *
+  fetchValue.pipe(
+    Effect.repeat({
+      schedule: Schedule.spaced("5 seconds"),
+      until: (v) => v.ready,
+      times: 36,
+    }),
+  );
 ```
 
 ## Provider lifecycle tests

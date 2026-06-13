@@ -2,7 +2,7 @@
 
 This is a reference shape for `template/.github/pull_request_template.md` or `.agent/checklists/pr.md`.
 
-```md
+````md
 ## Summary
 
 Briefly describe what changed and why.
@@ -41,6 +41,7 @@ List exact commands and results.
 command: <command>
 result: <PASS/FAIL + short output summary>
 ```
+````
 
 Required checks:
 
@@ -75,4 +76,7 @@ If any required practice was skipped, cite the exception ID.
 - Practice skipped:
 - Approver:
 - Expiry/review date:
+
+```
+
 ```

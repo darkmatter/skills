@@ -25,7 +25,7 @@ Remove try/catch, null-guards, fallback returns, and other defensive scaffolding
 - **Catches that classify and re-route**: `catch (e) { if (e instanceof RetryableError) retry(); else throw }` — that's real handling
 - **Catches with logging that propagates the error**: `catch (e) { logger.error(e); throw }` — observability + propagation, both real
 - **Resource cleanup**: `try { ... } finally { close() }` — finally is the point, catch is incidental or absent
-- **Catches that handle a documented, reachable failure mode** — even if the handling is just emitting a metric and returning a sentinel — *if* the contract documents the sentinel
+- **Catches that handle a documented, reachable failure mode** — even if the handling is just emitting a metric and returning a sentinel — _if_ the contract documents the sentinel
 - **Null-guards at API boundaries** where the type system can't reach (untyped callers, dynamic input)
 - **Defensive checks in code that has been bitten by the failure mode before** — git blame / commit message will mention the incident
 

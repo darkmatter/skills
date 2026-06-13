@@ -10,8 +10,7 @@
  */
 
 export const AutoCompactMin = async ({ client }) => {
-  const THRESHOLD =
-    Number.parseInt(process.env.OC_COMPACT_THRESHOLD ?? "60", 10) || 60;
+  const THRESHOLD = Number.parseInt(process.env.OC_COMPACT_THRESHOLD ?? "60", 10) || 60;
 
   let sessionId = null;
   let toolCountSinceLastCompact = 0;

@@ -8,11 +8,7 @@ const MAX_CHUNK_CHARS = 900;
 const MAX_INJECTED_CONTEXT_CHARS = 2200;
 const ENV_RAG_PATHS = "OPENCODE_FIGMA_RAG_PATHS";
 
-const DEFAULT_RAG_RELATIVE_PATHS = [
-  ".opencode/figma-rag.md",
-  "docs/figma-rag.md",
-  "figma-rag.md",
-];
+const DEFAULT_RAG_RELATIVE_PATHS = [".opencode/figma-rag.md", "docs/figma-rag.md", "figma-rag.md"];
 
 const FIGMA_HINTS = [
   "figma",
@@ -150,8 +146,7 @@ const notifyMac = async ($, title, message) => {
 
   try {
     await $`osascript -e ${script}`;
-  } catch {
-  }
+  } catch {}
 };
 
 const toast = async (client, title, message) => {
@@ -166,8 +161,7 @@ const toast = async (client, title, message) => {
       variant: "info",
       duration: 2500,
     });
-  } catch {
-  }
+  } catch {}
 };
 
 const extractTextFromParts = (parts) => {
@@ -334,13 +328,7 @@ const readFileWithCache = async (cache, filePath) => {
   }
 };
 
-const retrieveRagSnippets = async ({
-  query,
-  directory,
-  worktree,
-  pluginDirectory,
-  cache,
-}) => {
+const retrieveRagSnippets = async ({ query, directory, worktree, pluginDirectory, cache }) => {
   const ragPaths = resolveRagPaths({ directory, worktree, pluginDirectory });
   if (ragPaths.length === 0) {
     return [];
@@ -551,8 +539,7 @@ export const FigmaMcpTriggerPlugin = async ({ $, client, directory, worktree }) 
             },
           });
         }
-      } catch {
-      }
+      } catch {}
     },
     "tool.execute.after": async (input, output) => {
       const shouldTrigger = isFigmaMcpCall(input.tool, output?.metadata);
@@ -585,8 +572,7 @@ export const FigmaMcpTriggerPlugin = async ({ $, client, directory, worktree }) 
             },
           });
         }
-      } catch {
-      }
+      } catch {}
     },
   };
 };

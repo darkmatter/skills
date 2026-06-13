@@ -3,7 +3,7 @@ name: strategic-compact
 description: Runtime compaction policy — makes auto-compaction safe for autonomous multi-phase work by preparing durable state. Not an ordinary task skill; consumed by the agent client during compaction.
 ---
 
-> **This is a runtime policy document**, not an ordinary task skill. It configures the agent's compaction behavior for long autonomous sessions. The agent client loads this to enforce safe-compaction discipline. It does not implement compaction itself — it *prescribes* the state-preservation behavior the client must follow.
+> **This is a runtime policy document**, not an ordinary task skill. It configures the agent's compaction behavior for long autonomous sessions. The agent client loads this to enforce safe-compaction discipline. It does not implement compaction itself — it _prescribes_ the state-preservation behavior the client must follow.
 
 # Strategic Compact (OpenCode) — Autonomous Agent Edition
 

@@ -19,13 +19,13 @@ It is provider-agnostic. Any AI tool — Claude Code, Codex, OpenCode, Cursor, A
 
 ## Lifecycle
 
-| Folder | Update pattern | When to edit |
-|---|---|---|
-| `context/` | Updated as reality changes | Project state changes (positions, decisions, scope) |
-| `workflows/` | Stable | Procedure for a recurring task changes |
-| `skills/` | Versioned like libraries | Capability evolves, or a new project-local capability is added |
-| `memory/` | Append-mostly | After incidents, mistakes, or significant learnings |
-| `prompts/` | Stable | New task template or change to entry point |
+| Folder       | Update pattern             | When to edit                                                   |
+| ------------ | -------------------------- | -------------------------------------------------------------- |
+| `context/`   | Updated as reality changes | Project state changes (positions, decisions, scope)            |
+| `workflows/` | Stable                     | Procedure for a recurring task changes                         |
+| `skills/`    | Versioned like libraries   | Capability evolves, or a new project-local capability is added |
+| `memory/`    | Append-mostly              | After incidents, mistakes, or significant learnings            |
+| `prompts/`   | Stable                     | New task template or change to entry point                     |
 
 ## How agents should use this directory
 

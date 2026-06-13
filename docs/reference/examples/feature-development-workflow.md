@@ -2,7 +2,7 @@
 
 This is a reference shape for `.agent/workflows/feature-development.md`.
 
-```md
+````md
 # Feature development workflow
 
 Use this workflow for new features and behavior changes.
@@ -58,6 +58,7 @@ Evidence format:
 RED: `pnpm test src/foo.test.ts -t "does X"`
 Result: FAIL, expected missing behavior assertion
 ```
+````
 
 ## Gate 4 — GREEN
 
@@ -122,4 +123,7 @@ Final response must include:
 - Review status
 - Known gaps or follow-ups
 - Exception IDs for skipped gates
+
+```
+
 ```

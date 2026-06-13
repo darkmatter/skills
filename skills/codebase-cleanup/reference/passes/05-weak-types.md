@@ -18,7 +18,7 @@ Replace weak / escape-hatch types with strong, accurate ones. The goal is correc
 
 ## What to skip (false positives)
 
-- **Genuinely dynamic data at the boundary** — JSON from external APIs, user input, plugin payloads. The right type there *is* `unknown` (TS) or `Any` (Python) until validated. Replacing it with a concrete type is a lie that causes bugs.
+- **Genuinely dynamic data at the boundary** — JSON from external APIs, user input, plugin payloads. The right type there _is_ `unknown` (TS) or `Any` (Python) until validated. Replacing it with a concrete type is a lie that causes bugs.
 - **Type-erased generics in language designs that require it** (e.g. some reflection-heavy frameworks)
 - **Library escape hatches** intentionally typed as `any` for ergonomics on the caller side
 - **`unknown` after a parsing step** where the next operation is the validation — leave it for the validator to narrow
@@ -50,7 +50,7 @@ Replace only when:
 
 1. You've traced the value's actual shape from real code (production path, not test).
 2. The new type is provably accurate — every operation done on the value is a valid operation on the new type.
-3. The replacement doesn't widen *somewhere else* (e.g. forcing a callsite to add `as any` to compile).
+3. The replacement doesn't widen _somewhere else_ (e.g. forcing a callsite to add `as any` to compile).
 4. Typecheck passes after the change.
 
 If the type is "knowable in principle" but the trace requires understanding behavior in 5+ files, flag as low-confidence.

@@ -2,7 +2,7 @@
 
 This is a reference shape for `.agent/workflows/release.md`.
 
-```md
+````md
 # Release workflow
 
 Use this workflow for production deploys, package releases, public tags, or any irreversible external publication.
@@ -29,6 +29,7 @@ Target: production
 Commit: abc1234
 Approver: cooper
 ```
+````
 
 ## Gate 2 — Clean working tree
 
@@ -119,4 +120,7 @@ Include:
 - Smoke test results
 - Rollback path
 - Known issues
+
+```
+
 ```

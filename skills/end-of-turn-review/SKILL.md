@@ -63,7 +63,7 @@ followed by a numbered list of specific issues (each with `file:line` if applica
 
 Client-agnostic wrapper around `review.sh`. Designed to be called from any agent runtime's end-of-turn / session-stop event, or from a plain git pre-commit hook. It checks for a non-trivial uncommitted diff and pipes it through `review.sh`, printing the critique on stdout.
 
-The hook makes no assumptions about the caller beyond *(a)* cwd is inside a git repo and *(b)* stdout is captured and surfaced somewhere — to the next agent turn, to the developer's terminal, or wherever the calling system routes it.
+The hook makes no assumptions about the caller beyond _(a)_ cwd is inside a git repo and _(b)_ stdout is captured and surfaced somewhere — to the next agent turn, to the developer's terminal, or wherever the calling system routes it.
 
 Not auto-installed. See `reference/hook-setup.md` for per-client wiring (Claude Code, opencode, Cursor, Aider, plain git).
 

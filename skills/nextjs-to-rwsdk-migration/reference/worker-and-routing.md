@@ -64,14 +64,14 @@ export default defineApp([
 
 ## Route patterns
 
-| Pattern | Matches | `params` shape |
-| --- | --- | --- |
-| `route("/", h)` | exact `/` | `{}` |
-| `route("/about", h)` | exact `/about` | `{}` |
-| `route("/blog/:slug", h)` | `/blog/foo` (one segment) | `{ slug: string }` |
-| `route("/blog/:cat/:slug", h)` | `/blog/news/foo` | `{ cat: string, slug: string }` |
-| `route("/files/*", h)` | `/files/anything/multi/segment` | `{ $0: string }` |
-| `route("/files/*/preview", h)` | `/files/x/y/preview` | `{ $0: string }` |
+| Pattern                        | Matches                         | `params` shape                  |
+| ------------------------------ | ------------------------------- | ------------------------------- |
+| `route("/", h)`                | exact `/`                       | `{}`                            |
+| `route("/about", h)`           | exact `/about`                  | `{}`                            |
+| `route("/blog/:slug", h)`      | `/blog/foo` (one segment)       | `{ slug: string }`              |
+| `route("/blog/:cat/:slug", h)` | `/blog/news/foo`                | `{ cat: string, slug: string }` |
+| `route("/files/*", h)`         | `/files/anything/multi/segment` | `{ $0: string }`                |
+| `route("/files/*/preview", h)` | `/files/x/y/preview`            | `{ $0: string }`                |
 
 Wildcards capture the remaining path as a single string — `params.$0` — not as a `string[]` like Next's `[[...slug]]`. Convert with `params.$0?.split("/").filter(Boolean)` when the page needs the array form.
 
@@ -129,7 +129,9 @@ Wire it into `defineApp` as one of the array entries:
 ```ts
 export default defineApp([
   setCommonHeaders(),
-  ({ ctx, request }) => { ctx.pathname = new URL(request.url).pathname; },
+  ({ ctx, request }) => {
+    ctx.pathname = new URL(request.url).pathname;
+  },
   crawlerRewriteMiddleware,
   // …routes…
 ]);

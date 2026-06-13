@@ -43,9 +43,9 @@ codebase:
   which becomes painful the moment any of it needs to run elsewhere.
 
 TypeScript's Effect ecosystem solves this with a three-layer
-separation: `Config<T>` describes *what* configuration is needed,
-`ConfigProvider` describes *where* it comes from, and the Effect
-`Runtime` is *how* it executes. The same separation exists, under
+separation: `Config<T>` describes _what_ configuration is needed,
+`ConfigProvider` describes _where_ it comes from, and the Effect
+`Runtime` is _how_ it executes. The same separation exists, under
 different names, in other ecosystems — Pydantic Settings + sources,
 Rust's `figment` + `Provider`, Go's `koanf` + providers. The pattern is
 sound, and it's the one we are standardizing on.
@@ -85,8 +85,8 @@ change when the provider changes.
 
 ### 2. Description, provider, and runtime are three separate layers
 
-Configuration MUST be expressed as a *description* of needs that is
-independent of *where* values come from and *how* the program executes:
+Configuration MUST be expressed as a _description_ of needs that is
+independent of _where_ values come from and _how_ the program executes:
 
 - **Description layer.** A typed schema saying "this app needs a string
   `DATABASE_URL`, a redacted string `STRIPE_KEY`, an integer `PORT`
@@ -107,8 +107,8 @@ independent of *where* values come from and *how* the program executes:
 
 The practical test: it MUST be possible to swap from env-var-based
 config to JSON-file-based config to a remote secret store without
-touching the settings module's *description* or any consuming code —
-only the *provider* wiring in the runtime entrypoint changes.
+touching the settings module's _description_ or any consuming code —
+only the _provider_ wiring in the runtime entrypoint changes.
 
 ### 3. Consumers receive typed settings, not the raw provider
 
@@ -130,36 +130,35 @@ of this ADR in the languages we ship most often:
 
 ```ts
 // src/settings.ts — description layer
-import { Config, Effect, Redacted } from "effect"
+import { Config, Effect, Redacted } from "effect";
 
 export class Settings extends Effect.Service<Settings>()("Settings", {
   effect: Effect.gen(function* () {
-    const port = yield* Config.integer("PORT").pipe(Config.withDefault(8080))
-    const databaseUrl = yield* Config.string("DATABASE_URL")
-    const stripeKey = yield* Config.redacted("STRIPE_KEY")
-    const logLevel = yield* Config.literal("debug", "info", "warn", "error")(
-      "LOG_LEVEL",
-    ).pipe(Config.withDefault("info"))
-    return { port, databaseUrl, stripeKey, logLevel } as const
+    const port = yield* Config.integer("PORT").pipe(Config.withDefault(8080));
+    const databaseUrl = yield* Config.string("DATABASE_URL");
+    const stripeKey = yield* Config.redacted("STRIPE_KEY");
+    const logLevel = yield* Config.literal(
+      "debug",
+      "info",
+      "warn",
+      "error",
+    )("LOG_LEVEL").pipe(Config.withDefault("info"));
+    return { port, databaseUrl, stripeKey, logLevel } as const;
   }),
 }) {}
 ```
 
 ```ts
 // src/main.ts — runtime layer (Node)
-import { NodeRuntime } from "@effect/platform-node"
-import { ConfigProvider, Effect, Layer } from "effect"
-import { Settings } from "./settings"
-import { program } from "./program"
+import { NodeRuntime } from "@effect/platform-node";
+import { ConfigProvider, Effect, Layer } from "effect";
+import { Settings } from "./settings";
+import { program } from "./program";
 
-const provider = ConfigProvider.fromEnv() // swap for fromJson, fromMap, etc.
-const providerLayer = Layer.setConfigProvider(provider)
+const provider = ConfigProvider.fromEnv(); // swap for fromJson, fromMap, etc.
+const providerLayer = Layer.setConfigProvider(provider);
 
-program.pipe(
-  Effect.provide(Settings.Default),
-  Effect.provide(providerLayer),
-  NodeRuntime.runMain,
-)
+program.pipe(Effect.provide(Settings.Default), Effect.provide(providerLayer), NodeRuntime.runMain);
 ```
 
 The description (`Settings` service) is identical regardless of where
@@ -173,13 +172,13 @@ object. The discipline is the same; the machinery is lighter.
 
 ### Reference implementations: other languages
 
-| Language     | Description                              | Provider                                                              | Runtime                |
-| ------------ | ---------------------------------------- | --------------------------------------------------------------------- | ---------------------- |
-| TS / Effect  | `Config` + `Schema` in a `Settings` service | `ConfigProvider.fromEnv` / `fromJson` / `fromMap` / custom                | Node / Bun / Workers   |
-| TS / non-Effect | `zod` schema in `src/settings.ts`      | `process.env` (or any source) parsed once into the schema             | Node / Bun / Deno      |
-| Python       | `pydantic_settings.BaseSettings` class   | `EnvSettingsSource`, `SecretsSettingsSource`, `JsonConfigSettingsSource` | CPython / uv runner    |
-| Rust         | `Settings` struct with `serde::Deserialize` | `figment::Provider` (Env, Toml, Json, Json5, custom)                  | tokio / async-std      |
-| Go           | `Config` struct                          | `koanf` providers (env, file, vault, consul)                          | go runtime             |
+| Language        | Description                                 | Provider                                                                 | Runtime              |
+| --------------- | ------------------------------------------- | ------------------------------------------------------------------------ | -------------------- |
+| TS / Effect     | `Config` + `Schema` in a `Settings` service | `ConfigProvider.fromEnv` / `fromJson` / `fromMap` / custom               | Node / Bun / Workers |
+| TS / non-Effect | `zod` schema in `src/settings.ts`           | `process.env` (or any source) parsed once into the schema                | Node / Bun / Deno    |
+| Python          | `pydantic_settings.BaseSettings` class      | `EnvSettingsSource`, `SecretsSettingsSource`, `JsonConfigSettingsSource` | CPython / uv runner  |
+| Rust            | `Settings` struct with `serde::Deserialize` | `figment::Provider` (Env, Toml, Json, Json5, custom)                     | tokio / async-std    |
+| Go              | `Config` struct                             | `koanf` providers (env, file, vault, consul)                             | go runtime           |
 
 In each row, the three columns map to the three required layers. A
 correct implementation in any language fills all three columns and
@@ -223,8 +222,8 @@ config files.
 1. **Trivially small programs.** A script of fewer than ~50 lines that
    reads one or two env vars and is not deployed (one-shot CLI, ad-hoc
    ETL, a `scripts/` helper) MAY read env vars directly. The threshold
-   is roughly *2+ configuration inputs OR 2+ files that consume any
-   config* — once either holds, the settings module is required.
+   is roughly _2+ configuration inputs OR 2+ files that consume any
+   config_ — once either holds, the settings module is required.
 
 2. **Generated / bundled config.** Build-time constants injected by a
    bundler (Vite `import.meta.env.VITE_*`, Webpack `DefinePlugin`,
@@ -239,7 +238,7 @@ config files.
    startup" shape. Model these as their own service (a `FeatureFlags`
    service injected like any other), not as fields on the static
    settings struct. The static settings struct MAY carry the
-   *configuration* of the flags service (its endpoint, SDK key) but
+   _configuration_ of the flags service (its endpoint, SDK key) but
    not the flag values themselves.
 
 ## Consequences
@@ -286,7 +285,7 @@ config files.
 - **Dynamic config is awkward in the static struct.** Feature flags
   and live-tunable values don't fit; the exception carves them out,
   but a project that has lots of dynamic config will end up with both
-  a static settings module *and* a dynamic flags service, which is
+  a static settings module _and_ a dynamic flags service, which is
   more moving parts.
 - **Lint enforcement requires per-language configuration.** The "only
   one file may touch the provider" rule is most powerful when
@@ -306,19 +305,19 @@ script, the trade is decisively favorable.
 - **Status quo: env vars read inline.** This is what the ADR exists
   to address. Cheap to write, expensive to audit, fragile in
   production, hostile to multi-runtime work.
-- **A `dotenv` library and call it done.** Solves *loading* (read
-  `.env` into `process.env`), does nothing for *typing*, *centralizing*,
-  *swappability*, or *runtime portability*. Compatible with this ADR
+- **A `dotenv` library and call it done.** Solves _loading_ (read
+  `.env` into `process.env`), does nothing for _typing_, _centralizing_,
+  _swappability_, or _runtime portability_. Compatible with this ADR
   as a provider implementation, but not a substitute for it.
 - **Global config singleton.** Better than scattered reads, worse than
   a typed struct passed through DI. Singletons hide dependencies the
   same way globals do, complicate tests, and don't compose across
-  layers. The settings module is intentionally *not* a singleton — it
+  layers. The settings module is intentionally _not_ a singleton — it
   is a value that gets injected.
 - **Config service over the network (Consul, etcd, a dedicated config
   microservice).** Over-engineered for most projects and orthogonal to
-  this ADR. The settings module MAY *reference* such a service (its
-  endpoint and credentials) and a provider MAY *fetch from* such a
+  this ADR. The settings module MAY _reference_ such a service (its
+  endpoint and credentials) and a provider MAY _fetch from_ such a
   service; the discipline of "one typed module, decoupled from
   provider" still applies on top.
 - **TypeScript-only ADR (Effect-specific).** Tempting because Effect
@@ -328,8 +327,8 @@ script, the trade is decisively favorable.
   Rust and Python projects without guidance and re-create the same
   pain.
 - **12-factor's "config in the environment."** A useful framing for
-  *deployment* (config lives outside the artifact), not a
-  prescription for *consumption*. This ADR is the consumption-side
+  _deployment_ (config lives outside the artifact), not a
+  prescription for _consumption_. This ADR is the consumption-side
   discipline that 12-factor doesn't supply.
 - **Per-module config objects (each module owns its own settings).**
   Tempting from a locality-of-reference standpoint but defeats the

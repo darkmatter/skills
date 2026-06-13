@@ -4,9 +4,9 @@ Repo-diff evals test what a skill **does to a codebase**, not what it **says**. 
 
 ## How this differs from skill behavior evals
 
-The existing evals under `evals/skills/` are **behavior evals**: they send a scenario prompt to an LLM and check that the model responds with the right decision (ALLOW or BLOCK). They test whether the model *understands* the rule.
+The existing evals under `evals/skills/` are **behavior evals**: they send a scenario prompt to an LLM and check that the model responds with the right decision (ALLOW or BLOCK). They test whether the model _understands_ the rule.
 
-Repo-diff evals are **structural evals**: they check the actual file changes a skill would produce. They test whether the skill *produces the right diff*: the right files touched, the right lines added or removed, the right scope. Both suites run in CI, but they answer different questions.
+Repo-diff evals are **structural evals**: they check the actual file changes a skill would produce. They test whether the skill _produces the right diff_: the right files touched, the right lines added or removed, the right scope. Both suites run in CI, but they answer different questions.
 
 ## Quickstart
 
@@ -73,15 +73,15 @@ The stub patch represents what an ideal agent would produce. Because the patch i
 
 `assertions.js` exports pure functions for inspecting unified diffs. Import them in test files, or copy the same simple checks into Promptfoo inline `javascript` assertions:
 
-| Function | What it checks |
-|---|---|
-| `getChangedFiles(diff)` | Returns sorted, deduplicated list of changed file paths |
-| `diffTouchesFile(diff, matcher)` | True if any changed file matches (string, RegExp, or predicate) |
-| `diffDoesNotTouchFile(diff, matcher)` | Inverse of `diffTouchesFile` |
-| `diffAddsLine(diff, pattern)` | True if an added line (excluding `+++` headers) matches |
-| `diffRemovesLine(diff, pattern)` | True if a removed line (excluding `---` headers) matches |
-| `diffFileCount(diff)` | Number of distinct changed files |
-| `diffIsScopedTo(diff, prefixes)` | True if every changed file starts with one of the prefixes |
+| Function                              | What it checks                                                  |
+| ------------------------------------- | --------------------------------------------------------------- |
+| `getChangedFiles(diff)`               | Returns sorted, deduplicated list of changed file paths         |
+| `diffTouchesFile(diff, matcher)`      | True if any changed file matches (string, RegExp, or predicate) |
+| `diffDoesNotTouchFile(diff, matcher)` | Inverse of `diffTouchesFile`                                    |
+| `diffAddsLine(diff, pattern)`         | True if an added line (excluding `+++` headers) matches         |
+| `diffRemovesLine(diff, pattern)`      | True if a removed line (excluding `---` headers) matches        |
+| `diffFileCount(diff)`                 | Number of distinct changed files                                |
+| `diffIsScopedTo(diff, prefixes)`      | True if every changed file starts with one of the prefixes      |
 
 Unit tests for these helpers live in `assertions.test.js` and run via `npm run test:repo-diff`.
 

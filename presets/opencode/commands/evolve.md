@@ -16,6 +16,7 @@ Analyze instincts and promote clusters to skills.
 ### Step 1: Analyze Instincts
 
 Group instincts by:
+
 - Trigger similarity
 - Action patterns
 - Category tags
@@ -34,6 +35,7 @@ Cluster: Error Handling
 ### Step 3: Generate Skill
 
 When cluster has:
+
 - 3+ instincts
 - Average confidence > 0.75
 - Cohesive theme
@@ -44,23 +46,28 @@ Generate SKILL.md:
 # Error Handling Skill
 
 ## Overview
+
 Patterns for robust error handling learned from session observations.
 
 ## Patterns
 
 ### 1. Catch Specific Errors
+
 **Trigger**: When catching errors with generic catch
 **Action**: Use specific error types
 
 ### 2. Wrap Errors with Context
+
 **Trigger**: When re-throwing errors
 **Action**: Add context with fmt.Errorf or Error.cause
 
 ### 3. Log with Stack Trace
+
 **Trigger**: When logging errors
 **Action**: Include stack trace for debugging
 
 ### 4. Meaningful Messages
+
 **Trigger**: When returning errors to users
 **Action**: Provide actionable error messages
 ```
@@ -101,11 +108,11 @@ Remaining Instincts: 12
 
 ## Thresholds
 
-| Metric | Threshold |
-|--------|-----------|
-| Min instincts per cluster | 3 |
-| Min average confidence | 0.75 |
-| Min cluster cohesion | 0.6 |
+| Metric                    | Threshold |
+| ------------------------- | --------- |
+| Min instincts per cluster | 3         |
+| Min average confidence    | 0.75      |
+| Min cluster cohesion      | 0.6       |
 
 ---
 

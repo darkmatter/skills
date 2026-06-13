@@ -1,5 +1,5 @@
-import { describe, it } from 'node:test';
-import assert from 'node:assert/strict';
+import { describe, it } from "node:test";
+import assert from "node:assert/strict";
 import {
   getChangedFiles,
   diffTouchesFile,
@@ -8,7 +8,7 @@ import {
   diffRemovesLine,
   diffFileCount,
   diffIsScopedTo,
-} from './assertions.js';
+} from "./assertions.js";
 
 // ── Sample unified diffs for testing ──────────────────────────────
 
@@ -81,36 +81,36 @@ index 1234567..abcdef0 100644
 +console.log(data.toString());
 `;
 
-const EMPTY_DIFF = '';
+const EMPTY_DIFF = "";
 
 // ── getChangedFiles ───────────────────────────────────────────────
 
-describe('getChangedFiles', () => {
-  it('returns empty array for empty diff', () => {
+describe("getChangedFiles", () => {
+  it("returns empty array for empty diff", () => {
     assert.deepEqual(getChangedFiles(EMPTY_DIFF), []);
   });
 
-  it('extracts a single changed file', () => {
+  it("extracts a single changed file", () => {
     const files = getChangedFiles(DIFF_SINGLE_FILE);
-    assert.deepEqual(files, ['index.js']);
+    assert.deepEqual(files, ["index.js"]);
   });
 
-  it('extracts multiple changed files', () => {
+  it("extracts multiple changed files", () => {
     const files = getChangedFiles(DIFF_MULTI_FILE);
-    assert.deepEqual(files, ['README.md', 'index.js', 'src/util.js']);
+    assert.deepEqual(files, ["README.md", "index.js", "src/util.js"]);
   });
 
-  it('handles renamed files using the new name', () => {
+  it("handles renamed files using the new name", () => {
     const files = getChangedFiles(DIFF_RENAME);
-    assert.deepEqual(files, ['new.js']);
+    assert.deepEqual(files, ["new.js"]);
   });
 
-  it('handles deleted files', () => {
+  it("handles deleted files", () => {
     const files = getChangedFiles(DIFF_DELETE);
-    assert.deepEqual(files, ['deleted.js']);
+    assert.deepEqual(files, ["deleted.js"]);
   });
 
-  it('deduplicates files that appear in multiple hunks', () => {
+  it("deduplicates files that appear in multiple hunks", () => {
     const diff = `diff --git a/a.js b/a.js
 --- a/a.js
 +++ b/a.js
@@ -125,150 +125,162 @@ diff --git a/a.js b/a.js
 +w
 `;
     const files = getChangedFiles(diff);
-    assert.deepEqual(files, ['a.js']);
+    assert.deepEqual(files, ["a.js"]);
   });
 });
 
 // ── diffTouchesFile ───────────────────────────────────────────────
 
-describe('diffTouchesFile', () => {
-  it('returns true when file is in diff (string)', () => {
-    assert.equal(diffTouchesFile(DIFF_SINGLE_FILE, 'index.js'), true);
+describe("diffTouchesFile", () => {
+  it("returns true when file is in diff (string)", () => {
+    assert.equal(diffTouchesFile(DIFF_SINGLE_FILE, "index.js"), true);
   });
 
-  it('returns true for a file in a multi-file diff (string)', () => {
-    assert.equal(diffTouchesFile(DIFF_MULTI_FILE, 'src/util.js'), true);
+  it("returns true for a file in a multi-file diff (string)", () => {
+    assert.equal(diffTouchesFile(DIFF_MULTI_FILE, "src/util.js"), true);
   });
 
-  it('returns false when file is not in diff (string)', () => {
-    assert.equal(diffTouchesFile(DIFF_SINGLE_FILE, 'README.md'), false);
+  it("returns false when file is not in diff (string)", () => {
+    assert.equal(diffTouchesFile(DIFF_SINGLE_FILE, "README.md"), false);
   });
 
-  it('returns false for empty diff (string)', () => {
-    assert.equal(diffTouchesFile(EMPTY_DIFF, 'anything.js'), false);
+  it("returns false for empty diff (string)", () => {
+    assert.equal(diffTouchesFile(EMPTY_DIFF, "anything.js"), false);
   });
 
-  it('matches with a RegExp', () => {
+  it("matches with a RegExp", () => {
     assert.equal(diffTouchesFile(DIFF_MULTI_FILE, /\.js$/), true);
   });
 
-  it('returns false when RegExp matches no files', () => {
+  it("returns false when RegExp matches no files", () => {
     assert.equal(diffTouchesFile(DIFF_MULTI_FILE, /\.py$/), false);
   });
 
-  it('matches with a predicate function', () => {
-    assert.equal(diffTouchesFile(DIFF_MULTI_FILE, (f) => f.startsWith('src/')), true);
+  it("matches with a predicate function", () => {
+    assert.equal(
+      diffTouchesFile(DIFF_MULTI_FILE, (f) => f.startsWith("src/")),
+      true,
+    );
   });
 
-  it('returns false when predicate matches no files', () => {
-    assert.equal(diffTouchesFile(DIFF_MULTI_FILE, (f) => f.endsWith('.py')), false);
+  it("returns false when predicate matches no files", () => {
+    assert.equal(
+      diffTouchesFile(DIFF_MULTI_FILE, (f) => f.endsWith(".py")),
+      false,
+    );
   });
 
-  it('RegExp matches partial path', () => {
+  it("RegExp matches partial path", () => {
     assert.equal(diffTouchesFile(DIFF_MULTI_FILE, /util/), true);
   });
 });
 
 // ── diffDoesNotTouchFile ──────────────────────────────────────────
 
-describe('diffDoesNotTouchFile', () => {
-  it('returns true when file is not in diff (string)', () => {
-    assert.equal(diffDoesNotTouchFile(DIFF_SINGLE_FILE, 'README.md'), true);
+describe("diffDoesNotTouchFile", () => {
+  it("returns true when file is not in diff (string)", () => {
+    assert.equal(diffDoesNotTouchFile(DIFF_SINGLE_FILE, "README.md"), true);
   });
 
-  it('returns false when file is in diff (string)', () => {
-    assert.equal(diffDoesNotTouchFile(DIFF_SINGLE_FILE, 'index.js'), false);
+  it("returns false when file is in diff (string)", () => {
+    assert.equal(diffDoesNotTouchFile(DIFF_SINGLE_FILE, "index.js"), false);
   });
 
-  it('returns true for empty diff (string)', () => {
-    assert.equal(diffDoesNotTouchFile(EMPTY_DIFF, 'anything.js'), true);
+  it("returns true for empty diff (string)", () => {
+    assert.equal(diffDoesNotTouchFile(EMPTY_DIFF, "anything.js"), true);
   });
 
-  it('returns true when RegExp matches no files', () => {
+  it("returns true when RegExp matches no files", () => {
     assert.equal(diffDoesNotTouchFile(DIFF_SINGLE_FILE, /\.py$/), true);
   });
 
-  it('returns false when RegExp matches a file', () => {
+  it("returns false when RegExp matches a file", () => {
     assert.equal(diffDoesNotTouchFile(DIFF_SINGLE_FILE, /\.js$/), false);
   });
 
-  it('returns true when predicate matches no files', () => {
-    assert.equal(diffDoesNotTouchFile(DIFF_SINGLE_FILE, (f) => f.endsWith('.py')), true);
+  it("returns true when predicate matches no files", () => {
+    assert.equal(
+      diffDoesNotTouchFile(DIFF_SINGLE_FILE, (f) => f.endsWith(".py")),
+      true,
+    );
   });
 
-  it('returns false when predicate matches a file', () => {
-    assert.equal(diffDoesNotTouchFile(DIFF_SINGLE_FILE, (f) => f.endsWith('.js')), false);
+  it("returns false when predicate matches a file", () => {
+    assert.equal(
+      diffDoesNotTouchFile(DIFF_SINGLE_FILE, (f) => f.endsWith(".js")),
+      false,
+    );
   });
 });
 
 // ── diffAddsLine ──────────────────────────────────────────────────
 
-describe('diffAddsLine', () => {
-  it('returns true when a line matching the pattern is added', () => {
+describe("diffAddsLine", () => {
+  it("returns true when a line matching the pattern is added", () => {
     assert.equal(diffAddsLine(DIFF_SINGLE_FILE, "const path = require('path');"), true);
   });
 
-  it('returns true with a regex pattern', () => {
+  it("returns true with a regex pattern", () => {
     assert.equal(diffAddsLine(DIFF_SINGLE_FILE, /const \w+ = require/), true);
   });
 
-  it('returns false when the line is not added', () => {
-    assert.equal(diffAddsLine(DIFF_SINGLE_FILE, 'console.log(data);'), false);
+  it("returns false when the line is not added", () => {
+    assert.equal(diffAddsLine(DIFF_SINGLE_FILE, "console.log(data);"), false);
   });
 
-  it('does not match removed lines', () => {
+  it("does not match removed lines", () => {
     assert.equal(diffAddsLine(DIFF_ADDS_AND_REMOVES, "const fs = require('fs');"), false);
   });
 
-  it('returns false for empty diff', () => {
-    assert.equal(diffAddsLine(EMPTY_DIFF, 'anything'), false);
+  it("returns false for empty diff", () => {
+    assert.equal(diffAddsLine(EMPTY_DIFF, "anything"), false);
   });
 });
 
 // ── diffRemovesLine ───────────────────────────────────────────────
 
-describe('diffRemovesLine', () => {
-  it('returns true when a line matching the pattern is removed', () => {
+describe("diffRemovesLine", () => {
+  it("returns true when a line matching the pattern is removed", () => {
     assert.equal(diffRemovesLine(DIFF_ADDS_AND_REMOVES, "const fs = require('fs');"), true);
   });
 
-  it('returns true with a regex pattern', () => {
+  it("returns true with a regex pattern", () => {
     assert.equal(diffRemovesLine(DIFF_ADDS_AND_REMOVES, /console\.log\(data\)/), true);
   });
 
-  it('returns false when the line is not removed', () => {
+  it("returns false when the line is not removed", () => {
     assert.equal(diffRemovesLine(DIFF_ADDS_AND_REMOVES, "const fs = require('node:fs');"), false);
   });
 
-  it('does not match added lines', () => {
+  it("does not match added lines", () => {
     assert.equal(diffRemovesLine(DIFF_ADDS_AND_REMOVES, "const fs = require('node:fs');"), false);
   });
 
-  it('returns false for empty diff', () => {
-    assert.equal(diffRemovesLine(EMPTY_DIFF, 'anything'), false);
+  it("returns false for empty diff", () => {
+    assert.equal(diffRemovesLine(EMPTY_DIFF, "anything"), false);
   });
 });
 
 // ── diffFileCount ─────────────────────────────────────────────────
 
-describe('diffFileCount', () => {
-  it('returns 0 for empty diff', () => {
+describe("diffFileCount", () => {
+  it("returns 0 for empty diff", () => {
     assert.equal(diffFileCount(EMPTY_DIFF), 0);
   });
 
-  it('returns 1 for single-file diff', () => {
+  it("returns 1 for single-file diff", () => {
     assert.equal(diffFileCount(DIFF_SINGLE_FILE), 1);
   });
 
-  it('returns 3 for multi-file diff', () => {
+  it("returns 3 for multi-file diff", () => {
     assert.equal(diffFileCount(DIFF_MULTI_FILE), 3);
   });
 });
 
 // ── diffIsScopedTo ────────────────────────────────────────────────
 
-describe('diffIsScopedTo', () => {
-  it('returns true when all changed files match the prefix', () => {
+describe("diffIsScopedTo", () => {
+  it("returns true when all changed files match the prefix", () => {
     const diff = `diff --git a/src/a.js b/src/a.js
 --- a/src/a.js
 +++ b/src/a.js
@@ -282,18 +294,18 @@ diff --git a/src/b.js b/src/b.js
 -z
 +w
 `;
-    assert.equal(diffIsScopedTo(diff, 'src/'), true);
+    assert.equal(diffIsScopedTo(diff, "src/"), true);
   });
 
-  it('returns false when some files are outside the prefix', () => {
-    assert.equal(diffIsScopedTo(DIFF_MULTI_FILE, 'src/'), false);
+  it("returns false when some files are outside the prefix", () => {
+    assert.equal(diffIsScopedTo(DIFF_MULTI_FILE, "src/"), false);
   });
 
-  it('returns true for empty diff (vacuously scoped)', () => {
-    assert.equal(diffIsScopedTo(EMPTY_DIFF, 'src/'), true);
+  it("returns true for empty diff (vacuously scoped)", () => {
+    assert.equal(diffIsScopedTo(EMPTY_DIFF, "src/"), true);
   });
 
-  it('supports array of prefixes', () => {
+  it("supports array of prefixes", () => {
     const diff = `diff --git a/src/a.js b/src/a.js
 --- a/src/a.js
 +++ b/src/a.js
@@ -307,10 +319,10 @@ diff --git a/test/a.test.js b/test/a.test.js
 -z
 +w
 `;
-    assert.equal(diffIsScopedTo(diff, ['src/', 'test/']), true);
+    assert.equal(diffIsScopedTo(diff, ["src/", "test/"]), true);
   });
 
-  it('returns false when a file matches none of the prefixes', () => {
-    assert.equal(diffIsScopedTo(DIFF_MULTI_FILE, ['src/', 'test/']), false);
+  it("returns false when a file matches none of the prefixes", () => {
+    assert.equal(diffIsScopedTo(DIFF_MULTI_FILE, ["src/", "test/"]), false);
   });
 });

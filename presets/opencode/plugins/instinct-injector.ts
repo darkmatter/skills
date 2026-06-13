@@ -94,17 +94,12 @@ function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null;
 }
 
-function getStringField(
-  record: Record<string, unknown>,
-  key: string,
-): string | undefined {
+function getStringField(record: Record<string, unknown>, key: string): string | undefined {
   const value = record[key];
   return typeof value === "string" ? value : undefined;
 }
 
-function parseFrontmatter(
-  raw: string,
-): { fm: Record<string, string>; body: string } | null {
+function parseFrontmatter(raw: string): { fm: Record<string, string>; body: string } | null {
   const match = raw.match(/^---\r?\n([\s\S]*?)\r?\n---\r?\n([\s\S]*)$/);
   if (!match) return null;
 
@@ -196,11 +191,9 @@ async function tryRealpath(p: string): Promise<string | null> {
 
 async function findGitRoot(dir: string): Promise<string | null> {
   try {
-    const { stdout } = await execFile(
-      "git",
-      ["-C", dir, "rev-parse", "--show-toplevel"],
-      { timeout: 2000 },
-    );
+    const { stdout } = await execFile("git", ["-C", dir, "rev-parse", "--show-toplevel"], {
+      timeout: 2000,
+    });
     const trimmed = stdout.trim();
     return trimmed.length > 0 ? trimmed : null;
   } catch {
@@ -208,10 +201,7 @@ async function findGitRoot(dir: string): Promise<string | null> {
   }
 }
 
-async function resolveProjectId(
-  directory: string,
-  log: LogFn,
-): Promise<string | null> {
+async function resolveProjectId(directory: string, log: LogFn): Promise<string | null> {
   if (!directory) return null;
 
   let resolved = await tryRealpath(directory);
@@ -273,8 +263,7 @@ async function detectStack(directory: string): Promise<ReadonlySet<string>> {
         if (isRecord(block)) Object.assign(allDeps, block);
       }
       const depNames = Object.keys(allDeps);
-      const has = (needle: string): boolean =>
-        depNames.some((d) => d.includes(needle));
+      const has = (needle: string): boolean => depNames.some((d) => d.includes(needle));
       if (has("@angular/")) tags.add("angular");
       if (has("react") || has("react-dom")) tags.add("react");
       if (has("vue")) tags.add("vue");
@@ -312,10 +301,7 @@ async function detectStack(directory: string): Promise<ReadonlySet<string>> {
   return tags;
 }
 
-function isRelevantToStack(
-  instinct: Instinct,
-  stack: ReadonlySet<string>,
-): boolean {
+function isRelevantToStack(instinct: Instinct, stack: ReadonlySet<string>): boolean {
   if (!instinct.domain) return true;
   if (!FRAMEWORK_DOMAINS.has(instinct.domain)) return true;
   return stack.has(instinct.domain);
@@ -366,19 +352,14 @@ function formatPreamble(instincts: readonly Instinct[]): string {
     return `- [${i.scope} ${pct}%] ${i.trigger} → ${action}`;
   });
 
-  return [
-    "Active instincts (from continuous-learning v2 shared store):",
-    ...lines,
-  ].join("\n");
+  return ["Active instincts (from continuous-learning v2 shared store):", ...lines].join("\n");
 }
 
 const InstinctInjectorPlugin: Plugin = async ({ client, directory }) => {
   const log: LogFn = async (level, message) => {
     // Fire-and-forget: awaiting client.app.log during plugin init deadlocks
     // the server (server waits for init before accepting requests).
-    client.app
-      .log({ body: { service: "instinct-injector", level, message } })
-      .catch(() => {});
+    client.app.log({ body: { service: "instinct-injector", level, message } }).catch(() => {});
   };
 
   // Plugin lifetime is bound to one opencode instance, which is bound to one

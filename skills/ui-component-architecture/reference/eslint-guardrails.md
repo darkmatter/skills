@@ -26,8 +26,15 @@ export default [
         "error",
         {
           patterns: [
-            { group: ["@/*"], message: "@repo/ui must not import app code. Keep primitives presentational; pass data as props." },
-            { group: ["@repo/api", "@repo/db", "**/stores/*", "**/routes/*"], message: "No app stores/routes/data layers inside @repo/ui." },
+            {
+              group: ["@/*"],
+              message:
+                "@repo/ui must not import app code. Keep primitives presentational; pass data as props.",
+            },
+            {
+              group: ["@repo/api", "@repo/db", "**/stores/*", "**/routes/*"],
+              message: "No app stores/routes/data layers inside @repo/ui.",
+            },
           ],
         },
       ],
@@ -88,9 +95,7 @@ Doesn't enforce reuse, but keeps the inline styling that remains tidy.
 ```js
 import tailwind from "eslint-plugin-tailwindcss";
 
-export default [
-  ...tailwind.configs["flat/recommended"],
-];
+export default [...tailwind.configs["flat/recommended"]];
 ```
 
 ## Rollout note

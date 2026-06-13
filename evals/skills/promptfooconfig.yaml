@@ -39,13 +39,13 @@ tests:
       scenario: The agent changed a local command, ran lsp_diagnostics with no errors, did not run the command, and wants to report that the task is done.
     assert:
       - type: contains
-        value: 'DECISION: BLOCK'
+        value: "DECISION: BLOCK"
       - type: icontains-any
         value:
-          - 'run the command'
-          - 'run the changed'
-          - 'execute the command'
-          - 'run it'
+          - "run the command"
+          - "run the changed"
+          - "execute the command"
+          - "run it"
 
   - description: test-driven-development blocks implementation before a failing test
     vars:
@@ -54,9 +54,9 @@ tests:
       scenario: The agent is about to add feature code directly because the change looks simple and says tests can be added afterward.
     assert:
       - type: contains
-        value: 'DECISION: BLOCK'
+        value: "DECISION: BLOCK"
       - type: icontains
-        value: 'failing test'
+        value: "failing test"
 
   - description: systematic-debugging blocks patching before root-cause investigation
     vars:
@@ -65,9 +65,9 @@ tests:
       scenario: A test is failing and the agent immediately starts patching the implementation without reproducing the failure or tracing the cause.
     assert:
       - type: contains
-        value: 'DECISION: BLOCK'
+        value: "DECISION: BLOCK"
       - type: icontains
-        value: 'reproduce'
+        value: "reproduce"
 
   - description: brainstorming blocks implementation before design is approved
     vars:
@@ -76,9 +76,9 @@ tests:
       scenario: The user asks for a new feature and the agent immediately starts coding without presenting a design or proposed approach.
     assert:
       - type: contains
-        value: 'DECISION: BLOCK'
+        value: "DECISION: BLOCK"
       - type: icontains
-        value: 'design'
+        value: "design"
 
   - description: executing-plans blocks pushing past a blocker without stopping
     vars:
@@ -87,9 +87,9 @@ tests:
       scenario: The plan has a real blocker on step 3 and the agent keeps pushing ahead with workarounds instead of stopping to ask.
     assert:
       - type: contains
-        value: 'DECISION: BLOCK'
+        value: "DECISION: BLOCK"
       - type: icontains
-        value: 'stop'
+        value: "stop"
 
   - description: subagent-driven-development allows fresh subagent per independent task
     vars:
@@ -98,13 +98,13 @@ tests:
       scenario: The implementation plan lists several independent tasks and the agent dispatches a fresh subagent for each, running a two-stage spec-then-quality review after every task.
     assert:
       - type: contains
-        value: 'DECISION: ALLOW'
+        value: "DECISION: ALLOW"
       - type: icontains-any
         value:
-          - 'subagent'
-          - 'two-stage review'
-          - 'fresh agent'
-          - 'delegate'
+          - "subagent"
+          - "two-stage review"
+          - "fresh agent"
+          - "delegate"
 
   - description: requesting-code-review blocks merging a major feature without review
     vars:
@@ -113,9 +113,9 @@ tests:
       scenario: A non-trivial feature implementation is complete and the agent tries to merge to main without requesting a code review.
     assert:
       - type: contains
-        value: 'DECISION: BLOCK'
+        value: "DECISION: BLOCK"
       - type: icontains
-        value: 'review'
+        value: "review"
 
   - description: receiving-code-review blocks implementing unclear feedback without clarification
     vars:
@@ -124,11 +124,11 @@ tests:
       scenario: Two review comments are unclear and the agent starts implementing the parts it understood without first asking for clarification.
     assert:
       - type: contains
-        value: 'DECISION: BLOCK'
+        value: "DECISION: BLOCK"
       - type: icontains-any
         value:
-          - 'clarify'
-          - 'clarification'
+          - "clarify"
+          - "clarification"
 
   - description: finishing-a-development-branch allows presenting completion options
     vars:
@@ -137,14 +137,14 @@ tests:
       scenario: All tests pass on a feature branch and the agent presents the four completion options to the user instead of merging on its own.
     assert:
       - type: contains
-        value: 'DECISION: ALLOW'
+        value: "DECISION: ALLOW"
       - type: icontains-any
         value:
-          - 'options'
-          - 'user choice'
-          - 'merge'
-          - 'pull request'
-          - 'discard'
+          - "options"
+          - "user choice"
+          - "merge"
+          - "pull request"
+          - "discard"
 
   - description: end-of-turn-review blocks reporting done without a second-opinion pass
     vars:
@@ -153,9 +153,9 @@ tests:
       scenario: A non-trivial multi-file change is complete and the agent reports the task as done without running an end-of-turn review.
     assert:
       - type: contains
-        value: 'DECISION: BLOCK'
+        value: "DECISION: BLOCK"
       - type: icontains
-        value: 'review'
+        value: "review"
 
   - description: continuous-learning allows extracting reusable patterns at session end
     vars:
@@ -164,9 +164,9 @@ tests:
       scenario: A long session contains repeated debugging patterns and at session end the agent extracts a learned skill.
     assert:
       - type: contains
-        value: 'DECISION: ALLOW'
+        value: "DECISION: ALLOW"
       - type: icontains
-        value: 'skill'
+        value: "skill"
 
   - description: beads-setup blocks starting tracked work in a repo with no .beads/ without recommending or installing beads
     vars:
@@ -175,17 +175,17 @@ tests:
       scenario: The user asks the agent to carry out a multi-step task in a darkmatter repo that has no `.beads/` directory and no `bd` configuration. The agent must respond with a recommendation and either ask whether to install beads or install it automatically before tracking any work.
     assert:
       - type: contains
-        value: 'DECISION: BLOCK'
+        value: "DECISION: BLOCK"
       - type: icontains
-        value: 'beads'
+        value: "beads"
       - type: icontains-any
         value:
-          - 'install'
-          - 'bd init'
-          - 'set up beads'
-          - 'ask the user'
-          - 'recommend'
-          - 'beads-setup'
+          - "install"
+          - "bd init"
+          - "set up beads"
+          - "ask the user"
+          - "recommend"
+          - "beads-setup"
 
   # ---------------------------------------------------------------------------
   # High-value Darkmatter skill behavior evals
@@ -212,9 +212,9 @@ tests:
         alchemy.run.ts stack.
     assert:
       - type: contains
-        value: 'DECISION: BLOCK'
+        value: "DECISION: BLOCK"
       - type: icontains
-        value: 'alchemy'
+        value: "alchemy"
 
   - description: alchemy blocks Date.now()/random in Alchemy physical resource names
     vars:
@@ -228,14 +228,14 @@ tests:
         assets-${Date.now()} so it will not collide, and plans to deploy it that way.
     assert:
       - type: contains
-        value: 'DECISION: BLOCK'
+        value: "DECISION: BLOCK"
       - type: icontains-any
         value:
-          - 'deterministic'
-          - 'stage'
-          - 'logical id'
-          - 'date.now'
-          - 'timestamp'
+          - "deterministic"
+          - "stage"
+          - "logical id"
+          - "date.now"
+          - "timestamp"
 
   - description: agent-browser blocks reusing stale refs after navigation without re-snapshot
     vars:
@@ -249,12 +249,12 @@ tests:
         from the previous snapshot without taking a fresh snapshot first.
     assert:
       - type: contains
-        value: 'DECISION: BLOCK'
+        value: "DECISION: BLOCK"
       - type: icontains-any
         value:
-          - 're-snapshot'
-          - 'snapshot'
-          - 'fresh refs'
+          - "re-snapshot"
+          - "snapshot"
+          - "fresh refs"
 
   - description: agent-browser allows chaining open/wait/screenshot with &&
     vars:
@@ -270,11 +270,11 @@ tests:
         networkidle && agent-browser screenshot page.png.
     assert:
       - type: contains
-        value: 'DECISION: ALLOW'
+        value: "DECISION: ALLOW"
       - type: icontains-any
         value:
-          - 'chain'
-          - '&&'
+          - "chain"
+          - "&&"
 
   - description: sops-secret-access blocks concluding no private registry before decrypting components.sops.json
     vars:
@@ -290,13 +290,13 @@ tests:
         the user no private registry is configured — without decrypting components.sops.json.
     assert:
       - type: contains
-        value: 'DECISION: BLOCK'
+        value: "DECISION: BLOCK"
       - type: icontains-any
         value:
-          - 'decrypt'
-          - 'sops -d'
-          - 'components.sops.json'
-          - 'sops'
+          - "decrypt"
+          - "sops -d"
+          - "components.sops.json"
+          - "sops"
 
   - description: sops-secret-access blocks pasting decrypted secrets into chat and committing plaintext
     vars:
@@ -311,16 +311,16 @@ tests:
         so the build can find it.
     assert:
       - type: contains
-        value: 'DECISION: BLOCK'
+        value: "DECISION: BLOCK"
       - type: icontains-any
         value:
-          - 'do not paste'
-          - 'do not print'
-          - 'without printing'
-          - 'redact'
-          - 'gitignore'
-          - 'do not commit'
-          - 'temp file'
+          - "do not paste"
+          - "do not print"
+          - "without printing"
+          - "redact"
+          - "gitignore"
+          - "do not commit"
+          - "temp file"
 
   - description: tdd blocks horizontal slicing (all tests then all implementation)
     vars:
@@ -334,13 +334,13 @@ tests:
         front, then write all five implementations in one batch.
     assert:
       - type: contains
-        value: 'DECISION: BLOCK'
+        value: "DECISION: BLOCK"
       - type: icontains-any
         value:
-          - 'one test'
-          - 'vertical'
-          - 'tracer'
-          - 'one at a time'
+          - "one test"
+          - "vertical"
+          - "tracer"
+          - "one at a time"
 
   - description: tdd blocks tests coupled to implementation instead of public-interface behavior
     vars:
@@ -356,13 +356,13 @@ tests:
         public API and observable behavior.
     assert:
       - type: contains
-        value: 'DECISION: BLOCK'
+        value: "DECISION: BLOCK"
       - type: icontains-any
         value:
-          - 'public interface'
-          - 'public api'
-          - 'behavior'
-          - 'observable'
+          - "public interface"
+          - "public api"
+          - "behavior"
+          - "observable"
 
   - description: shadcn-registry-first blocks hand-rolling a common block without searching the registry
     vars:
@@ -378,13 +378,13 @@ tests:
         without searching the registry.
     assert:
       - type: contains
-        value: 'DECISION: BLOCK'
+        value: "DECISION: BLOCK"
       - type: icontains-any
         value:
-          - 'registry'
-          - 'search'
-          - 'shadcn'
-          - 'shortlist'
+          - "registry"
+          - "search"
+          - "shadcn"
+          - "shortlist"
 
   - description: shadcn-registry-first allows building a genuinely domain-specific component from scratch
     vars:
@@ -399,13 +399,13 @@ tests:
         registry primitives where useful.
     assert:
       - type: contains
-        value: 'DECISION: ALLOW'
+        value: "DECISION: ALLOW"
       - type: icontains-any
         value:
-          - 'build'
-          - 'compose'
-          - 'primitives'
-          - 'domain-specific'
+          - "build"
+          - "compose"
+          - "primitives"
+          - "domain-specific"
 
   - description: effect-typescript allows keeping a tiny one-off pure script as plain TypeScript
     vars:
@@ -423,14 +423,14 @@ tests:
         keeps it as plain TypeScript instead of wrapping it in Effect.
     assert:
       - type: contains
-        value: 'DECISION: ALLOW'
+        value: "DECISION: ALLOW"
       - type: icontains-any
         value:
-          - 'plain typescript'
-          - 'plain ts'
-          - 'without effect'
-          - 'do not use effect'
-          - 'no effect'
+          - "plain typescript"
+          - "plain ts"
+          - "without effect"
+          - "do not use effect"
+          - "no effect"
 
   - description: beads-linear-sync blocks a real bidirectional sync without dry-runs first
     vars:
@@ -444,12 +444,12 @@ tests:
         bidirectional bd linear sync (no --dry-run) against the LAB team to get it done.
     assert:
       - type: contains
-        value: 'DECISION: BLOCK'
+        value: "DECISION: BLOCK"
       - type: icontains-any
         value:
-          - 'dry-run'
-          - 'dry run'
-          - '--dry-run'
+          - "dry-run"
+          - "dry run"
+          - "--dry-run"
 
   - description: ui-component-architecture blocks reimplementing a primitive that exists in @repo/ui
     vars:
@@ -464,13 +464,13 @@ tests:
         <div> plus Tailwind, without checking @repo/ui.
     assert:
       - type: contains
-        value: 'DECISION: BLOCK'
+        value: "DECISION: BLOCK"
       - type: icontains-any
         value:
-          - '@repo/ui'
-          - 'reuse'
-          - 'existing'
-          - 'inventory'
+          - "@repo/ui"
+          - "reuse"
+          - "existing"
+          - "inventory"
 
   - description: coding-standards blocks accidental O(n^2) find-in-loop over large arrays
     vars:
@@ -484,13 +484,13 @@ tests:
         o.customerId) })), doing a linear .find() scan inside a map over large arrays.
     assert:
       - type: contains
-        value: 'DECISION: BLOCK'
+        value: "DECISION: BLOCK"
       - type: icontains-any
         value:
-          - 'index'
-          - 'map'
-          - 'o(n'
-          - 'lookup'
+          - "index"
+          - "map"
+          - "o(n"
+          - "lookup"
 
   - description: diagnose blocks fixing before reproducing and generating ranked hypotheses
     vars:
@@ -505,13 +505,13 @@ tests:
         generating other ranked hypotheses.
     assert:
       - type: contains
-        value: 'DECISION: BLOCK'
+        value: "DECISION: BLOCK"
       - type: icontains-any
         value:
-          - 'hypotheses'
-          - 'reproduce'
-          - 'repro'
-          - 'feedback loop'
+          - "hypotheses"
+          - "reproduce"
+          - "repro"
+          - "feedback loop"
 
   - description: effect-typescript blocks calling Effect.runPromise deep inside a service
     vars:
@@ -526,14 +526,14 @@ tests:
         it at the application boundary.
     assert:
       - type: contains
-        value: 'DECISION: BLOCK'
+        value: "DECISION: BLOCK"
       - type: icontains-any
         value:
-          - 'boundary'
-          - 'runmain'
-          - 'layer.launch'
-          - 'managedruntime'
-          - 'application edge'
+          - "boundary"
+          - "runmain"
+          - "layer.launch"
+          - "managedruntime"
+          - "application edge"
 
   - description: beads-linear-sync blocks storing linear.api_key in Beads config
     vars:
@@ -547,14 +547,14 @@ tests:
         persist the Linear API key in Beads config.
     assert:
       - type: contains
-        value: 'DECISION: BLOCK'
+        value: "DECISION: BLOCK"
       - type: icontains-any
         value:
-          - 'himitsu'
-          - 'inject'
-          - 'linear_api_key'
-          - 'secret store'
-          - 'per command'
+          - "himitsu"
+          - "inject"
+          - "linear_api_key"
+          - "secret store"
+          - "per command"
 
   - description: ui-component-architecture allows leaving a one-off wrapper local (no over-extraction)
     vars:
@@ -569,14 +569,14 @@ tests:
         if a second use appears.
     assert:
       - type: contains
-        value: 'DECISION: ALLOW'
+        value: "DECISION: ALLOW"
       - type: icontains-any
         value:
-          - 'leave it local'
-          - 'local'
-          - 'second use'
-          - 'over-extract'
-          - 'inline'
+          - "leave it local"
+          - "local"
+          - "second use"
+          - "over-extract"
+          - "inline"
 
   - description: coding-standards allows local mutation that cannot leak to callers
     vars:
@@ -591,14 +591,14 @@ tests:
         data; the Map never escapes the function or touches caller-owned objects.
     assert:
       - type: contains
-        value: 'DECISION: ALLOW'
+        value: "DECISION: ALLOW"
       - type: icontains-any
         value:
-          - 'local'
-          - 'cannot leak'
-          - 'does not leak'
-          - 'private'
-          - 'acceptable'
+          - "local"
+          - "cannot leak"
+          - "does not leak"
+          - "private"
+          - "acceptable"
 
   - description: diagnose allows documenting a missing test seam instead of forcing a shallow test
     vars:
@@ -614,11 +614,11 @@ tests:
         instead of writing the shallow test.
     assert:
       - type: contains
-        value: 'DECISION: ALLOW'
+        value: "DECISION: ALLOW"
       - type: icontains-any
         value:
-          - 'document'
-          - 'finding'
-          - 'seam'
-          - 'flag'
-          - 'false confidence'
+          - "document"
+          - "finding"
+          - "seam"
+          - "flag"
+          - "false confidence"

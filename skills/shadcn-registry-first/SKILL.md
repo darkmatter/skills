@@ -64,7 +64,7 @@ fall back to hand-rolling just because the key is missing; fix the key.
 ### 2. Search and shortlist at least three candidates
 
 Use `search_items_in_registries` with the pattern you need, scoped to the
-configured registries. Search the *thing*, not keywords:
+configured registries. Search the _thing_, not keywords:
 
 - `search_items_in_registries(registries=["@shadcnblocks"], query="hero dark")`
 - `search_items_in_registries(registries=["@shadcnblocks"], query="pricing toggle")`
@@ -177,6 +177,7 @@ previous session may carry an expired key. Always do these two steps first:
    in the project.
 
 Typical invocation:
+
 ```bash
 # From repo root:
 scripts/setup-components-json.sh
@@ -192,11 +193,11 @@ pattern.
 
 ## Relationship to other skills
 
-- `sops-secret-access` — how to *access* the encrypted registry config and keys.
-  This skill is about *preferring registry components*; that one is about the
+- `sops-secret-access` — how to _access_ the encrypted registry config and keys.
+  This skill is about _preferring registry components_; that one is about the
   plumbing to reach a private registry.
 - `ui-ux-pro-max` — design intelligence (styles, palettes, layout, a11y). Use it
-  to decide *what* good UI looks like; use this skill to *source* the components
+  to decide _what_ good UI looks like; use this skill to _source_ the components
   that realize it. They compose: pick the aesthetic with `ui-ux-pro-max`, then
   search the registry for blocks that match.
 - `vercel-react-best-practices` — performance patterns for the React you write

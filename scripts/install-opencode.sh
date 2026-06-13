@@ -9,36 +9,36 @@ DRY_RUN=0
 args=("$@")
 idx=0
 while [[ "$idx" -lt "${#args[@]}" ]]; do
-	case "${args[$idx]}" in
-	--dry-run) DRY_RUN=1 ;;
-	--target)
-		idx=$((idx + 1))
-		CONFIG_DIR="${args[$idx]-}"
-		[[ -z "$CONFIG_DIR" ]] && { printf 'error: --target requires a value\n' >&2; exit 1; }
-		;;
-	--help|-h)
-		"$REPO_ROOT/scripts/sync-opencode.sh" --help
-		printf '\nWrapper behavior:\n'
-		printf '  - Installs npm/bun dependencies if package.json exists.\n'
-		printf '  - Prints next steps and uninstall guidance.\n'
-		exit 0
-		;;
-	esac
-	idx=$((idx + 1))
+  case "${args[$idx]}" in
+    --dry-run) DRY_RUN=1 ;;
+    --target)
+      idx=$((idx + 1))
+      CONFIG_DIR="${args[$idx]-}"
+      [[ -z "$CONFIG_DIR" ]] && { printf 'error: --target requires a value\n' >&2; exit 1; }
+      ;;
+    --help|-h)
+      "$REPO_ROOT/scripts/sync-opencode.sh" --help
+      printf '\nWrapper behavior:\n'
+      printf '  - Installs npm/bun dependencies if package.json exists.\n'
+      printf '  - Prints next steps and uninstall guidance.\n'
+      exit 0
+      ;;
+  esac
+  idx=$((idx + 1))
 done
 
 "$REPO_ROOT/scripts/sync-opencode.sh" "$@"
 
 if [[ "$DRY_RUN" -eq 1 ]]; then
-	printf 'dry-run: skipping dependency install\n'
+  printf 'dry-run: skipping dependency install\n'
 elif [[ -f "$CONFIG_DIR/package.json" ]]; then
-	if command -v bun >/dev/null 2>&1; then
-		(cd "$CONFIG_DIR" && bun install)
-	elif command -v npm >/dev/null 2>&1; then
-		(cd "$CONFIG_DIR" && npm install)
-	else
-		printf 'warning: neither bun nor npm found; skipping OpenCode plugin/tool dependency install\n' >&2
-	fi
+  if command -v bun >/dev/null 2>&1; then
+    (cd "$CONFIG_DIR" && bun install)
+  elif command -v npm >/dev/null 2>&1; then
+    (cd "$CONFIG_DIR" && npm install)
+  else
+    printf 'warning: neither bun nor npm found; skipping OpenCode plugin/tool dependency install\n' >&2
+  fi
 fi
 
 cat <<'MSG'

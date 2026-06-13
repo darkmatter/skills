@@ -12,11 +12,11 @@ contradict older ones, that's fine.
 
 Building a Cowork artifact that depends on `mcp__Desktop_Commander__start_process`
 took two iterations to discover that the artifact runtime can't reach local
-MCP servers at all. The bridge returns a *string* `"Tool call failed: 400"`
+MCP servers at all. The bridge returns a _string_ `"Tool call failed: 400"`
 rather than throwing, which masked the issue until the user reported it.
 
 Lesson: **before building a UI that depends on a tool category, verify the
-*runtime* permits that category, not just the tool's individual schema.** For
+_runtime_ permits that category, not just the tool's individual schema.** For
 artifacts specifically, the test is "is this tool a registered connector?"
 (see `mcp__mcp-registry__list_connectors`).
 

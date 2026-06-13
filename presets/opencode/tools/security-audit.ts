@@ -23,9 +23,7 @@ export default tool({
     fix: tool.schema
       .boolean()
       .optional()
-      .describe(
-        "Attempt to auto-fix dependency vulnerabilities (default: false)",
-      ),
+      .describe("Attempt to auto-fix dependency vulnerabilities (default: false)"),
     severity: tool.schema
       .enum(["low", "moderate", "high", "critical"])
       .optional()
@@ -148,14 +146,7 @@ async function scanForSecrets(
     { pattern: /aws[_-]?secret[_-]?access[_-]?key/gi, name: "AWS Secret" },
   ];
 
-  const ignorePatterns = [
-    "node_modules",
-    ".git",
-    "dist",
-    "build",
-    ".env.example",
-    ".env.template",
-  ];
+  const ignorePatterns = ["node_modules", ".git", "dist", "build", ".env.example", ".env.template"];
 
   const srcDir = path.join(cwd, "src");
   if (fs.existsSync(srcDir)) {
@@ -248,12 +239,7 @@ async function scanCodeSecurity(
 
   const srcDir = path.join(cwd, "src");
   if (fs.existsSync(srcDir)) {
-    await scanDirectory(
-      srcDir,
-      securityPatterns,
-      ["node_modules", ".git", "dist"],
-      findings,
-    );
+    await scanDirectory(srcDir, securityPatterns, ["node_modules", ".git", "dist"], findings);
   }
 
   return findings;
@@ -267,27 +253,18 @@ function generateRecommendations(results: AuditResults): string[] {
       recommendations.push(
         "CRITICAL: Remove hardcoded secrets and use environment variables instead",
       );
-      recommendations.push(
-        "Add a .env file (gitignored) for local development",
-      );
+      recommendations.push("Add a .env file (gitignored) for local development");
       recommendations.push("Use a secrets manager for production deployments");
     }
 
     if (check.status === "warning" && check.name === "Code Security") {
-      recommendations.push(
-        "Review flagged code patterns for potential security vulnerabilities",
-      );
+      recommendations.push("Review flagged code patterns for potential security vulnerabilities");
       recommendations.push("Consider using DOMPurify for HTML sanitization");
       recommendations.push("Use parameterized queries for database operations");
     }
 
-    if (
-      check.status === "pending" &&
-      check.name === "Dependency Vulnerabilities"
-    ) {
-      recommendations.push(
-        "Run 'npm audit' to check for dependency vulnerabilities",
-      );
+    if (check.status === "pending" && check.name === "Dependency Vulnerabilities") {
+      recommendations.push("Run 'npm audit' to check for dependency vulnerabilities");
       recommendations.push("Consider using 'npm audit fix' to auto-fix issues");
     }
   }

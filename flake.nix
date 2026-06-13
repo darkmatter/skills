@@ -11,9 +11,11 @@
 
     sops-nix.url = "github:Mic92/sops-nix";
     sops-nix.inputs.nixpkgs.follows = "nixpkgs";
+    treefmt-nix.url = "github:numtide/treefmt-nix";
   };
 
-  outputs = inputs@{ flake-parts, agent-skills, ... }:
+  outputs =
+    inputs@{ flake-parts, agent-skills, ... }:
     flake-parts.lib.mkFlake { inputs = inputs; } {
       systems = [
         "x86_64-linux"
@@ -22,12 +24,31 @@
       ];
 
       imports = [
+        inputs.treefmt-nix.flakeModule
         ./flake/modules/flake-parts/sops-nix.nix
       ];
 
       flake = {
         homeManagerModules.default = import ./home-manager.nix { inherit agent-skills; };
-        homeManagerModules.shared  = import ./home-manager.nix { inherit agent-skills; };
+        homeManagerModules.shared = import ./home-manager.nix { inherit agent-skills; };
+      };
+
+      perSystem = _: {
+        treefmt = {
+          projectRootFile = "flake.nix";
+          settings = {
+            global.excludes = [
+              "skills/writing-skills/anthropic-best-practices.md"
+            ];
+          };
+          programs = {
+            oxfmt.enable = true;
+            nixf-diagnose.enable = true;
+            nixfmt.enable = true;
+            shellcheck.enable = true;
+            beautysh.enable = true;
+          };
+        };
       };
     };
 }

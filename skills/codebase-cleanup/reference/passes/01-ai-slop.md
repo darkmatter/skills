@@ -4,25 +4,25 @@ You are pass 1 of 8. Read `../protocol.md` first — you must follow the 3-phase
 
 ## Goal
 
-Remove generated noise that nobody would have written by hand: in-motion-work comments, "previously this did X, now it does Y" diff narration, larp ("Production-grade enterprise solution"), unnecessary boilerplate, stub bodies that pretend to be real, and explanatory comments that re-narrate code instead of explaining the *why*.
+Remove generated noise that nobody would have written by hand: in-motion-work comments, "previously this did X, now it does Y" diff narration, larp ("Production-grade enterprise solution"), unnecessary boilerplate, stub bodies that pretend to be real, and explanatory comments that re-narrate code instead of explaining the _why_.
 
 ## What counts as a hit
 
-- Comments that describe the *change* rather than the code: `// Updated to handle null case`, `// Refactored from foo to bar`, `// New approach: ...`
+- Comments that describe the _change_ rather than the code: `// Updated to handle null case`, `// Refactored from foo to bar`, `// New approach: ...`
 - Comments that re-narrate code visible right next to them: `// Increment counter` above `counter++`
 - Larp adjectives: "robust", "production-grade", "enterprise-ready", "comprehensive", "best-in-class", "world-class" — when they're describing code, not documenting requirements
 - Stub bodies: `throw new Error("not implemented")` in functions that callers actually invoke at runtime
 - Pseudo-typed stubs: functions whose return type is `any` / `unknown` and whose body just returns `{} as any`
 - AI-style decorative comments: section banners (`// ============ Helpers ============`) where the code structure already conveys it
 - TODO comments older than the git history of the surrounding code (probably forgotten)
-- Comments that explain *what* well-named identifiers already explain
+- Comments that explain _what_ well-named identifiers already explain
 - "For future use" / "may be needed later" placeholders with no consumer
 
 ## What to skip (false positives)
 
-- Comments documenting *why* a non-obvious decision was made — keep these even if terse
+- Comments documenting _why_ a non-obvious decision was made — keep these even if terse
 - Comments documenting a workaround for a specific bug / browser quirk / library version — keep, possibly with a link
-- Comments above code that *intentionally* looks wrong (e.g. `// SAFETY:` blocks in unsafe Rust)
+- Comments above code that _intentionally_ looks wrong (e.g. `// SAFETY:` blocks in unsafe Rust)
 - License headers, copyright notices, generated-file markers
 - Doc comments (`///`, `/** */`, docstrings) on public APIs — these are documentation, not slop
 - Test descriptions in `it(...)` / `describe(...)` / `test(...)` blocks
@@ -31,7 +31,7 @@ Remove generated noise that nobody would have written by hand: in-motion-work co
 ## Tools
 
 - `grep -rn` for known slop phrases: "production-grade", "enterprise", "robust", "world-class", "Refactored", "Previously", "Updated to", "New approach"
-- `git log -p` on suspicious comments — if the comment was added in a commit that *only* added it (not the surrounding code), it's likely slop
+- `git log -p` on suspicious comments — if the comment was added in a commit that _only_ added it (not the surrounding code), it's likely slop
 - `git blame` — comments far older than the surrounding code that don't match its current behavior are stale
 - For stubs: AST search for functions with body matching `throw.*not.implemented` or `return.*as any`
 

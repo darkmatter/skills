@@ -46,7 +46,7 @@ The script enforces a verb prefix on `--manual` and warns if a verb-prefixed nam
 Sections to write:
 
 - **Frontmatter `description`** — the primary triggering signal.
-  - For auto-triggered skills: combine *what* and *when*. Include explicit `Do NOT trigger for…` clauses for adjacent things.
+  - For auto-triggered skills: combine _what_ and _when_. Include explicit `Do NOT trigger for…` clauses for adjacent things.
   - For manual-invocation skills: open with `Manual-invocation skill — run only when the user explicitly asks for "<name>" or invokes it as a slash command. Do not auto-trigger on adjacent topics.` then describe what the skill does.
 - **When to use** — concrete trigger phrases.
 - **When NOT to use** — adjacent-but-different cases.

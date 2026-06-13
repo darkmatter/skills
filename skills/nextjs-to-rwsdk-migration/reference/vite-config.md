@@ -64,8 +64,8 @@ Don't add a second cloudflare plugin (e.g. via `Cloudflare.Vite` from alchemy) â
 
 Add globs for any package that ships a `"use client"` boundary inside `node_modules` AND is reached through enough barrel-re-export hops that the scanner races on cold start. Confirmed examples:
 
-| Package | Files to register |
-| --- | --- |
+| Package              | Files to register                                                       |
+| -------------------- | ----------------------------------------------------------------------- |
 | `lucide-react@^1.16` | `dist/esm/Icon.mjs`, `dist/esm/context.mjs`, `dist/esm/DynamicIcon.mjs` |
 
 If you hit `No module found for '/node_modules/<pkg>/...'` for a different package, grep that package's `dist/` (or `build/`) for `"use client"` and add each matching file path. Cheap to over-register; expensive to under-register.
@@ -87,7 +87,7 @@ If you hit `No module found for '/node_modules/<pkg>/...'` for a different packa
       "@cloudflare/workers-types",
       "./worker-configuration.d.ts",
       "./src/types/rw.d.ts",
-      "./src/types/vite.d.ts"
+      "./src/types/vite.d.ts",
     ],
     "paths": {
       "@/*": ["./*"],
@@ -99,7 +99,7 @@ If you hit `No module found for '/node_modules/<pkg>/...'` for a different packa
       "next/font/local": ["./src/shims/next-font-local"],
       "next/server": ["./src/shims/next-server"],
       "next/og": ["./src/shims/next-og"],
-      "next/headers": ["./src/shims/next-headers"]
+      "next/headers": ["./src/shims/next-headers"],
     },
     "resolveJsonModule": true,
     "noEmit": true,
@@ -109,7 +109,7 @@ If you hit `No module found for '/node_modules/<pkg>/...'` for a different packa
     "esModuleInterop": true,
     "strict": false,
     "skipLibCheck": true,
-    "incremental": true
+    "incremental": true,
   },
   "include": [
     "src/**/*.ts",
@@ -119,7 +119,7 @@ If you hit `No module found for '/node_modules/<pkg>/...'` for a different packa
     "lib/**/*.ts",
     "lib/**/*.tsx",
     "hooks/**/*.ts",
-    "hooks/**/*.tsx"
+    "hooks/**/*.tsx",
   ],
   "exclude": [
     "node_modules",
@@ -129,8 +129,8 @@ If you hit `No module found for '/node_modules/<pkg>/...'` for a different packa
     ".wrangler",
     "app",
     "**/*.test.ts",
-    "**/*.test.tsx"
-  ]
+    "**/*.test.tsx",
+  ],
 }
 ```
 
@@ -170,7 +170,7 @@ Add:
     "generate": "rw-scripts ensure-env && wrangler types --include-runtime false",
     "worker:run": "rw-scripts worker-run",
     "check": "tsc",
-    "types": "tsc"
+    "types": "tsc",
   },
   "dependencies": {
     "rwsdk": "1.2.9",
@@ -178,7 +178,7 @@ Add:
     "react-dom": "19.2.6",
     "react-server-dom-webpack": "19.2.6",
     "@fontsource-variable/inter": "^5.2.8",
-    "effect": "4.0.0-beta.68"
+    "effect": "4.0.0-beta.68",
   },
   "devDependencies": {
     "@cloudflare/vite-plugin": "1.33.2",
@@ -191,18 +191,18 @@ Add:
     "tailwindcss": "^4",
     "typescript": "~5.9.0",
     "vite": "~7.3.2",
-    "wrangler": "4.85.0"
+    "wrangler": "4.85.0",
   },
   "overrides": {
     "@types/react": "19.2.14",
     "@types/react-dom": "19.2.3",
-    "csstype": "^3.1.3"
+    "csstype": "^3.1.3",
   },
   "resolutions": {
     "@types/react": "19.2.14",
     "@types/react-dom": "19.2.3",
-    "csstype": "^3.1.3"
-  }
+    "csstype": "^3.1.3",
+  },
 }
 ```
 

@@ -2,9 +2,9 @@ import { spawnSync } from "node:child_process";
 import { existsSync } from "node:fs";
 
 const HOME = process.env.HOME || "";
-const STOP_HOOK_PATH = process.env.OPENCODE_CONTINUOUS_LEARNING_STOP_HOOK || (HOME
-  ? `${HOME}/.config/opencode/skills/continuous-learning/hooks/stop.sh`
-  : "");
+const STOP_HOOK_PATH =
+  process.env.OPENCODE_CONTINUOUS_LEARNING_STOP_HOOK ||
+  (HOME ? `${HOME}/.config/opencode/skills/continuous-learning/hooks/stop.sh` : "");
 
 export const ContinuousLearningStopHookPlugin = async ({ $, client }) => {
   let lastSessionID;
@@ -19,9 +19,9 @@ export const ContinuousLearningStopHookPlugin = async ({ $, client }) => {
           ? lastSessionID
           : undefined;
 
-		if (!STOP_HOOK_PATH || !resolvedSessionID || !existsSync(STOP_HOOK_PATH)) {
-			return;
-		}
+    if (!STOP_HOOK_PATH || !resolvedSessionID || !existsSync(STOP_HOOK_PATH)) {
+      return;
+    }
 
     if (processedSessionIDs.has(resolvedSessionID)) {
       return;
@@ -49,8 +49,7 @@ export const ContinuousLearningStopHookPlugin = async ({ $, client }) => {
     process.once("exit", () => {
       runStopHookSync("process.exit");
     });
-  } catch {
-  }
+  } catch {}
 
   const log = async (level, message, extra) => {
     try {
@@ -166,10 +165,7 @@ export const ContinuousLearningStopHookPlugin = async ({ $, client }) => {
     };
 
     try {
-      const result = await $`${STOP_HOOK_PATH}`
-        .env(buildShellEnv(env))
-        .quiet()
-        .nothrow();
+      const result = await $`${STOP_HOOK_PATH}`.env(buildShellEnv(env)).quiet().nothrow();
       const stdout = result.stdout.toString("utf8").trim();
       const stderr = result.stderr.toString("utf8").trim();
 

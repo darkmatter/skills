@@ -2,7 +2,7 @@
 
 This is a reference shape for `.agent/workflows/refactor.md`.
 
-```md
+````md
 # Refactor workflow
 
 Use this workflow when changing structure without intentionally changing behavior.
@@ -30,6 +30,7 @@ Evidence format:
 Baseline: `pnpm test src/pricing src/orders`
 Result: PASS, 84 tests
 ```
+````
 
 If baseline is failing, either fix baseline first or record the known failure in `.agent/memory/known-issues.md` and ensure the refactor does not worsen it.
 
@@ -97,4 +98,7 @@ Include:
 - Confirmation of no intended behavior change
 - Baseline and final verification
 - Review status
+
+```
+
 ```

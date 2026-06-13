@@ -21,9 +21,7 @@ const domainsForStage = (stage: string): string[] | undefined => {
     return undefined;
   }
 
-  const raw =
-    process.env.CLOUDFLARE_WORKER_DOMAINS ??
-    process.env.CLOUDFLARE_WORKER_DOMAIN;
+  const raw = process.env.CLOUDFLARE_WORKER_DOMAINS ?? process.env.CLOUDFLARE_WORKER_DOMAIN;
 
   if (!raw) return undefined;
 

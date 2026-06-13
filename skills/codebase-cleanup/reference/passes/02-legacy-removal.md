@@ -23,7 +23,7 @@ Remove code paths that exist only for compatibility with a state of the world th
 - Fallbacks for genuinely-still-needed scenarios (e.g. browser support for a still-supported old browser)
 - Feature flags that look fully-on but actually gate a kill-switch the team relies on for incidents
 - Backwards-compat shims explicitly required by the project's stated support matrix
-- Code that *looks* legacy by name but is actively maintained — names lie
+- Code that _looks_ legacy by name but is actively maintained — names lie
 
 Always check: package's stated support matrix, downstream consumers, and the project's release notes / CHANGELOG before deleting "legacy" code.
 
@@ -51,5 +51,5 @@ Per the protocol. Note in your assessment which legacy items you considered but 
 ## Out-of-scope
 
 - Don't rename "legacy"-named things to "current" names. Renaming is a different pass.
-- Don't delete code that's just *unused* but not legacy — that's pass 3.
+- Don't delete code that's just _unused_ but not legacy — that's pass 3.
 - Don't unify duplicated code paths even if both look legacy — that's pass 8.

@@ -84,14 +84,22 @@
   mcp = {
     "morph-mcp" = {
       type = "local";
-      command = [ "npx" "-y" "@morphllm/morphmcp" ];
+      command = [
+        "npx"
+        "-y"
+        "@morphllm/morphmcp"
+      ];
       environment = {
         ENABLED_TOOLS = "edit_file,warpgrep_codebase_search";
       };
     };
     context7 = {
       type = "local";
-      command = [ "npx" "-y" "@upstash/context7-mcp" ];
+      command = [
+        "npx"
+        "-y"
+        "@upstash/context7-mcp"
+      ];
       enabled = true;
       environment = { };
     };

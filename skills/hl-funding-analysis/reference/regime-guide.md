@@ -37,6 +37,7 @@ How to read the screener output and decide whether to deploy capital. Project-sp
 **What it means:** Either (a) the asset is dying and shorts are happy to keep paying because they expect more downside, or (b) short-squeeze setup brewing. Both are dangerous.
 
 **Action:** Approach with extreme care. Long-harvest can work but only if:
+
 - The asset has not been in sustained downtrend (>40% drawdown in last 30d disqualifies)
 - No identifiable catalyst (delisting, unlock, hack) explaining the negative funding
 - 30d historical PnL of the long-harvest position would have been positive
@@ -64,6 +65,7 @@ A 30% APR with +5% PnL means you collected 2.5% in funding and the underlying dr
 If a name passes the gates but you have a strong fundamental view on the underlying, defer to the fundamental view. The screener doesn't know about news, unlocks, governance issues, or narrative shifts. It's an evidence-based starting point for analysis, not a buy signal.
 
 Common cases where to override the screener:
+
 - Name is in your existing book or is correlated to it (avoid — adds correlated risk)
 - Recent news catalyst (within 7 days) — wait for funding to stabilize post-news
 - Sector leader during its narrative cycle (don't short SOL during a Solana season)
@@ -72,6 +74,7 @@ Common cases where to override the screener:
 ## Position rotation discipline
 
 If running multiple harvest positions, rotate weekly:
+
 - Re-run screener
 - Names that no longer pass thresholds → close
 - New names that pass → consider opening

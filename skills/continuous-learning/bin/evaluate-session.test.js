@@ -23,15 +23,7 @@ async function listChildDirectories(directoryPath) {
 function runEvaluator({ configPath, transcriptPath, sessionId }) {
   return spawnSync(
     process.execPath,
-    [
-      scriptPath,
-      "--config",
-      configPath,
-      "--transcript",
-      transcriptPath,
-      "--session-id",
-      sessionId,
-    ],
+    [scriptPath, "--config", configPath, "--transcript", transcriptPath, "--session-id", sessionId],
     { encoding: "utf8" },
   );
 }

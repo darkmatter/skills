@@ -41,6 +41,7 @@ Acceptance Criteria:
 ### Step 2: Run Tests
 
 For each criterion:
+
 - Execute relevant test
 - Collect evidence
 - Score result
@@ -59,15 +60,16 @@ Final Score = Σ (criterion_score × weight) / total_weight
 
 ### Criterion Breakdown
 
-| Criterion | Score | Weight | Weighted |
-|-----------|-------|--------|----------|
-| [Criterion 1] | X/10 | 30% | X |
-| [Criterion 2] | X/10 | 40% | X |
-| [Criterion 3] | X/10 | 30% | X |
+| Criterion     | Score | Weight | Weighted |
+| ------------- | ----- | ------ | -------- |
+| [Criterion 1] | X/10  | 30%    | X        |
+| [Criterion 2] | X/10  | 40%    | X        |
+| [Criterion 3] | X/10  | 30%    | X        |
 
 ### Evidence
 
 **Criterion 1: [Name]**
+
 - Test: [what was tested]
 - Result: [outcome]
 - Evidence: [screenshot, log, output]
@@ -79,6 +81,7 @@ Final Score = Σ (criterion_score × weight) / total_weight
 ## Pass@K Metrics
 
 For non-deterministic evaluations:
+
 - Run K times
 - Calculate pass rate
 - Report: "Pass@K = X/K"

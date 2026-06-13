@@ -34,6 +34,7 @@ Do not modify user-private config, credentials, `.obsidian/`, or existing unrela
 ## Task 1: Add Preset Skeleton
 
 **Files:**
+
 - Create: `presets/README.md`
 - Create: `presets/base/README.md`
 - Create: `presets/base/AGENTS.md`
@@ -148,18 +149,16 @@ Write `presets/opencode/opencode.jsonc`:
 ```jsonc
 {
   "$schema": "https://opencode.ai/config.json",
-  "instructions": [
-    "AGENTS.md"
-  ],
+  "instructions": ["AGENTS.md"],
   "permission": {
     "edit": "ask",
     "bash": "ask",
     "skill": {
-      "*": "allow"
-    }
+      "*": "allow",
+    },
   },
   "share": "manual",
-  "autoupdate": "notify"
+  "autoupdate": "notify",
 }
 ```
 
@@ -217,6 +216,7 @@ Expected: commit succeeds.
 ## Task 2: Document OpenCode Directory Mapping
 
 **Files:**
+
 - Create: `docs/opencode-layout.md`
 - Modify: `README.md`
 
@@ -232,17 +232,17 @@ client, but the repo root is not itself an OpenCode config directory.
 
 ## Source to install mapping
 
-| OpenCode target | Source path | Purpose |
-|---|---|---|
+| OpenCode target                     | Source path                       | Purpose                                                                                      |
+| ----------------------------------- | --------------------------------- | -------------------------------------------------------------------------------------------- |
 | `~/.config/opencode/opencode.jsonc` | `presets/opencode/opencode.jsonc` | Runtime config: models, permissions, agents, MCP servers, instructions, plugins, formatters. |
-| `~/.config/opencode/tui.json` | `presets/opencode/tui.json` | TUI-only config: theme, keybinds, diff style, mouse behavior. |
-| `~/.config/opencode/AGENTS.md` | `presets/base/AGENTS.md` | Global shared instructions. |
-| `~/.config/opencode/agents/` | `presets/opencode/agents/` | Markdown agent definitions. |
-| `~/.config/opencode/commands/` | `presets/opencode/commands/` | Slash-command prompt templates. |
-| `~/.config/opencode/plugins/` | `presets/opencode/plugins/` | JS/TS OpenCode lifecycle hooks and event extensions. |
-| `~/.config/opencode/tools/` | `presets/opencode/tools/` | JS/TS custom tools callable by the model. |
-| `~/.config/opencode/themes/` | `presets/opencode/themes/` | Optional TUI themes. |
-| `~/.config/opencode/skills/` | `skills/` | Shared on-demand skills. |
+| `~/.config/opencode/tui.json`       | `presets/opencode/tui.json`       | TUI-only config: theme, keybinds, diff style, mouse behavior.                                |
+| `~/.config/opencode/AGENTS.md`      | `presets/base/AGENTS.md`          | Global shared instructions.                                                                  |
+| `~/.config/opencode/agents/`        | `presets/opencode/agents/`        | Markdown agent definitions.                                                                  |
+| `~/.config/opencode/commands/`      | `presets/opencode/commands/`      | Slash-command prompt templates.                                                              |
+| `~/.config/opencode/plugins/`       | `presets/opencode/plugins/`       | JS/TS OpenCode lifecycle hooks and event extensions.                                         |
+| `~/.config/opencode/tools/`         | `presets/opencode/tools/`         | JS/TS custom tools callable by the model.                                                    |
+| `~/.config/opencode/themes/`        | `presets/opencode/themes/`        | Optional TUI themes.                                                                         |
+| `~/.config/opencode/skills/`        | `skills/`                         | Shared on-demand skills.                                                                     |
 
 ## What goes where
 
@@ -328,6 +328,7 @@ Expected: commit succeeds.
 ## Task 3: Add Safe OpenCode Sync Scripts
 
 **Files:**
+
 - Create: `scripts/sync-opencode.sh`
 - Create: `scripts/install-opencode.sh`
 
@@ -567,6 +568,7 @@ Expected: commit succeeds.
 ## Task 4: Wire Presets Into Home Manager
 
 **Files:**
+
 - Modify: `home-manager.nix`
 - Optional modify: `README.md`
 
@@ -640,6 +642,7 @@ Expected: commit succeeds.
 ## Task 5: Validate Whole Reorg
 
 **Files:**
+
 - Read: `README.md`
 - Read: `docs/opencode-layout.md`
 - Read: `presets/opencode/README.md`

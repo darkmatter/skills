@@ -15,12 +15,7 @@
 
 import type { PluginInput } from "@opencode-ai/plugin";
 
-export const ECCHooksPlugin = async ({
-  client,
-  $,
-  directory,
-  worktree,
-}: PluginInput) => {
+export const ECCHooksPlugin = async ({ client, $, directory, worktree }: PluginInput) => {
   // Track files edited in current session for console.log audit
   const editedFiles = new Set<string>();
 
@@ -53,8 +48,7 @@ export const ECCHooksPlugin = async ({
       // Console.log warning check
       if (event.path.match(/\.(ts|tsx|js|jsx)$/)) {
         try {
-          const result =
-            await $`grep -n "console\\.log" ${event.path} 2>/dev/null`.text();
+          const result = await $`grep -n "console\\.log" ${event.path} 2>/dev/null`.text();
           if (result.trim()) {
             const lines = result.trim().split("\n").length;
             log(
@@ -80,10 +74,7 @@ export const ECCHooksPlugin = async ({
       input: { tool: string; args?: { filePath?: string } },
       output: unknown,
     ) => {
-      if (
-        input.tool === "bash" &&
-        input.args?.toString().includes("gh pr create")
-      ) {
+      if (input.tool === "bash" && input.args?.toString().includes("gh pr create")) {
         log("info", "[ECC] PR created - check GitHub Actions status");
       }
     },
@@ -95,10 +86,7 @@ export const ECCHooksPlugin = async ({
      * Triggers: Before tool execution
      * Action: Warns about potential security issues
      */
-    "tool.execute.before": async (input: {
-      tool: string;
-      args?: Record<string, unknown>;
-    }) => {
+    "tool.execute.before": async (input: { tool: string; args?: Record<string, unknown> }) => {
       // === HARD STOP: block conductor self-delegation ===
       // Defense in depth on top of permission "conductor: deny" in opencode.jsonc.
       // Weak open-weight models sometimes hallucinate task(subagent="conductor")
@@ -126,9 +114,7 @@ export const ECCHooksPlugin = async ({
       // tee, or python -c open().write(). Applies globally — no subagent
       // should be writing code through bash either.
       if (input.tool === "bash") {
-        const cmd = String(
-          (input.args as { command?: string })?.command ?? input.args ?? "",
-        );
+        const cmd = String((input.args as { command?: string })?.command ?? input.args ?? "");
 
         const CODE_EXT =
           "(?:ts|tsx|js|jsx|mjs|cjs|py|go|rs|kt|java|swift|php|rb|cs|cpp|cc|hpp|h|c|sql|sh|bash|zsh|fish)";
@@ -170,14 +156,8 @@ export const ECCHooksPlugin = async ({
       }
 
       // Git push review reminder
-      if (
-        input.tool === "bash" &&
-        input.args?.toString().includes("git push")
-      ) {
-        log(
-          "info",
-          "[ECC] Remember to review changes before pushing: git diff origin/main...HEAD",
-        );
+      if (input.tool === "bash" && input.args?.toString().includes("git push")) {
+        log("info", "[ECC] Remember to review changes before pushing: git diff origin/main...HEAD");
       }
 
       // Block creation of unnecessary documentation files
@@ -194,10 +174,7 @@ export const ECCHooksPlugin = async ({
           !filePath.includes("LICENSE") &&
           !filePath.includes("CONTRIBUTING")
         ) {
-          log(
-            "warn",
-            `[ECC] Creating ${filePath} - consider if this documentation is necessary`,
-          );
+          log("warn", `[ECC] Creating ${filePath} - consider if this documentation is necessary`);
         }
       }
 
@@ -209,10 +186,7 @@ export const ECCHooksPlugin = async ({
           cmd.match(/^cargo\s+(build|test|run)/) ||
           cmd.match(/^go\s+(build|test|run)/)
         ) {
-          log(
-            "info",
-            "[ECC] Long-running command detected - consider using background execution",
-          );
+          log("info", "[ECC] Long-running command detected - consider using background execution");
         }
       }
     },
@@ -236,8 +210,7 @@ export const ECCHooksPlugin = async ({
         if (!file.match(/\.(ts|tsx|js|jsx)$/)) continue;
 
         try {
-          const result =
-            await $`grep -c "console\\.log" ${file} 2>/dev/null`.text();
+          const result = await $`grep -c "console\\.log" ${file} 2>/dev/null`.text();
           const count = parseInt(result.trim(), 10);
           if (count > 0) {
             totalConsoleLogCount += count;
@@ -306,9 +279,7 @@ export const ECCHooksPlugin = async ({
      * Triggers: When todo list is updated
      * Action: Logs progress
      */
-    "todo.updated": async (event: {
-      todos: Array<{ text: string; done: boolean }>;
-    }) => {
+    "todo.updated": async (event: { todos: Array<{ text: string; done: boolean }> }) => {
       const completed = event.todos.filter((t) => t.done).length;
       const total = event.todos.length;
       if (total > 0) {

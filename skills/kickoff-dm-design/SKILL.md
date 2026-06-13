@@ -1,6 +1,6 @@
 ---
 name: kickoff-dm-design
-description: "Manual-invocation skill — run only when the user explicitly asks for \"kickoff-dm-design\" or invokes it as a slash command. Do not auto-trigger on adjacent topics. Inverted-flow design-room kickoff for Darkmatter teammates. Operator creates a Claude Design project manually, drops the URL — this skill creates the Linear ticket, posts the kickoff to #design-room, and cross-links Linear ⇄ Slack ⇄ Claude Design. Non-interactive — never asks for a brief, team, or confirmation. Derives screen name + brief from the URL itself. Idempotent on rerun."
+description: 'Manual-invocation skill — run only when the user explicitly asks for "kickoff-dm-design" or invokes it as a slash command. Do not auto-trigger on adjacent topics. Inverted-flow design-room kickoff for Darkmatter teammates. Operator creates a Claude Design project manually, drops the URL — this skill creates the Linear ticket, posts the kickoff to #design-room, and cross-links Linear ⇄ Slack ⇄ Claude Design. Non-interactive — never asks for a brief, team, or confirmation. Derives screen name + brief from the URL itself. Idempotent on rerun.'
 ---
 
 # Darkmatter design-room kickoff
@@ -91,9 +91,9 @@ That's it. No interactive questions.
 
 ## Sharing (nudge, not gate)
 
-The Claude Design URL only renders for collaborators if the project's Share dialog is set to *"Anyone at Darkmatter with the link can view + comment."* The skill cannot verify this programmatically.
+The Claude Design URL only renders for collaborators if the project's Share dialog is set to _"Anyone at Darkmatter with the link can view + comment."_ The skill cannot verify this programmatically.
 
-Instead of gating on it, include a one-line nudge in the Slack kickoff post itself: *"⚠ If the Claude Design link 404s for you, the creator needs to set Share → 'Anyone at Darkmatter with the link.'"* Teammates will self-report mismatches; that's fine.
+Instead of gating on it, include a one-line nudge in the Slack kickoff post itself: _"⚠ If the Claude Design link 404s for you, the creator needs to set Share → 'Anyone at Darkmatter with the link.'"_ Teammates will self-report mismatches; that's fine.
 
 ## Best-effort URL enrichment
 
@@ -110,7 +110,7 @@ If the operator's invocation references an existing Linear issue ID:
 
 1. Read the issue.
 2. Add the Claude Design URL as an attachment.
-3. Add a one-line comment: *"Design exploration started — see Claude Design project."*
+3. Add a one-line comment: _"Design exploration started — see Claude Design project."_
 4. Add the Slack kickoff permalink as a second attachment after the Slack post completes.
 
 If no issue exists:
@@ -132,6 +132,7 @@ After Slack is posted, update the Linear issue with the Slack kickoff permalink 
 <inferred 2-sentence brief>
 
 Links:
+
 - Claude Design: <url>
 - Slack: <kickoff permalink — added after Slack post>
 ```

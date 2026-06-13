@@ -13,13 +13,21 @@ It's tempting to keep a single `<SiteShell>` wrapper inside `Document` that uses
 "use client";
 import { useEffect, useState } from "react";
 
-function useClientPathname() { /* ...listen to popstate + rwsdk:navigation... */ }
+function useClientPathname() {
+  /* ...listen to popstate + rwsdk:navigation... */
+}
 
 export function SiteShell({ children }) {
   const pathname = useClientPathname();
   const isWikiRoute = /^(\/internal)?\/(wiki|vault)(\/|$)/i.test(pathname ?? "");
   if (isWikiRoute) return <>{children}</>;
-  return <><SiteHeader /><div>{children}</div><SiteFooter /></>;
+  return (
+    <>
+      <SiteHeader />
+      <div>{children}</div>
+      <SiteFooter />
+    </>
+  );
 }
 ```
 
@@ -117,7 +125,7 @@ No more `<SiteShell>`, no more `useClientPathname()`.
 render(Document, [
   layout(SiteLayout, [
     route("/internal", InternalIndex),
-    route("/internal/:slug", InternalDetail),     // catches /internal/wiki
+    route("/internal/:slug", InternalDetail), // catches /internal/wiki
   ]),
   layout(WikiLayout, [
     route("/internal/wiki", InternalWikiCatchAll), // never reached
@@ -131,10 +139,7 @@ render(Document, [
     route("/internal/wiki", InternalWikiCatchAll),
     route("/internal/wiki/*", InternalWikiCatchAll),
   ]),
-  layout(SiteLayout, [
-    route("/internal", InternalIndex),
-    route("/internal/:slug", InternalDetail),
-  ]),
+  layout(SiteLayout, [route("/internal", InternalIndex), route("/internal/:slug", InternalDetail)]),
 ]);
 ```
 
@@ -187,10 +192,7 @@ If a layout is `"use client"`, it gets only `{ children }` — `requestInfo` is 
 render(Document, [
   layout(AppLayout, [
     prefix("/admin", [
-      layout(AdminLayout, [
-        route("/", AdminDashboard),
-        route("/users", UserManagement),
-      ]),
+      layout(AdminLayout, [route("/", AdminDashboard), route("/users", UserManagement)]),
     ]),
   ]),
 ]);

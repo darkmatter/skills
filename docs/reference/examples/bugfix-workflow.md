@@ -2,7 +2,7 @@
 
 This is a reference shape for `.agent/workflows/bugfix.md`.
 
-```md
+````md
 # Bugfix workflow
 
 Use this workflow for defects, regressions, flaky behavior, failing tests, or unexpected production behavior.
@@ -36,6 +36,7 @@ Evidence format:
 REPRO: `pnpm test src/foo.test.ts -t "handles empty input"`
 Result: FAIL with `TypeError: Cannot read properties of undefined`
 ```
+````
 
 If reproduction is impossible, stop and report what evidence is missing.
 
@@ -103,4 +104,7 @@ Include:
 - Regression test
 - Verification results
 - Review status
+
+```
+
 ```

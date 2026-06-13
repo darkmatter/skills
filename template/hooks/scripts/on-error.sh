@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
 set -euo pipefail
-INPUT=$(cat)
+_input=$(cat)
+# shellcheck disable=SC2034
+INPUT="$_input"
 echo '{"action": "allow", "modifications": null}'

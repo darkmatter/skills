@@ -14,26 +14,26 @@ set -euo pipefail
 
 # Prefer git toplevel; fall back to script's parent dir for pre-init use.
 if ROOT="$(git rev-parse --show-toplevel 2>/dev/null)"; then
-	:
+  :
 else
-	ROOT="$(cd "$(dirname "$0")/.." && pwd)"
+  ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 fi
 cd "$ROOT"
 
 if [[ ! -d ".agent" ]]; then
-	echo "error: .agent/ directory not found at $ROOT" >&2
-	exit 1
+  echo "error: .agent/ directory not found at $ROOT" >&2
+  exit 1
 fi
 
 # Pull project name from agent.yaml if present, else fall back to directory name.
 PROJECT="$(basename "$ROOT")"
 if [[ -f agent.yaml ]]; then
-	name_line="$(grep -E '^name:' agent.yaml | head -1 || true)"
-	if [[ -n "$name_line" ]]; then
-		# Strip "name:", quotes, whitespace
-		candidate="$(echo "$name_line" | sed -E 's/^name:[[:space:]]*//; s/^"//; s/"$//; s/^'\''//; s/'\''$//')"
-		[[ -n "$candidate" ]] && PROJECT="$candidate"
-	fi
+  name_line="$(grep -E '^name:' agent.yaml | head -1 || true)"
+  if [[ -n "$name_line" ]]; then
+    # Strip "name:", quotes, whitespace
+    candidate="$(echo "$name_line" | sed -E 's/^name:[[:space:]]*//; s/^"//; s/"$//; s/^'\''//; s/'\''$//')"
+    [[ -n "$candidate" ]] && PROJECT="$candidate"
+  fi
 fi
 
 # AGENTS.md and CLAUDE.md are identical shims pointing into .agent/.
@@ -41,7 +41,7 @@ fi
 # more compatible with agents that read content rather than follow links.
 
 shim_body() {
-	cat <<EOF
+  cat <<EOF
 # ${PROJECT} — agent entry point
 
 This file is a shim. Canonical agent context lives in \`.agent/\`. Read these files in order before starting any session in this repo:

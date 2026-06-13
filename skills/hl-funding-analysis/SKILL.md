@@ -61,9 +61,9 @@ python3 scripts/funding_history.py --report --exclude BTC,ETH,SOL
 
 The screener produces two tables per run:
 
-**SHORT-HARVEST** — short these names to *receive* positive funding. Profitable when funding income exceeds price drift against your short.
+**SHORT-HARVEST** — short these names to _receive_ positive funding. Profitable when funding income exceeds price drift against your short.
 
-**LONG-HARVEST** — long these names to *receive* negative funding (shorts paying longs). Profitable when funding income exceeds any price drift against your long. Often risky because negative funding usually exists for a reason (declining asset, short conviction, etc.).
+**LONG-HARVEST** — long these names to _receive_ negative funding (shorts paying longs). Profitable when funding income exceeds any price drift against your long. Often risky because negative funding usually exists for a reason (declining asset, short conviction, etc.).
 
 Per row, key fields:
 

@@ -1,9 +1,16 @@
 { agent-skills }:
-{ lib, pkgs, personalAgentSkillsPath ? null, opencodeConfigOverlays ? [ ], ... }:
+{
+  lib,
+  pkgs,
+  personalAgentSkillsPath ? null,
+  opencodeConfigOverlays ? [ ],
+  ...
+}:
 let
   # Each subdirectory is one skill. Non-directory entries (.DS_Store,
   # README.md, etc) are skipped so they don't get wrapped as SKILL.md.
-  readSkills = path:
+  readSkills =
+    path:
     let
       entries = builtins.readDir path;
       onlyDirs = lib.filterAttrs (_: type: type == "directory") entries;
@@ -16,13 +23,11 @@ let
 
   baseOpencodeSettings = import ./presets/opencode/opencode.nix;
   opencodeSettings = lib.foldl' (
-    previous: overlay:
-      lib.recursiveUpdate previous (overlay previous)
+    previous: overlay: lib.recursiveUpdate previous (overlay previous)
   ) baseOpencodeSettings opencodeConfigOverlays;
   opencodeJson = builtins.toJSON opencodeSettings;
   opencodeJsonFile = pkgs.writeText "darkmatter-opencode.jsonc" opencodeJson;
   opencodeJsonHash = builtins.hashString "sha256" opencodeJson;
-  jsonFormat = pkgs.formats.json {};
 
 in
 {

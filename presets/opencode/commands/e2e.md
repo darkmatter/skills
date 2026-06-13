@@ -39,46 +39,49 @@ When Agent Browser isn't available, use Playwright directly.
 ## Test Structure
 
 ```typescript
-import { test, expect } from '@playwright/test'
+import { test, expect } from "@playwright/test";
 
-test.describe('Feature: [Name]', () => {
+test.describe("Feature: [Name]", () => {
   test.beforeEach(async ({ page }) => {
     // Setup: Navigate, authenticate, prepare state
-  })
+  });
 
-  test('should [expected behavior]', async ({ page }) => {
+  test("should [expected behavior]", async ({ page }) => {
     // Arrange: Set up test data
 
     // Act: Perform user actions
-    await page.click('[data-testid="button"]')
-    await page.fill('[data-testid="input"]', 'value')
+    await page.click('[data-testid="button"]');
+    await page.fill('[data-testid="input"]', "value");
 
     // Assert: Verify results
-    await expect(page.locator('[data-testid="result"]')).toBeVisible()
-  })
+    await expect(page.locator('[data-testid="result"]')).toBeVisible();
+  });
 
   test.afterEach(async ({ page }, testInfo) => {
     // Capture screenshot on failure
-    if (testInfo.status !== 'passed') {
-      await page.screenshot({ path: `test-results/${testInfo.title}.png` })
+    if (testInfo.status !== "passed") {
+      await page.screenshot({ path: `test-results/${testInfo.title}.png` });
     }
-  })
-})
+  });
+});
 ```
 
 ## Best Practices
 
 ### Selectors
+
 - Prefer `data-testid` attributes
 - Avoid CSS classes (they change)
 - Use semantic selectors (roles, labels)
 
 ### Waits
+
 - Use Playwright's auto-waiting
 - Avoid `page.waitForTimeout()`
 - Use `expect().toBeVisible()` for assertions
 
 ### Test Isolation
+
 - Each test should be independent
 - Clean up test data after
 - Don't rely on test order

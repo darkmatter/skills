@@ -31,14 +31,14 @@ Original never lost. You can read and edit `.original.md`. Run skill again to re
 
 Real results on real project files:
 
-| File | Original | Compressed | Saved |
-|------|----------:|----------:|------:|
-| `claude-md-preferences.md` | 706 | 285 | **59.6%** |
-| `project-notes.md` | 1145 | 535 | **53.3%** |
-| `claude-md-project.md` | 1122 | 687 | **38.8%** |
-| `todo-list.md` | 627 | 388 | **38.1%** |
-| `mixed-with-code.md` | 888 | 574 | **35.4%** |
-| **Average** | **898** | **494** | **45%** |
+| File                       | Original | Compressed |     Saved |
+| -------------------------- | -------: | ---------: | --------: |
+| `claude-md-preferences.md` |      706 |        285 | **59.6%** |
+| `project-notes.md`         |     1145 |        535 | **53.3%** |
+| `claude-md-project.md`     |     1122 |        687 | **38.8%** |
+| `todo-list.md`             |      627 |        388 | **38.1%** |
+| `mixed-with-code.md`       |      888 |        574 | **35.4%** |
+| **Average**                |  **898** |    **494** |   **45%** |
 
 All validations passed ✅ — headings, code blocks, URLs, file paths preserved exactly.
 
@@ -88,6 +88,7 @@ caveman-compress/
 ```
 
 Examples:
+
 ```
 /caveman:compress CLAUDE.md
 /caveman:compress docs/preferences.md
@@ -96,12 +97,12 @@ Examples:
 
 ### What files work
 
-| Type | Compress? |
-|------|-----------|
-| `.md`, `.txt`, `.rst` | ✅ Yes |
-| Extensionless natural language | ✅ Yes |
-| `.py`, `.js`, `.ts`, `.json`, `.yaml` | ❌ Skip (code/config) |
-| `*.original.md` | ❌ Skip (backup files) |
+| Type                                  | Compress?              |
+| ------------------------------------- | ---------------------- |
+| `.md`, `.txt`, `.rst`                 | ✅ Yes                 |
+| Extensionless natural language        | ✅ Yes                 |
+| `.py`, `.js`, `.ts`, `.json`, `.yaml` | ❌ Skip (code/config)  |
+| `*.original.md`                       | ❌ Skip (backup files) |
 
 ## How It Work
 
@@ -159,5 +160,5 @@ Caveman cut that by ~45% on average. Same instructions. Same accuracy. Less wast
 
 This skill is part of the [caveman](https://github.com/JuliusBrussee/caveman) toolkit — making Claude use fewer tokens without losing accuracy.
 
-- **caveman** — make Claude *speak* like caveman (cuts response tokens ~65%)
-- **caveman-compress** — make Claude *read* less (cuts context tokens ~45%)
+- **caveman** — make Claude _speak_ like caveman (cuts response tokens ~65%)
+- **caveman-compress** — make Claude _read_ less (cuts context tokens ~45%)

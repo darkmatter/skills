@@ -23,10 +23,7 @@ function getNestedRecord(
   return isRecord(nestedValue) ? nestedValue : undefined;
 }
 
-function getNestedString(
-  value: Record<string, unknown>,
-  key: string,
-): string | undefined {
+function getNestedString(value: Record<string, unknown>, key: string): string | undefined {
   const nestedValue = value[key];
   return typeof nestedValue === "string" ? nestedValue : undefined;
 }
@@ -39,12 +36,8 @@ function extractSessionID(event: unknown): string | undefined {
   const body = getNestedRecord(event, "body");
   const bodySession = body ? getNestedRecord(body, "session") : undefined;
   const properties = getNestedRecord(event, "properties");
-  const propertiesInfo = properties
-    ? getNestedRecord(properties, "info")
-    : undefined;
-  const propertiesSession = properties
-    ? getNestedRecord(properties, "session")
-    : undefined;
+  const propertiesInfo = properties ? getNestedRecord(properties, "info") : undefined;
+  const propertiesSession = properties ? getNestedRecord(properties, "session") : undefined;
 
   return (
     topLevelSessionID ??
@@ -60,10 +53,7 @@ function extractSessionID(event: unknown): string | undefined {
 function extractSessionDirectory(event: unknown): string | undefined {
   if (!isRecord(event)) return undefined;
 
-  const info = getNestedRecord(
-    getNestedRecord(event, "properties") ?? {},
-    "info",
-  );
+  const info = getNestedRecord(getNestedRecord(event, "properties") ?? {}, "info");
   return getNestedString(info ?? {}, "directory");
 }
 
@@ -71,10 +61,7 @@ function normalizePath(value: string): string {
   return path.resolve(value);
 }
 
-function matchesProjectTarget(
-  requestedProject: string,
-  directory: string,
-): boolean {
+function matchesProjectTarget(requestedProject: string, directory: string): boolean {
   const normalizedDirectory = normalizePath(directory);
 
   if (path.isAbsolute(requestedProject)) {
@@ -85,16 +72,10 @@ function matchesProjectTarget(
     return true;
   }
 
-  return (
-    normalizePath(path.join(normalizedDirectory, requestedProject)) ===
-    normalizedDirectory
-  );
+  return normalizePath(path.join(normalizedDirectory, requestedProject)) === normalizedDirectory;
 }
 
-async function loadInstructionFile(
-  filePath: string,
-  fallback: string,
-): Promise<string> {
+async function loadInstructionFile(filePath: string, fallback: string): Promise<string> {
   try {
     const content = await readFile(filePath, "utf8");
     const trimmedContent = content.trim();
@@ -106,20 +87,14 @@ async function loadInstructionFile(
 
 const StartupBootstrapPlugin: Plugin = async ({ client }) => {
   const pluginDirectory = path.dirname(fileURLToPath(import.meta.url));
-  const instructionsDirectory = path.resolve(
-    pluginDirectory,
-    "../instructions",
-  );
+  const instructionsDirectory = path.resolve(pluginDirectory, "../instructions");
 
   const serenaInstruction = await loadInstructionFile(
     path.join(instructionsDirectory, "serena.md"),
     `Connect to Serena by calling \`${SERENA_ACTIVATE_TOOL}\` with the current project path.`,
   );
 
-  async function log(
-    level: "debug" | "info" | "warn" | "error",
-    message: string,
-  ): Promise<void> {
+  async function log(level: "debug" | "info" | "warn" | "error", message: string): Promise<void> {
     try {
       await client.app.log({
         body: { service: "startup-bootstrap", level, message },
@@ -200,15 +175,15 @@ const StartupBootstrapPlugin: Plugin = async ({ client }) => {
         return;
       }
 
-		if (!state.serenaDone) {
-			output.system.push(
-				[
-					"Session startup: if no specialist-routing rule applies, activate Serena before doing substantive work.",
-					serenaInstruction.trim(),
-					"Specialist routing remains the first-tool gate when it matches the user request.",
-				].join("\n\n"),
-			);
-		}
+      if (!state.serenaDone) {
+        output.system.push(
+          [
+            "Session startup: if no specialist-routing rule applies, activate Serena before doing substantive work.",
+            serenaInstruction.trim(),
+            "Specialist routing remains the first-tool gate when it matches the user request.",
+          ].join("\n\n"),
+        );
+      }
     },
   };
 };

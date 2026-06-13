@@ -18,18 +18,18 @@ Orchestrate multiple specialized agents for this complex task: $ARGUMENTS
 
 ## Available Agents
 
-| Agent                  | Specialty               | Use For                 |
-| ---------------------- | ----------------------- | ----------------------- |
-| planner                | Implementation planning | Complex feature design  |
-| architect              | System design           | Architectural decisions |
-| code-reviewer          | Code quality            | Review changes          |
-| security-reviewer      | Security analysis       | Vulnerability detection |
-| tdd-guide              | Test-driven dev         | Feature implementation  |
-| build-error-resolver   | Build fixes             | TypeScript/build errors |
-| e2e-runner             | E2E testing             | User flow testing       |
-| doc-updater            | Documentation           | Updating docs           |
-| refactor-cleaner       | Code cleanup            | Dead code removal       |
-| database-reviewer      | Database                | Query optimization      |
+| Agent                | Specialty               | Use For                 |
+| -------------------- | ----------------------- | ----------------------- |
+| planner              | Implementation planning | Complex feature design  |
+| architect            | System design           | Architectural decisions |
+| code-reviewer        | Code quality            | Review changes          |
+| security-reviewer    | Security analysis       | Vulnerability detection |
+| tdd-guide            | Test-driven dev         | Feature implementation  |
+| build-error-resolver | Build fixes             | TypeScript/build errors |
+| e2e-runner           | E2E testing             | User flow testing       |
+| doc-updater          | Documentation           | Updating docs           |
+| refactor-cleaner     | Code cleanup            | Dead code removal       |
+| database-reviewer    | Database                | Query optimization      |
 
 ## Orchestration Patterns
 

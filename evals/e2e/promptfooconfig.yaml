@@ -24,6 +24,6 @@ tests:
       request: Run the Promptfoo end-to-end eval locally.
     assert:
       - type: contains
-        value: 'COMMAND: npm run eval:e2e'
+        value: "COMMAND: npm run eval:e2e"
       - type: icontains
-        value: 'secrets'
+        value: "secrets"

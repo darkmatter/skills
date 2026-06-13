@@ -68,19 +68,19 @@ See `docs/opencode-layout.md` for the source-to-install mapping.
 
 Use this table before adding a new instruction, skill, command, hook, or tool. The goal is to keep always-on context small while still making reusable behavior discoverable.
 
-| Need | Put it here | Loaded when | Examples / notes |
-|---|---|---|---|
-| Org-wide rules that must apply in every session | `presets/base/AGENTS.md` | Always, as global agent instructions | Keep short: safety, verification, preserving user changes, secret handling, evidence-before-claims. |
-| Project-specific rules and decisions | Target project `AGENTS.md`, `.agent/context/*`, `.agent/policy/*` from `template/` | Always inside that project | Stack choices, local conventions, approved exceptions, project state. |
-| Reusable task guidance the model should choose when relevant | `skills/<name>/SKILL.md` | On demand via skill discovery | Debugging, TDD, Effect, Neon, Nix, codebase cleanup. Add a row in `docs/catalog.md`. |
-| Long skill detail, examples, fixtures, or lookup data | `skills/<name>/reference/` | Only after the skill points there | Use for large docs so `SKILL.md` stays concise. |
-| Deterministic helper used by a skill | `skills/<name>/scripts/` | Only when the skill/script is invoked | Bash or Python stdlib preferred; document deps in the skill and catalog. |
-| Manual slash-invoked workflow for OpenCode | `presets/opencode/commands/` | User invokes `/command` | Use for explicit workflows, prompts with arguments, or timing-sensitive actions. |
-| OpenCode specialist agent definition | `presets/opencode/agents/` | Invoked by agent routing or user | Use for role-specific behavior and permissions, not reusable task instructions. |
-| OpenCode lifecycle behavior | `presets/opencode/plugins/` | Event driven | Use for hooks, startup/stop behavior, observers, and client integrations. |
-| Model-callable deterministic function | `presets/opencode/tools/` | Tool call during a session | Use for code that returns structured results and should not be prose instructions. |
-| Repo maintenance helper | `scripts/` | Human/agent command from this repo | Validators, scaffolders, bootstrap scripts. Not auto-discovered by clients. |
-| Human-readable inventory of shared skills | `docs/catalog.md` | Manual lookup and review | Track skill purpose, triggers, mode/kind, overlaps, deprecations, and operational notes. |
+| Need                                                         | Put it here                                                                        | Loaded when                           | Examples / notes                                                                                    |
+| ------------------------------------------------------------ | ---------------------------------------------------------------------------------- | ------------------------------------- | --------------------------------------------------------------------------------------------------- |
+| Org-wide rules that must apply in every session              | `presets/base/AGENTS.md`                                                           | Always, as global agent instructions  | Keep short: safety, verification, preserving user changes, secret handling, evidence-before-claims. |
+| Project-specific rules and decisions                         | Target project `AGENTS.md`, `.agent/context/*`, `.agent/policy/*` from `template/` | Always inside that project            | Stack choices, local conventions, approved exceptions, project state.                               |
+| Reusable task guidance the model should choose when relevant | `skills/<name>/SKILL.md`                                                           | On demand via skill discovery         | Debugging, TDD, Effect, Neon, Nix, codebase cleanup. Add a row in `docs/catalog.md`.                |
+| Long skill detail, examples, fixtures, or lookup data        | `skills/<name>/reference/`                                                         | Only after the skill points there     | Use for large docs so `SKILL.md` stays concise.                                                     |
+| Deterministic helper used by a skill                         | `skills/<name>/scripts/`                                                           | Only when the skill/script is invoked | Bash or Python stdlib preferred; document deps in the skill and catalog.                            |
+| Manual slash-invoked workflow for OpenCode                   | `presets/opencode/commands/`                                                       | User invokes `/command`               | Use for explicit workflows, prompts with arguments, or timing-sensitive actions.                    |
+| OpenCode specialist agent definition                         | `presets/opencode/agents/`                                                         | Invoked by agent routing or user      | Use for role-specific behavior and permissions, not reusable task instructions.                     |
+| OpenCode lifecycle behavior                                  | `presets/opencode/plugins/`                                                        | Event driven                          | Use for hooks, startup/stop behavior, observers, and client integrations.                           |
+| Model-callable deterministic function                        | `presets/opencode/tools/`                                                          | Tool call during a session            | Use for code that returns structured results and should not be prose instructions.                  |
+| Repo maintenance helper                                      | `scripts/`                                                                         | Human/agent command from this repo    | Validators, scaffolders, bootstrap scripts. Not auto-discovered by clients.                         |
+| Human-readable inventory of shared skills                    | `docs/catalog.md`                                                                  | Manual lookup and review              | Track skill purpose, triggers, mode/kind, overlaps, deprecations, and operational notes.            |
 
 Placement rules:
 
@@ -155,11 +155,11 @@ See [`skills/README.md`](skills/README.md) for the skill format spec.
 
 ## Personal vs. team vs. project skills
 
-| Scope | Where it lives | When to use |
-|---|---|---|
-| Personal | private repo, `personal/skills/`, gitignored | Only useful to you; no team value |
-| Team-wide | `skills/` here | Useful across multiple darkmatter projects |
-| Project-local | `<project>/.agent/skills/` | Only relevant inside one project |
+| Scope         | Where it lives                               | When to use                                |
+| ------------- | -------------------------------------------- | ------------------------------------------ |
+| Personal      | private repo, `personal/skills/`, gitignored | Only useful to you; no team value          |
+| Team-wide     | `skills/` here                               | Useful across multiple darkmatter projects |
+| Project-local | `<project>/.agent/skills/`                   | Only relevant inside one project           |
 
 ## For agents reading this file
 

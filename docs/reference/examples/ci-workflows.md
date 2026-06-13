@@ -59,7 +59,7 @@ jobs:
       - name: Shellcheck scripts
         uses: ludeeus/action-shellcheck@master
         with:
-          scandir: './scripts ./template/scripts ./template/hooks/scripts'
+          scandir: "./scripts ./template/scripts ./template/hooks/scripts"
 ```
 
 ## Downstream project workflow

@@ -25,13 +25,7 @@
  */
 
 import { execFile as execFileCb } from "node:child_process";
-import {
-  readFile,
-  readdir,
-  realpath,
-  stat,
-  writeFile,
-} from "node:fs/promises";
+import { readFile, readdir, realpath, stat, writeFile } from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 import { promisify } from "node:util";
@@ -44,12 +38,7 @@ const HOMUNCULUS_ROOT = path.join(os.homedir(), ".claude", "homunculus");
 const PROJECTS_JSON = path.join(HOMUNCULUS_ROOT, "projects.json");
 const GLOBAL_INSTINCTS_ROOT = path.join(HOMUNCULUS_ROOT, "instincts");
 
-const STATE_FILE = path.join(
-  os.homedir(),
-  ".config",
-  "opencode",
-  ".instinct-digest-state.json",
-);
+const STATE_FILE = path.join(os.homedir(), ".config", "opencode", ".instinct-digest-state.json");
 
 const MAX_DIGEST_ENTRIES = 5;
 
@@ -79,10 +68,7 @@ function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null;
 }
 
-function getStringField(
-  record: Record<string, unknown>,
-  key: string,
-): string | undefined {
+function getStringField(record: Record<string, unknown>, key: string): string | undefined {
   const value = record[key];
   return typeof value === "string" ? value : undefined;
 }
@@ -97,11 +83,9 @@ async function tryRealpath(p: string): Promise<string | null> {
 
 async function findGitRoot(dir: string): Promise<string | null> {
   try {
-    const { stdout } = await execFile(
-      "git",
-      ["-C", dir, "rev-parse", "--show-toplevel"],
-      { timeout: 2000 },
-    );
+    const { stdout } = await execFile("git", ["-C", dir, "rev-parse", "--show-toplevel"], {
+      timeout: 2000,
+    });
     const trimmed = stdout.trim();
     return trimmed.length > 0 ? trimmed : null;
   } catch {
@@ -145,9 +129,7 @@ async function resolveProjectId(directory: string): Promise<string | null> {
   return null;
 }
 
-function parseFrontmatter(
-  raw: string,
-): { fm: Record<string, string>; body: string } | null {
+function parseFrontmatter(raw: string): { fm: Record<string, string>; body: string } | null {
   const match = raw.match(/^---\r?\n([\s\S]*?)\r?\n---\r?\n([\s\S]*)$/);
   if (!match) return null;
   const [, fmRaw, body] = match;
@@ -173,10 +155,7 @@ function extractAction(body: string): string | null {
   return match[1].trim() || null;
 }
 
-async function summariseFile(
-  fullPath: string,
-  relPath: string,
-): Promise<InstinctSummary | null> {
+async function summariseFile(fullPath: string, relPath: string): Promise<InstinctSummary | null> {
   let raw: string;
   let mtimeMs: number;
   try {
@@ -194,10 +173,7 @@ async function summariseFile(
   return { id: fm.id, relPath, mtimeMs, trigger: fm.trigger, action };
 }
 
-async function scanDir(
-  dir: string,
-  relRoot: string,
-): Promise<readonly InstinctSummary[]> {
+async function scanDir(dir: string, relRoot: string): Promise<readonly InstinctSummary[]> {
   let entries: string[];
   try {
     entries = await readdir(dir);
@@ -215,9 +191,7 @@ async function scanDir(
   return out;
 }
 
-async function scanAll(
-  projectId: string | null,
-): Promise<readonly InstinctSummary[]> {
+async function scanAll(projectId: string | null): Promise<readonly InstinctSummary[]> {
   const tasks: Promise<readonly InstinctSummary[]>[] = [
     scanDir(path.join(GLOBAL_INSTINCTS_ROOT, "personal"), "global/personal"),
     scanDir(path.join(GLOBAL_INSTINCTS_ROOT, "inherited"), "global/inherited"),
@@ -257,9 +231,7 @@ async function loadSentinel(): Promise<SentinelState | null> {
   return { last_check_iso: last, seen: seenNorm };
 }
 
-async function writeSentinel(
-  current: readonly InstinctSummary[],
-): Promise<void> {
+async function writeSentinel(current: readonly InstinctSummary[]): Promise<void> {
   const seen: Record<string, number> = {};
   for (const s of current) seen[s.relPath] = s.mtimeMs;
   const state: SentinelState = {
@@ -273,10 +245,7 @@ async function writeSentinel(
   }
 }
 
-function diffAgainstSentinel(
-  current: readonly InstinctSummary[],
-  sentinel: SentinelState,
-): Digest {
+function diffAgainstSentinel(current: readonly InstinctSummary[], sentinel: SentinelState): Digest {
   const added: InstinctSummary[] = [];
   const updated: InstinctSummary[] = [];
   for (const s of current) {
@@ -297,9 +266,7 @@ function formatDigest(digest: Digest, sinceIso: string): string | null {
   const total = digest.added.length + digest.updated.length;
   if (total === 0) return null;
 
-  const lines: string[] = [
-    `Recently learned (since ${sinceIso}):`,
-  ];
+  const lines: string[] = [`Recently learned (since ${sinceIso}):`];
 
   const fmtEntry = (label: string, s: InstinctSummary): string => {
     const action = s.action.replace(/\s+/g, " ").trim();
@@ -329,9 +296,7 @@ const InstinctDigestPlugin: Plugin = async ({ client, directory }) => {
   const log: LogFn = async (level, message) => {
     // Fire-and-forget: awaiting client.app.log during plugin init deadlocks
     // the server.
-    client.app
-      .log({ body: { service: "instinct-digest", level, message } })
-      .catch(() => {});
+    client.app.log({ body: { service: "instinct-digest", level, message } }).catch(() => {});
   };
 
   const projectId = await resolveProjectId(directory ?? "");
