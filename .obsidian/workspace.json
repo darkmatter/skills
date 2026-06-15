@@ -185,11 +185,24 @@
       "daily-notes:Open today's daily note": false,
       "templates:Insert template": false,
       "command-palette:Open command palette": false,
-      "bases:Create new base": false
+      "bases:Create new base": false,
+      "obsidian42-brat:BRAT": false
     }
   },
   "active": "09e49016fbfeecf0",
   "lastOpenFiles": [
+    "skills/rust-best-practices/references/chapter_09.md",
+    "skills/rust-best-practices/references/chapter_08.md",
+    "skills/rust-best-practices/references/chapter_06.md",
+    "skills/rust-best-practices/references/chapter_07.md",
+    "skills/rust-best-practices/references/chapter_05.md",
+    "skills/rust-best-practices/references/chapter_04.md",
+    "skills/rust-best-practices/references/chapter_03.md",
+    "skills/rust-best-practices/references/chapter_02.md",
+    "skills/rust-best-practices/references/chapter_01.md",
+    "skills/rust-best-practices/references",
+    "skills/rust-best-practices/SKILL.md",
+    "skills/rust-best-practices",
     "presets/claude/themes/apathy.json",
     "presets/claude/themes",
     "presets/claude",
@@ -198,9 +211,6 @@
     "skills/shadcn-registry-first.zip",
     "skills/grill-with-docs.zip",
     "skills/grill-me.zip",
-    "skills/improve-codebase-architecture.zip",
-    "evals/repo-diff/stubs/alchemy-deterministic-name.patch",
-    "evals/repo-diff/stubs/coding-standards-nplusone.patch",
     "node_modules/mongodb-connection-string-url/node_modules/whatwg-url/node_modules/webidl-conversions/README.md",
     "node_modules/mongodb-connection-string-url/node_modules/whatwg-url/node_modules/webidl-conversions/LICENSE.md",
     "node_modules/mongodb-connection-string-url/node_modules/whatwg-url/node_modules/tr46/README.md",
@@ -216,15 +226,6 @@
     "node_modules/engine.io/node_modules/accepts/node_modules/mime-types/README.md",
     "node_modules/engine.io/node_modules/accepts/node_modules/mime-types/HISTORY.md",
     "node_modules/get-uri/node_modules/debug/README.md",
-    "node_modules/get-uri/node_modules/data-uri-to-buffer/README.md",
-    "node_modules/wrap-ansi/node_modules/strip-ansi/node_modules/ansi-regex/readme.md",
-    "node_modules/mongodb/node_modules/gcp-metadata/README.md",
-    "node_modules/wrap-ansi/node_modules/string-width/node_modules/emoji-regex/README.md",
-    "node_modules/widest-line/node_modules/string-width/node_modules/strip-ansi/node_modules/ansi-regex/readme.md",
-    "node_modules/widest-line/node_modules/string-width/node_modules/strip-ansi/readme.md",
-    "node_modules/cli-truncate/node_modules/string-width/node_modules/strip-ansi/node_modules/ansi-regex/readme.md",
-    "node_modules/cli-truncate/node_modules/string-width/node_modules/strip-ansi/readme.md",
-    "node_modules/restore-cursor/node_modules/signal-exit/README.md",
-    "node_modules/@tokenizer/inflate/node_modules/debug/README.md"
+    "node_modules/get-uri/node_modules/data-uri-to-buffer/README.md"
   ]
 }

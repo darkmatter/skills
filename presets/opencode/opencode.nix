@@ -50,6 +50,16 @@
             output = 128000;
           };
         };
+        "kimi-k2.7-code" = {
+          name = "Kimi K2.7 Code (darkmatter)";
+          reasoning = true;
+          temperature = false;
+          tool_call = true;
+          limit = {
+            context = 262144;
+            output = 32768;
+          };
+        };
         "gpt-oss-120b" = {
           name = "GPT-OSS-120B (darkmatter)";
           reasoning = true;

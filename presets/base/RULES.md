@@ -41,6 +41,7 @@ Hard constraints on agent behavior across all darkmatter projects. These overrid
 - **Comments explain WHY** — not WHAT. Named constants over magic numbers
 - **Type safety** — proper types, no `any`. Schema-decode unknown data at trust boundaries. Typed errors handled by tag, not thrown
 - **No accidental quadratic** — build indexes once, avoid `.find()` inside loops, use streaming/pagination for large inputs
+- **React/JSX** — function components + hooks (classes only for error boundaries); one component per file; stable unique `key` (never array index for dynamic lists); defaults via destructuring, not `defaultProps`; required `alt` + valid ARIA roles, no `accessKey`; `useRef` not string refs; share logic via custom hooks, not mixins/HOCs. Adapted from [Airbnb React](https://github.com/airbnb/javascript/tree/master/react)
 
 ## Authority order
 

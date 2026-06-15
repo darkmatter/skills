@@ -184,6 +184,196 @@ function getMarket(id: any): Promise<any> {
 }
 ```
 
+## React & JSX
+
+Adapted from the [Airbnb React/JSX Style Guide](https://github.com/airbnb/javascript/tree/master/react), modernized for **TypeScript + function components with hooks**. Airbnb's class-era rules (`React.createClass`, mixins, `propTypes`/`defaultProps`, lifecycle-method ordering, constructor binding, `isMounted`, string refs) are intentionally dropped — TypeScript and hooks supersede them, and several conflict with the type-safety rules above.
+
+### Component Basics
+
+- One exported component per file. Small, pure helper components may share the file.
+- Author UI as JSX; never call `React.createElement` directly.
+- Prefer **function components with hooks**. Reach for a class only for error boundaries (the one thing hooks can't yet express).
+
+```tsx
+// ❌ BAD: class component for simple UI
+class Listing extends React.Component<{ hello: string }> {
+  render() {
+    return <div>{this.props.hello}</div>;
+  }
+}
+
+// ✅ GOOD: function component
+function Listing({ hello }: { hello: string }) {
+  return <div>{hello}</div>;
+}
+```
+
+### Naming
+
+Filenames follow the [File Naming](#file-naming) rules above (`PascalCase.tsx` for components). A directory's root component is `index.tsx`, named after the directory.
+
+```tsx
+// ❌ BAD
+import reservationCard from "./ReservationCard"; // component refs are PascalCase
+const ReservationItem = <ReservationCard />; // instances are camelCase
+
+// ✅ GOOD
+import ReservationCard from "./ReservationCard";
+const reservationItem = <ReservationCard />;
+```
+
+- Components are PascalCase, instances are camelCase.
+- Don't repurpose DOM prop names (`style`, `className`, …) for different meanings — readers expect them to behave as usual. Use a distinct name like `variant`.
+- Set `displayName` on wrapped components (`memo`, `forwardRef`, HOCs) so devtools and error messages stay legible.
+
+### Props
+
+```tsx
+// ❌ BAD
+<Foo
+  UserName="hello"      // prop names are camelCase
+  phone_number={12345678}
+  hidden={true}         // redundant for an explicitly-true boolean
+/>
+
+// ✅ GOOD
+<Foo
+  userName="hello"
+  phoneNumber={12345678}
+  Component={SomeComponent} // PascalCase only when the value is a component
+  hidden                    // boolean true is implied
+/>
+```
+
+- Provide defaults via **destructuring defaults**, not `defaultProps` (deprecated for function components):
+
+```tsx
+// ✅ GOOD
+function Banner({ tone = "neutral", dismissible = false }: BannerProps) {
+  /* ... */
+}
+```
+
+- Use a stable, unique `key` — never the array index when the list can reorder, insert, or delete:
+
+```tsx
+// ❌ BAD
+{
+  todos.map((todo, index) => <Todo {...todo} key={index} />);
+}
+
+// ✅ GOOD
+{
+  todos.map((todo) => <Todo {...todo} key={todo.id} />);
+}
+```
+
+- Spread props sparingly, and spread only what the child needs so you don't leak unexpected attributes:
+
+```tsx
+// ❌ BAD: forwards everything, including irrelevantProp
+const { irrelevantProp, ...rest } = props;
+return <WrappedComponent {...props} />;
+
+// ✅ GOOD
+const { irrelevantProp, ...rest } = props;
+return <WrappedComponent {...rest} />;
+```
+
+### Accessibility (a11y)
+
+```tsx
+// ❌ BAD
+<img src="hello.jpg" />                                  // missing alt
+<img src="hello.jpg" alt="Picture of me waving hello" /> // "Picture of" is redundant
+<div role="datepicker" />                                // not a real ARIA role
+<div accessKey="h" />                                    // conflicts with screen-reader shortcuts
+
+// ✅ GOOD
+<img src="hello.jpg" alt="Me waving hello" />
+<img src="hello.jpg" alt="" />                           // decorative: empty alt
+<div role="button" />                                    // valid, non-abstract role
+```
+
+- Every `<img>` needs `alt` (empty string or `role="presentation"` for decorative images).
+- Don't say "image/photo/picture" in `alt` — screen readers already announce it as an image.
+- Use only valid, non-abstract ARIA roles. Never use `accessKey`.
+
+### Formatting
+
+These match Prettier defaults — let the formatter enforce them. They're listed so reviews can reason about them.
+
+```tsx
+// Alignment: one prop per line when they don't fit; closing bracket aligns with the opening tag.
+// ❌ BAD
+<Foo superLongParam="bar"
+     anotherSuperLongParam="baz" />
+
+// ✅ GOOD
+<Foo
+  superLongParam="bar"
+  anotherSuperLongParam="baz"
+/>
+
+// ✅ GOOD: fits on one line
+<Foo bar="bar" />
+```
+
+- **Quotes**: double quotes for JSX attributes (mirrors HTML); JS string style follows your Prettier config.
+- **Spacing**: one space before a self-closing slash (`<Foo />`, not `<Foo/>`); no padding inside JSX braces (`<Foo bar={baz} />`, not `<Foo bar={ baz } />`).
+- **Tags**: self-close childless tags (`<Foo variant="stuff" />`, not `<Foo variant="stuff"></Foo>`).
+- **Parentheses**: wrap multiline JSX in parentheses.
+
+```tsx
+return (
+  <MyComponent variant="long body" foo="bar">
+    <MyChild />
+  </MyComponent>
+);
+
+// Conditionals stay readable
+{showButton && <Button />}
+{showButton && (
+  <Button />
+)}
+```
+
+### Handlers, Refs & Logic
+
+- Pass inline arrow handlers to close over local data; when handing a callback to a memoized child (`React.memo`), wrap it in `useCallback` so you don't force needless re-renders:
+
+```tsx
+// ✅ GOOD: closes over `item`
+{
+  items.map((item) => (
+    <Item key={item.id} onClick={(event) => doSomethingWith(event, item.name)} />
+  ));
+}
+```
+
+- Use `useRef` (or callback refs) — never string refs:
+
+```tsx
+// ✅ GOOD
+const inputRef = useRef<HTMLInputElement>(null);
+return <input ref={inputRef} />;
+```
+
+- Don't underscore-prefix "private" helpers — JS has no real privacy and the prefix only misleads. Extract genuinely shared logic into **custom hooks** (the modern replacement for mixins).
+- A component must always return JSX or `null` — never fall off the end returning `undefined`.
+- Don't track an "is mounted" flag to guard state updates; cancel in-flight work with an `AbortController` and clean up in the effect's return:
+
+```tsx
+// ✅ GOOD
+useEffect(() => {
+  const controller = new AbortController();
+  fetchData({ signal: controller.signal }).then(setData).catch(ignoreAbort);
+  return () => controller.abort();
+}, []);
+```
+
+- Order a function component top-to-bottom: hooks (state → refs → context → effects), then derived values and handlers, then the returned JSX.
+
 ## API Design Standards
 
 ### REST API Conventions
