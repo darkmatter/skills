@@ -9,7 +9,7 @@ Use this skill when configuring, developing, deploying, or debugging infrastruct
 
 Alchemy is the preferred Darkmatter path for new TypeScript/Effect deployable infrastructure. Reach for it before ad hoc provider scripts, hand-written Wrangler/Terraform glue, or one-off deploy workflows unless a repo has an explicit exception or an existing production system that should not be disturbed.
 
-Alchemy v2 and `alchemy-effect` move quickly. Verify upstream docs before changing deploy or dev code, especially package versions, provider APIs, `alchemy dev` behavior, and CLI flags.
+Alchemy v2 and `alchemy-effect` move quickly. Verify upstream docs before changing deploy or dev code, especially package versions, provider APIs, `alchemy dev` behavior, and CLI flags. This skill carries the upstream `alchemy-run/alchemy-effect` repo as a local submodule at `reference/alchemy-effect` for source, examples, and agent instructions.
 
 ## When to use
 
@@ -45,10 +45,20 @@ Use these upstream references first:
 - `https://v2.alchemy.run/concepts/local-development/` and `https://v2.alchemy.run/tutorial/part-4/` for `alchemy dev`.
 - `https://v2.alchemy.run/concepts/state-store/` for where state is persisted.
 - `https://v2.alchemy.run/guides/ci/` for non-interactive deploys and PR preview environments.
-- `https://raw.githubusercontent.com/alchemy-run/alchemy-effect/refs/heads/main/AGENTS.md` for upstream Effect-native infrastructure conventions.
-- `https://github.com/alchemy-run/alchemy-effect/tree/main/examples` for concrete app patterns.
+- `reference/alchemy-effect/AGENTS.md` for upstream Effect-native infrastructure conventions.
+- `reference/alchemy-effect/README.md` for the current project overview and install shape.
+- `reference/alchemy-effect/examples/` for concrete app patterns.
+- `reference/alchemy-effect/packages/alchemy/src/` for provider/resource implementation patterns.
 
 If upstream conflicts with this skill, follow upstream and mention the drift.
+
+If the submodule is missing in a fresh checkout, initialize it before relying on local references:
+
+```bash
+git submodule update --init skills/alchemy/reference/alchemy-effect
+```
+
+Treat the submodule as read-only during app/deploy work. Edit it only when the user explicitly asks for an upstream `alchemy-effect` contribution, and then follow `reference/alchemy-effect/AGENTS.md` as the repo-local authority.
 
 ## Project setup
 
@@ -445,3 +455,4 @@ If you edit resource JSDoc, run `bun generate:api-reference` to refresh `website
 - `reference/upstream-concepts.md` — Alchemy v2 and `alchemy-effect` concepts applied during app/deploy work.
 - `reference/examples.md` — `alchemy-run/alchemy-effect/examples` directories mapped to common deploy scenarios.
 - `reference/provider-implementation.md` — file system, reconciler doctrine, capability shape, tags, runtime context, test fixtures, JSDoc/docs, and tutorial standards for upstream provider contributions.
+- `reference/alchemy-effect/` — pinned git submodule of `alchemy-run/alchemy-effect` for current source, examples, docs, and upstream agent instructions.

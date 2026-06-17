@@ -1,0 +1,6 @@
+[submodule "skills/alchemy/reference/alchemy-effect"]
+	path = skills/alchemy/reference/alchemy-effect
+	url = https://github.com/alchemy-run/alchemy-effect.git
+[submodule "skills/effect-typescript/reference/effect"]
+	path = skills/effect-typescript/reference/effect
+	url = https://github.com/Effect-TS/effect.git
