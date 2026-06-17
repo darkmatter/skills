@@ -7,7 +7,7 @@ description: Use when TypeScript/Bun code involves meaningful I/O and you are wr
 
 Use Effect deliberately. The most important trigger is meaningful I/O: external APIs, files, databases, queues, workers, CLIs, config, secrets, clocks, subprocesses, network calls, or deployable runtime boundaries. Effect is excellent when that I/O needs typed failures, dependencies, runtime validation, retries, concurrency, resources, and testable boundaries. It is not a default replacement for simple TypeScript.
 
-This skill adapts guidance from `effect-smol` to darkmatter conventions: use Bun commands instead of pnpm, and prefer Alchemy for deployable infrastructure.
+This skill adapts Effect guidance to darkmatter conventions: use Bun commands instead of pnpm for darkmatter projects, and prefer Alchemy for deployable infrastructure. It carries the upstream `Effect-TS/effect` monorepo as a local submodule at `reference/effect` for current APIs, tests, package layout, docs, and upstream agent instructions.
 
 ## When to use
 
@@ -49,6 +49,24 @@ If only one is true, prefer plain TypeScript unless the surrounding codebase alr
 - Prefer Alchemy for deployable infrastructure. Put infra in `alchemy.run.ts`, create resources with Alchemy, bind them to workers/services, and call `await app.finalize()`.
 - Do not bake secrets into code or Alchemy resources. Use environment variables and `alchemy.secret(...)` for secret bindings.
 - Keep application logic independent from Alchemy. Alchemy owns infrastructure wiring; Effect services own runtime behavior.
+
+## Upstream Reference
+
+Use `reference/effect` when you need current Effect source or examples instead of relying on memory:
+
+- `reference/effect/AGENTS.md` — upstream repository rules, including pnpm validation commands, generated barrels, changesets, and `it.effect` conventions.
+- `reference/effect/packages/effect/` — core library source and tests.
+- `reference/effect/packages/platform-bun/` and `reference/effect/packages/platform-node/` — runtime/platform examples.
+- `reference/effect/packages/vitest/` — Effect-aware Vitest helpers.
+- `reference/effect/docs/` and package READMEs — local docs that match the pinned submodule SHA.
+
+If the submodule is missing in a fresh checkout, initialize it before using local references:
+
+```bash
+git submodule update --init skills/effect-typescript/reference/effect
+```
+
+For darkmatter application work, treat the submodule as read-only and translate upstream pnpm commands to the repo's package manager. For direct upstream Effect contributions, follow `reference/effect/AGENTS.md` exactly; do not apply darkmatter Bun defaults inside the upstream repo.
 
 ## Core Patterns
 
@@ -259,3 +277,7 @@ Alchemy rules:
 - Copying upstream `pnpm` commands into darkmatter projects instead of adapting to Bun.
 - Deploying Cloudflare or AWS resources ad hoc instead of encoding them in Alchemy.
 - Replacing `Cloudflare.state()` with filesystem/local state for local dev or PR previews; use Alchemy dev mode instead.
+
+## References
+
+- `reference/effect/` — pinned git submodule of `Effect-TS/effect` for current source, tests, docs, and upstream agent instructions.
