@@ -28,15 +28,15 @@
         apiKey = "{file:~/.secrets/litellm-api-key}";
       };
       models = {
-        "glm-5.1-fp8" = {
-          name = "GLM 5.1 (darkmatter)";
+        "glm-5.2-fp8" = {
+          name = "GLM 5.2 (darkmatter)";
           reasoning = true;
           temperature = true;
           tool_call = true;
           variants = {
             thinking = {
               thinking = {
-                reasoningEffort = "high";
+                reasoningEffort = "max";
               };
             };
             nothink = {
@@ -46,8 +46,8 @@
             };
           };
           limit = {
-            context = 200000;
-            output = 128000;
+            context = 1048576;
+            output = 131072;
           };
         };
         "kimi-k2.7-code" = {

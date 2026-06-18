@@ -29,9 +29,8 @@ darkmatter/skills/
 │   ├── new-project.sh       ← stamp template/ into a target dir
 │   └── validate-skill.sh    ← sanity-check skills/ catalog
 ├── evals/
-│   ├── e2e/                 ← Promptfoo local workflow smoke evals
-│   ├── skills/              ← Promptfoo behavior evals (LLM decision checks)
-│   └── repo-diff/           ← structural evals (diff-based, no API keys)
+│   ├── skills/              ← Promptfoo behavior evals (LLM decision checks, CI)
+│   └── prompt-tests/        ← real-repo opencode evals (local/manual only)
 └── docs/
     ├── catalog.md           ← what's in skills/
     └── new-project-guide.md ← walkthrough for bootstrapping a project
