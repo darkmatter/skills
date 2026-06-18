@@ -42,7 +42,11 @@ jobs:
           path: evals/results/*
           if-no-files-found: ignore
 
-  repo-diff-evals:
+  prompt-test-unit:
+    # The real prompt-test evals (evals/prompt-tests) are LOCAL/MANUAL ONLY:
+    # they make real model calls + network clones of darkmatter repos, so they
+    # are not run in CI. We DO run their pure diff-assertion unit tests here,
+    # which need no model and no network.
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -60,16 +64,5 @@ jobs:
       - name: Validate Promptfoo configs
         run: npm run eval:validate
 
-      - name: Run repo-diff assertion tests
-        run: npm run test:repo-diff
-
-      - name: Run repo-diff evals
-        run: npm run eval:repo-diff
-
-      - name: Upload eval artifacts
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: promptfoo-repo-diff-evals
-          path: evals/results/repo-diff.*
-          if-no-files-found: ignore
+      - name: Run prompt-test assertion unit tests
+        run: npm run test:prompt-tests
