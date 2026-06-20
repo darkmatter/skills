@@ -1,0 +1,23 @@
+# Darkmatter omp model/provider config.
+#
+# Installed to ~/.omp/agent/models.yml by scripts/install-omp.sh.
+#
+# The github-executor authenticates via OPENROUTER_API_KEY (OpenRouter is a
+# built-in provider in omp), so NO custom provider is required for the default
+# setup — the canonical "~anthropic/claude-*-latest" ids in config.yml resolve
+# through it automatically.
+#
+# Add custom providers below as needed. Schema + examples:
+# https://github.com/can1357/oh-my-pi/blob/main/docs/models.md
+#
+# Example — the darkmatter LiteLLM gateway (uncomment + set the key env var):
+#
+# providers:
+#   litellm:
+#     baseUrl: https://litellm.drkmttr.dev/v1
+#     apiKey: LITELLM_API_KEY        # name of the env var holding the key
+#     api: openai-completions
+#     discovery:
+#       type: openai-models-list     # auto-list the gateway's models
+
+providers: {}
