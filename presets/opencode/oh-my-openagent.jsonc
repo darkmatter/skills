@@ -1,7 +1,7 @@
 {
   "$schema": "https://raw.githubusercontent.com/code-yeongyu/oh-my-openagent/dev/assets/oh-my-opencode.schema.json",
   "sisyphus_agent": {
-    "default_builder_enabled": true
+    "default_builder_enabled": true,
   },
   "disabled_mcps": ["context7", "websearch", "ast_grep", "grep_app"],
   "agents": {
@@ -11,45 +11,45 @@
       "fallback_models": [
         {
           "model": "openai/gpt-5.5",
-          "variant": "medium"
+          "variant": "medium",
         },
         "digitalocean/glm-5",
-        "opencode/big-pickle"
-      ]
+        "opencode/big-pickle",
+      ],
     },
     "metis": {
       "model": "openai/gpt-5.5",
       "variant": "high",
-      "fallback_models": ["litellm/glm-5.2-fp8", "digitalocean/kimi-k2.5"]
+      "fallback_models": ["litellm/glm-5.2-fp8", "digitalocean/kimi-k2.5"],
     },
     "prometheus": {
       "model": "openai/gpt-5.5",
       "variant": "high",
       "fallback_models": [
         "litellm/glm-5.2-fp8",
-        "github-copilot/gemini-3.1-pro-preview"
+        "github-copilot/gemini-3.1-pro-preview",
       ],
-      "prompt_append": "Keep plans concise. Focus on file structure and key decisions."
+      "prompt_append": "Keep plans concise. Focus on file structure and key decisions.",
     },
     "atlas": {
       "model": "digitalocean/kimi-k2.6",
       "fallback_models": [
         {
           "model": "openai/gpt-5.5",
-          "variant": "medium"
+          "variant": "medium",
         },
-        "nvidia/minimaxai/minimax-m2.7"
-      ]
+        "nvidia/minimaxai/minimax-m2.7",
+      ],
     },
     "hephaestus": {
       "model": "openai/gpt-5.4",
       "variant": "medium",
       "ultrawork": {
         "model": "openai/gpt-5.5",
-        "variant": "medium"
+        "variant": "medium",
       },
       "fallback_models": [],
-      "prompt_append": "You are the primary implementation agent. Own the codebase. Explore, decide, execute. Use LSP and AST-grep aggressively."
+      "prompt_append": "You are the primary implementation agent. Own the codebase. Explore, decide, execute. Use LSP and AST-grep aggressively.",
     },
     "oracle": {
       "model": "openai/gpt-5.5",
@@ -57,11 +57,11 @@
       "fallback_models": [
         {
           "model": "github-copilot/gemini-3.1-pro-preview",
-          "variant": "high"
+          "variant": "high",
         },
         "litellm/glm-5.2-fp8",
-        "zai-coding-plan/glm-5.1"
-      ]
+        "zai-coding-plan/glm-5.1",
+      ],
     },
     "momus": {
       "model": "openai/gpt-5.5",
@@ -69,44 +69,44 @@
       "fallback_models": [
         {
           "model": "github-copilot/gemini-3.1-pro-preview",
-          "variant": "high"
+          "variant": "high",
         },
         "litellm/glm-5.2-fp8",
-        "zai-coding-plan/glm-5.1"
-      ]
+        "zai-coding-plan/glm-5.1",
+      ],
     },
     "explore": {
       "model": "nvidia/minimaxai/minimax-m2.7",
       "fallback_models": [
         "digitalocean/deepseek-3.2",
         "openai/gpt-5.4-mini",
-        "openai/gpt-5.4-nano"
-      ]
+        "openai/gpt-5.4-nano",
+      ],
     },
     "librarian": {
       "model": "nvidia/minimaxai/minimax-m2.7",
       "fallback_models": [
         "digitalocean/deepseek-3.2",
         "openai/gpt-5.4-mini",
-        "openai/gpt-5.4-nano"
-      ]
+        "openai/gpt-5.4-nano",
+      ],
     },
     "multimodal-looker": {
       "model": "openai/gpt-5.5",
       "variant": "medium",
-      "fallback_models": ["digitalocean/kimi-k2.6", "zai-coding-plan/glm-5v-turbo"]
+      "fallback_models": ["digitalocean/kimi-k2.6", "zai-coding-plan/glm-5v-turbo"],
     },
     "sisyphus-junior": {
       "model": "digitalocean/kimi-k2.6",
       "fallback_models": [
         {
           "model": "openai/gpt-5.5",
-          "variant": "medium"
+          "variant": "medium",
         },
         "nvidia/minimaxai/minimax-m2.7",
-        "opencode/big-pickle"
-      ]
-    }
+        "opencode/big-pickle",
+      ],
+    },
   },
 
   "categories": {
@@ -118,13 +118,13 @@
         "digitalocean/glm-5",
         "zai-coding-plan/glm-5.2",
         "zai-coding-plan/glm-5.1",
-        "digitalocean/kimi-k2.5"
-      ]
+        "digitalocean/kimi-k2.5",
+      ],
     },
     "artistry": {
       "model": "github-copilot/gemini-3.1-pro-preview",
       "variant": "high",
-      "fallback_models": ["openai/gpt-5.5"]
+      "fallback_models": ["openai/gpt-5.5"],
     },
     "ultrabrain": {
       "model": "openai/gpt-5.5",
@@ -132,12 +132,12 @@
       "fallback_models": [
         {
           "model": "github-copilot/gemini-3.1-pro-preview",
-          "variant": "high"
+          "variant": "high",
         },
         "litellm/glm-5.2-fp8",
         "zai-coding-plan/glm-5.2",
-        "zai-coding-plan/glm-5.1"
-      ]
+        "zai-coding-plan/glm-5.1",
+      ],
     },
     "deep": {
       "model": "openai/gpt-5.5",
@@ -145,17 +145,17 @@
       "fallback_models": [
         {
           "model": "github-copilot/gemini-3.1-pro-preview",
-          "variant": "high"
-        }
-      ]
+          "variant": "high",
+        },
+      ],
     },
     "quick": {
       "model": "openai/gpt-5.4-mini",
       "fallback_models": [
         "github-copilot/gemini-3-flash-preview",
         "nvidia/minimaxai/minimax-m2.7",
-        "opencode/big-pickle"
-      ]
+        "opencode/big-pickle",
+      ],
     },
     "unspecified-high": {
       "model": "openai/gpt-5.5",
@@ -163,40 +163,40 @@
       "fallback_models": [
         "litellm/glm-5.2-fp8",
         "digitalocean/glm-5",
-        "digitalocean/kimi-k2.5"
-      ]
+        "digitalocean/kimi-k2.5",
+      ],
     },
     "unspecified-low": {
       "model": "digitalocean/kimi-k2.6",
       "fallback_models": [
         {
           "model": "openai/gpt-5.3-codex",
-          "variant": "medium"
+          "variant": "medium",
         },
         "github-copilot/gemini-3-flash-preview",
-        "nvidia/minimaxai/minimax-m2.7"
-      ]
+        "nvidia/minimaxai/minimax-m2.7",
+      ],
     },
     "writing": {
       "model": "digitalocean/kimi-k2.5",
       "fallback_models": [
         "github-copilot/gemini-3-flash-preview",
         "digitalocean/kimi-k2.6",
-        "nvidia/minimaxai/minimax-m2.7"
-      ]
+        "nvidia/minimaxai/minimax-m2.7",
+      ],
     },
     "git": {
       "model": "github-copilot/gpt-5-mini",
       "fallback_models": ["opencode/big-pickle", "zai-coding-plan/glm-4.5-air"],
       "description": "All git operations",
-      "prompt_append": "Focus on atomic commits, clear messages, and safe operations."
-    }
+      "prompt_append": "Focus on atomic commits, clear messages, and safe operations.",
+    },
   },
   "claude_code": {
     "plugins_override": {
       "ecc@ecc": false,
-      "codex@openai-codex": false
-    }
+      "codex@openai-codex": false,
+    },
   },
   "background_task": {
     "defaultConcurrency": 5,
@@ -209,7 +209,7 @@
       "opencode": 10,
       "digitalocean": 3,
       "github-copilot": 5,
-      "zai-coding-plan": 10
+      "zai-coding-plan": 10,
     },
     "modelConcurrency": {
       "openai/gpt-5.5": 1,
@@ -217,13 +217,14 @@
       "openai/gpt-5.3-codex": 3,
       "openai/gpt-5.4-mini": 5,
       "openai/gpt-5.4-nano": 8,
+      "litellm/glm-5.2-fp8": 12,
       "zai-coding-plan/glm-4.5-air": 5,
       "zai-coding-plan/glm-4.7": 2,
       "zai-coding-plan/glm-5-turbo": 1,
       "zai-coding-plan/glm-5v-turbo": 1,
       "zai-coding-plan/glm-5.1": 10,
-      "zai-coding-plan/glm-5.2": 5
-    }
+      "zai-coding-plan/glm-5.2": 5,
+    },
   },
   "runtime_fallback": {
     "enabled": true,
@@ -231,7 +232,7 @@
     "max_fallback_attempts": 3,
     "cooldown_seconds": 60,
     "timeout_seconds": 30,
-    "notify_on_fallback": true
+    "notify_on_fallback": true,
   },
   "team_mode": {
     "enabled": true,
@@ -243,7 +244,7 @@
     "message_payload_max_bytes": 32768,
     "recipient_unread_max_bytes": 262144,
     "tmux_visualization": true,
-    "mailbox_poll_interval_ms": 3000
+    "mailbox_poll_interval_ms": 3000,
   },
 
   "tmux": {
@@ -252,11 +253,11 @@
     "main_pane_min_width": 120,
     "agent_pane_min_width": 40,
     "isolation": "session",
-    "main_pane_size": 60
+    "main_pane_size": 60,
   },
   "git_master": {
     "commit_footer": false,
     "git_env_prefix": "GIT_MASTER=1",
-    "include_co_authored_by": false
-  }
+    "include_co_authored_by": false,
+  },
 }

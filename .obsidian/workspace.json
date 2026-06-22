@@ -191,17 +191,19 @@
   },
   "active": "09e49016fbfeecf0",
   "lastOpenFiles": [
+    "scripts/install-omp.sh",
+    "scripts/sync-omp.sh",
+    "presets/omp/README.md",
+    "presets/omp/RULES.md",
+    "presets/omp/models.yml",
+    "presets/omp/config.yml",
+    "presets/omp",
     "presets/opencode/oh-my-openagent.jsonc",
     "presets/opencode/oh-my-openagent copy.json",
     "presets/opencode/oh-my-openagent.json",
     "evals/prompt-tests/__pycache__/snapshot_config.cpython-313.pyc",
     "evals/prompt-tests/__pycache__/provider.cpython-313.pyc",
     "evals/prompt-tests/__pycache__/snapshot_config.cpython-314.pyc",
-    "evals/prompt-tests/__pycache__/provider.cpython-314.pyc",
-    "evals/prompt-tests/__pycache__",
-    "evals/prompt-tests/__pycache__/x.pyc",
-    "evals/results/prompt-tests.html",
-    "evals/results/prompt-tests.json",
     "evals/prompt-tests/README.md",
     "docs/adr/0007-type-checked-sql-in-typescript.md",
     "node_modules/@openai/agents-core/node_modules/debug/README.md",
@@ -224,8 +226,6 @@
     "node_modules/@openai/agents/README.md",
     "node_modules/mongodb-connection-string-url/node_modules/whatwg-url/node_modules/webidl-conversions/LICENSE.md",
     "node_modules/mongodb-connection-string-url/node_modules/whatwg-url/node_modules/webidl-conversions/README.md",
-    "node_modules/mongodb-connection-string-url/node_modules/whatwg-url/node_modules/tr46/README.md",
-    "node_modules/mongodb-connection-string-url/node_modules/whatwg-url/node_modules/tr46/LICENSE.md",
-    "node_modules/duplexer2/node_modules/readable-stream/node_modules/string_decoder/README.md"
+    "node_modules/mongodb-connection-string-url/node_modules/whatwg-url/node_modules/tr46/README.md"
   ]
 }

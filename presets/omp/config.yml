@@ -1,0 +1,43 @@
+# Darkmatter omp (oh-my-pi) global settings.
+#
+# Installed to ~/.omp/agent/config.yml by scripts/install-omp.sh (copied, not
+# symlinked, because omp mutates this file via `omp config set`). Tuned for
+# autonomous, headless execution inside the github-executor container.
+#
+# Inspect the full schema and current values with `omp config list`.
+
+# --- Model roles -----------------------------------------------------------
+# Models route through OpenRouter (OPENROUTER_API_KEY in the env); these
+# canonical ids were confirmed available in the omp catalog. Edit to taste —
+# each is a one-line change. Org preference is the latest Claude models.
+modelRoles:
+  default: "~anthropic/claude-sonnet-latest" # general turns / code changes
+  smol: "~anthropic/claude-haiku-latest" # cheap subagent fan-out
+  slow: "~anthropic/claude-opus-latest" # deep reasoning
+  plan: "~anthropic/claude-sonnet-latest" # plan mode
+
+defaultThinkingLevel: medium
+
+# --- Tool approval ---------------------------------------------------------
+# The executor runs unattended: there is no human to answer approval prompts,
+# so read/write/exec must auto-approve (yolo). Blast radius is contained by the
+# executor itself — ephemeral per-job worktree, short-lived repo-scoped token,
+# container resource + network-egress limits.
+#
+# SOFT destructive-command policy lives in RULES.md (always-apply). HARD,
+# programmatic blocking of dangerous bash (rm -rf /, disk writes, fork bombs,
+# curl|sh) is a safety hook delivered in Phase 6 hardening (platform-uyt.7).
+tools:
+  approvalMode: yolo
+  approval:
+    # Capabilities the unattended PR agent never needs:
+    tts: deny
+    generate_image: deny
+
+# --- Behavior --------------------------------------------------------------
+compaction:
+  enabled: true # auto-compact long sessions
+
+# Suppress interactive startup chrome in non-interactive/headless runs.
+startup:
+  quiet: true
