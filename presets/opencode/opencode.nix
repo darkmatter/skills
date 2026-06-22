@@ -50,6 +50,28 @@
             output = 131072;
           };
         };
+        "glm-5.2-q5-gguf" = {
+          name = "GLM 5.2 Q5 (darkmatter)";
+          reasoning = true;
+          temperature = true;
+          tool_call = true;
+          variants = {
+            thinking = {
+              thinking = {
+                reasoningEffort = "max";
+              };
+            };
+            nothink = {
+              thinking = {
+                type = "disabled";
+              };
+            };
+          };
+          limit = {
+            context = 52428;
+            output = 65072;
+          };
+        };
         "kimi-k2.7-code" = {
           name = "Kimi K2.7 Code (darkmatter)";
           reasoning = true;
