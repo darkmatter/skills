@@ -25,6 +25,6 @@ Requires `OPENROUTER_API_KEY` in the environment.
 | `../../skills` | `skills/` | Shared skill catalog |
 
 Primarily consumed by the **github-executor** container (darkmatter/platform,
-epic `platform-uyt`), which runs omp headlessly to service `/oc` commands.
+epic `platform-uyt`), which runs omp headlessly to service `/bot` commands.
 Model roles default to the latest Claude models via OpenRouter; edit
 `config.yml` to change them.
