@@ -2,22 +2,22 @@
 #
 # Installed to ~/.omp/agent/models.yml by scripts/install-omp.sh.
 #
-# The github-executor authenticates via OPENROUTER_API_KEY (OpenRouter is a
-# built-in provider in omp), so NO custom provider is required for the default
-# setup — the canonical "~anthropic/claude-*-latest" ids in config.yml resolve
-# through it automatically.
+# Primary provider is the darkmatter LiteLLM gateway — our own dedicated
+# inference instance. `discovery: litellm` probes the proxy's management
+# endpoints (/model_group/info, /v2/model/info, then /models) so the gateway's
+# model list, context windows, and reasoning flags load automatically.
+# Requires LITELLM_API_KEY in the environment.
 #
-# Add custom providers below as needed. Schema + examples:
+# OpenRouter (built-in provider, OPENROUTER_API_KEY) stays available for the
+# frontier-model `slow` role in config.yml.
+#
+# Schema + examples:
 # https://github.com/can1357/oh-my-pi/blob/main/docs/models.md
-#
-# Example — the darkmatter LiteLLM gateway (uncomment + set the key env var):
-#
-# providers:
-#   litellm:
-#     baseUrl: https://litellm.drkmttr.dev/v1
-#     apiKey: LITELLM_API_KEY        # name of the env var holding the key
-#     api: openai-completions
-#     discovery:
-#       type: openai-models-list     # auto-list the gateway's models
 
-providers: {}
+providers:
+  litellm:
+    baseUrl: https://litellm.drkmttr.dev/v1
+    apiKey: LITELLM_API_KEY # name of the env var holding the key
+    api: openai-completions
+    discovery:
+      type: litellm

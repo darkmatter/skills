@@ -12,7 +12,9 @@ Darkmatter agents, installed into an omp agent directory (`~/.omp/agent`, or
 ./scripts/install-omp.sh --target /custom/agent/dir
 ```
 
-Requires `OPENROUTER_API_KEY` in the environment.
+Requires `LITELLM_API_KEY` (darkmatter LiteLLM gateway — the default provider)
+and `OPENROUTER_API_KEY` (frontier models for the `slow` role) in the
+environment.
 
 ## Contents
 
@@ -21,10 +23,11 @@ Requires `OPENROUTER_API_KEY` in the environment.
 | `../base/AGENTS.md` | `AGENTS.md` | Shared global agent instructions (user-level context) |
 | `RULES.md` | `RULES.md` | Always-apply safety rules (destructive-command policy) |
 | `config.yml` | `config.yml` | Settings: model roles, approval mode, behavior — copied, since omp mutates it |
-| `models.yml` | `models.yml` | Model/provider config (OpenRouter by default) — copied |
+| `models.yml` | `models.yml` | Model/provider config (darkmatter LiteLLM gateway + OpenRouter) — copied |
 | `../../skills` | `skills/` | Shared skill catalog |
 
 Primarily consumed by the **github-executor** container (darkmatter/platform,
 epic `platform-uyt`), which runs omp headlessly to service `/bot` commands.
-Model roles default to the latest Claude models via OpenRouter; edit
-`config.yml` to change them.
+Model roles default to `glm-5.2-fp8` on the darkmatter LiteLLM gateway (our
+dedicated instance); only the `slow` deep-reasoning role uses a frontier model
+(Claude via OpenRouter). Edit `config.yml` to change them.

@@ -7,14 +7,15 @@
 # Inspect the full schema and current values with `omp config list`.
 
 # --- Model roles -----------------------------------------------------------
-# Models route through OpenRouter (OPENROUTER_API_KEY in the env); these
-# canonical ids were confirmed available in the omp catalog. Edit to taste —
-# each is a one-line change. Org preference is the latest Claude models.
+# Default routing is glm-5.2-fp8 on the darkmatter LiteLLM gateway (our own
+# dedicated instance — see models.yml; needs LITELLM_API_KEY). Frontier models
+# (Claude/GPT via OpenRouter, OPENROUTER_API_KEY) are reserved for the `slow`
+# deep-reasoning role only.
 modelRoles:
-  default: "~anthropic/claude-sonnet-latest" # general turns / code changes
-  smol: "~anthropic/claude-haiku-latest" # cheap subagent fan-out
-  slow: "~anthropic/claude-opus-latest" # deep reasoning
-  plan: "~anthropic/claude-sonnet-latest" # plan mode
+  default: "litellm/glm-5.2-fp8" # general turns / code changes
+  smol: "litellm/glm-5.2-fp8" # cheap subagent fan-out
+  slow: "~anthropic/claude-opus-latest" # deep reasoning (frontier)
+  plan: "litellm/glm-5.2-fp8" # plan mode
 
 defaultThinkingLevel: medium
 
