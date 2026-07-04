@@ -5,7 +5,15 @@
 # autonomous, headless execution inside the github-executor container.
 #
 # Inspect the full schema and current values with `omp config list`.
-
+providers: 
+  webSearch: auto
+  litellm: 
+    baseUrl: https://litellm.drkmttr.dev/v1
+    apiKey: LITELLM_API_KEY
+    auth: apiKey
+    api: openai-completions
+    discovery: 
+      type: openai-models-list
 # --- Model roles -----------------------------------------------------------
 # Default routing is glm-5.2-fp8 on the darkmatter LiteLLM gateway (our own
 # dedicated instance — see models.yml; needs LITELLM_API_KEY). Frontier models
