@@ -14,8 +14,14 @@
 modelRoles:
   default: "litellm/glm-5.2-fp8" # general turns / code changes
   smol: "litellm/glm-5.2-fp8" # cheap subagent fan-out
-  slow: "~anthropic/claude-opus-latest" # deep reasoning (frontier)
-  plan: "litellm/glm-5.2-fp8" # plan mode
+  slow: "anthropic/claude-fable-5" # deep reasoning (frontier)
+  # vision:
+  plan: "anthropic/claude-fable-5" # plan mode
+  # designer:
+  commit: "litellm/glm-5.2-fp8"
+  # tiny:
+  task: "litellm/glm-5.2-fp8"
+  advisor: "anthropic/claude-fable-5"
 
 defaultThinkingLevel: medium
 
