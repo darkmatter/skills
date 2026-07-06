@@ -28,6 +28,10 @@ environment.
 
 Primarily consumed by the **github-executor** container (darkmatter/platform,
 epic `platform-uyt`), which runs omp headlessly to service `/bot` commands.
-Model roles default to `glm-5.2-fp8` on the darkmatter LiteLLM gateway (our
-dedicated instance); only the `slow` deep-reasoning role uses a frontier model
-(Claude via OpenRouter). Edit `config.yml` to change them.
+Model roles default to the gateway's `glm-local` alias (hosted_vllm
+`glm-5.2-fp8` on our dedicated LiteLLM instance); only the `slow` deep-reasoning
+role uses a frontier model (Claude via OpenRouter). Edit `config.yml` to change
+them. Do not point roles at `glm-5.2-fp8` directly: omp's discovery fuzzy-merges
+gateway ids against the live models.dev catalog, and that id collides with the
+fireworks-ai `glm-5p2-fp8` entry, which swaps in an upstream wire id the gateway
+rejects (see config.yml comment, diagnosed 2026-07-06).

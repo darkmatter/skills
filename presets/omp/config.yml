@@ -15,20 +15,25 @@ providers:
     discovery: 
       type: openai-models-list
 # --- Model roles -----------------------------------------------------------
-# Default routing is glm-5.2-fp8 on the darkmatter LiteLLM gateway (our own
-# dedicated instance — see models.yml; needs LITELLM_API_KEY). Frontier models
-# (Claude/GPT via OpenRouter, OPENROUTER_API_KEY) are reserved for the `slow`
-# deep-reasoning role only.
+# Default routing is the darkmatter LiteLLM gateway's `glm-local` alias
+# (hosted_vllm/glm-5.2-fp8 — our own dedicated instance; needs LITELLM_API_KEY).
+# Deliberately NOT `glm-5.2-fp8`: omp's discovery fuzzy-merges gateway model ids
+# against the live models.dev catalog, and `glm-5.2-fp8` collides with the
+# fireworks-ai entry `glm-5p2-fp8` — the SDK then puts the catalog's canonical
+# wire id (accounts/fireworks/models/glm-5p2-fp8) in the request body, which
+# LiteLLM 400s ("Invalid model name"). `glm-local` matches nothing in the
+# catalog, so the alias goes on the wire unchanged. Diagnosed 2026-07-06 (all
+# executor sessions returning "(agent produced no text)"). Frontier models
+# (Claude/GPT via OpenRouter, OPENROUTER_API_KEY) stay on the `slow` role only.
 modelRoles:
-  default: "litellm/glm-5.2-fp8" # general turns / code changes
-  smol: "litellm/glm-5.2-fp8" # cheap subagent fan-out
+  default: "litellm/glm-local" # general turns / code changes
+  smol: "litellm/glm-local" # cheap subagent fan-out
   slow: "anthropic/claude-fable-5" # deep reasoning (frontier)
   # vision:
   plan: "anthropic/claude-fable-5" # plan mode
   # designer:
-  commit: "litellm/glm-5.2-fp8"
-  # tiny:
-  task: "litellm/glm-5.2-fp8"
+  commit: "litellm/glm-local"
+  task: "litellm/glm-local"
   advisor: "anthropic/claude-fable-5"
 
 defaultThinkingLevel: medium
