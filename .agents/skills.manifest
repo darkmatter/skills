@@ -1,0 +1,21 @@
+# Skills shipped to Centaur sandboxes via the overlay contract.
+#
+# This is the curation surface: one skill name per line, matching a
+# directory under skills/. scripts/sync-sandbox-skills.sh copies each
+# listed skill into .agents/skills/ (the chart's default skillsSubdir);
+# CI fails if the generated tree drifts from this list.
+#
+# Keep this to self-contained reasoning/process skills. Skills that
+# assume a workstation (macOS setup, local key material) or post to
+# external services (Slack, Linear) stay out unless sandboxes gain
+# those capabilities.
+
+brainstorming
+caveman-commit
+definition-of-done
+diagnose
+handoff
+receiving-code-review
+repository-organization
+requesting-code-review
+test-driven-development

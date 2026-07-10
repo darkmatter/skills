@@ -19,6 +19,9 @@ It is **provider-agnostic**. Skills and `.agent/` content target any agent tool 
 
 ```
 darkmatter/skills/
+├── .agents/
+│   ├── skills.manifest      ← which skills ship to Centaur sandboxes
+│   └── skills/              ← GENERATED sandbox subset — never edit by hand
 ├── .claude-plugin/          ← Claude Code marketplace + plugin manifests
 ├── README.md                ← this file
 ├── flake.nix                ← Nix entry; exports the Home Manager module
@@ -29,6 +32,7 @@ darkmatter/skills/
 ├── template/                ← the per-project bootstrap (stamped by new-project.sh)
 ├── scripts/
 │   ├── new-project.sh       ← stamp template/ into a target dir
+│   ├── sync-sandbox-skills.sh ← regenerate .agents/skills/ from the manifest
 │   └── validate-skill.sh    ← sanity-check skills/ catalog
 ├── evals/
 │   ├── skills/              ← Promptfoo behavior evals (LLM decision checks, CI)
@@ -154,6 +158,30 @@ The module enables every `darkmatter/*` skill and syncs them to Claude, Codex, a
 6. Open a PR — CI runs `scripts/validate-skill.sh` across all skills via `.github/workflows/validate-skills.yml`.
 
 See [`skills/README.md`](skills/README.md) for the skill format spec.
+
+If the skill should also reach Centaur sandboxes, add its name to
+`.agents/skills.manifest` and run `scripts/sync-sandbox-skills.sh` (see below).
+
+## Centaur sandbox subset (`.agents/`)
+
+This repo is wired into [Centaur](https://github.com/darkmatter/centaur)
+sandboxes as an overlay source (gitops `apps/centaur.yaml`,
+`overlays.sources`). The overlay contract points at one directory per source
+with no per-skill filtering, and the full catalog includes workstation-only
+skills (macOS setup, local secrets, Slack side effects) that don't belong in a
+sandbox — so sandboxes get a curated subset instead:
+
+- `.agents/skills.manifest` — the curation surface: one skill name per line.
+- `.agents/skills/` — **generated** copies of the listed skills, at the
+  contract's default `skillsSubdir`. Never edit these by hand; edit
+  `skills/<name>/` or the manifest and run `scripts/sync-sandbox-skills.sh`.
+- CI runs `scripts/sync-sandbox-skills.sh --check` and fails on drift, so the
+  copies can't diverge from the catalog.
+
+Copies are real files, not symlinks: the sandbox skill merger preserves
+symlinks when copying into `~/workspace`, so symlinks would arrive dangling.
+Pushes to `main` reach sandboxes on the next repo-cache sync (~30s), no
+deploy needed.
 
 ## Personal vs. team vs. project skills
 

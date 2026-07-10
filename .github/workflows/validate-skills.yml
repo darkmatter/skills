@@ -13,3 +13,5 @@ jobs:
       - uses: actions/checkout@v4
       - name: Validate skill catalog
         run: scripts/validate-skill.sh
+      - name: Check sandbox skill subset is in sync
+        run: scripts/sync-sandbox-skills.sh --check
