@@ -39,6 +39,7 @@ The root `README.md` "Where to put what" table is the canonical placement table 
 | Project-local reusable capability               | `.agent/skills/`                     | Only useful in that project.                                           |
 | Team-wide reusable capability                   | `skills/<name>/`                     | Useful across multiple darkmatter projects; add `docs/catalog.md` row. |
 | Long skill examples or lookup material          | `skills/<name>/reference/`           | Loaded only after the skill points there.                              |
+| Per-language convention exemplar code           | `references/<language>/`             | Reference codebase read from the repo checkout; prose stays in skills. |
 | Skill-owned deterministic helper                | `skills/<name>/scripts/`             | Travels with the skill through the Home Manager module.                |
 | Repo maintenance automation                     | Top-level `scripts/`                 | Run from this repo; not auto-discovered by clients.                    |
 | Human-readable shared-skill inventory           | `docs/catalog.md`                    | Teammates skim it before adding or choosing skills.                    |

@@ -5,12 +5,13 @@ preferred client, but this repo stays source-oriented: shared assets live here
 and are synced into OpenCode, Claude-compatible, Codex, and generic agent
 locations as needed.
 
-This repo ships four things:
+This repo ships five things:
 
 1. **OpenCode-first presets** (`presets/`) — installable source packs for LLM clients.
 2. **A catalog of shared skills** (`skills/`) — installed across all darkmatter projects via Nix Home Manager, or as a Claude Code plugin (see [Claude Code plugin marketplace](#claude-code-plugin-marketplace)).
-3. **A project template** (`template/`) — `.agent/`, config, and shims to stamp into a new project repo.
-4. **Tooling** (`scripts/`) — generators, installers, sync scripts, and validation helpers.
+3. **Reference codebases** (`references/`) — per-language exemplar code agents consult for preferred conventions.
+4. **A project template** (`template/`) — `.agent/`, config, and shims to stamp into a new project repo.
+5. **Tooling** (`scripts/`) — generators, installers, sync scripts, and validation helpers.
 
 It is **provider-agnostic**. Skills and `.agent/` content target any agent tool (Claude Code, Codex, OpenCode, Cursor, Aider, etc.) by following the cross-vendor `AGENTS.md` convention plus the per-vendor shims (`CLAUDE.md`, `.cursorrules`).
 
@@ -24,6 +25,7 @@ darkmatter/skills/
 ├── home-manager.nix         ← HM module that wires skills/ into agent CLIs
 ├── presets/                 ← installable source packs, especially OpenCode
 ├── skills/                  ← team-wide shareable skills (the catalog)
+├── references/              ← per-language reference codebases (rust, go, typescript)
 ├── template/                ← the per-project bootstrap (stamped by new-project.sh)
 ├── scripts/
 │   ├── new-project.sh       ← stamp template/ into a target dir
@@ -73,6 +75,7 @@ Use this table before adding a new instruction, skill, command, hook, or tool. T
 | Project-specific rules and decisions                         | Target project `AGENTS.md`, `.agent/context/*`, `.agent/policy/*` from `template/` | Always inside that project            | Stack choices, local conventions, approved exceptions, project state.                               |
 | Reusable task guidance the model should choose when relevant | `skills/<name>/SKILL.md`                                                           | On demand via skill discovery         | Debugging, TDD, Effect, Neon, Nix, codebase cleanup. Add a row in `docs/catalog.md`.                |
 | Long skill detail, examples, fixtures, or lookup data        | `skills/<name>/reference/`                                                         | Only after the skill points there     | Use for large docs so `SKILL.md` stays concise.                                                     |
+| Per-language convention exemplar code                        | `references/<language>/`                                                           | On demand, from the repo checkout     | Reference codebases (rust, go, typescript). Code lives here; prose stays in skills. See ADR-0008.   |
 | Deterministic helper used by a skill                         | `skills/<name>/scripts/`                                                           | Only when the skill/script is invoked | Bash or Python stdlib preferred; document deps in the skill and catalog.                            |
 | Manual slash-invoked workflow for OpenCode                   | `presets/opencode/commands/`                                                       | User invokes `/command`               | Use for explicit workflows, prompts with arguments, or timing-sensitive actions.                    |
 | OpenCode specialist agent definition                         | `presets/opencode/agents/`                                                         | Invoked by agent routing or user      | Use for role-specific behavior and permissions, not reusable task instructions.                     |
