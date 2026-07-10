@@ -1,6 +1,6 @@
 # Reference example — skill policy validation
 
-This extends the current `scripts/validate-skill.sh` idea with policy checks for ADR-0001 and catalog coverage.
+This extends the current `scripts/validate-skill.sh` idea with policy checks for manual skill naming and catalog coverage.
 
 ```sh
 #!/usr/bin/env bash
@@ -47,7 +47,7 @@ check_skill() {
     error "$rel directory name does not match frontmatter name: $name"
   fi
 
-  # ADR-0001: manual skills use imperative prefix and description opening line.
+  # Manual skills use an imperative prefix and description opening line.
   if printf '%s\n' "$base" | grep -Eq "$manual_prefix_re"; then
     if ! printf '%s\n' "$desc" | grep -q '^Manual-invocation skill'; then
       error "$rel manual-prefixed skill must start description with 'Manual-invocation skill'"

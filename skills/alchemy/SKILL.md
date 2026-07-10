@@ -190,7 +190,7 @@ Treat stage and profile as part of the deployment contract:
 - Stage isolates state and physical names. The default is developer-specific; use explicit `--stage prod`, `--stage staging`, or `--stage pr-123` for shared environments.
 - Profile selects credentials. First deploy may prompt interactively and save credentials under `~/.alchemy/profiles.json`; non-interactive CI must have profiles or provider credentials prepared before deploy.
 - Production scripts should pass both `--stage prod` and the intended `--profile`.
-- Preview deploys should derive a deterministic stage from the PR, branch, or Beads/issue id and should destroy that stage when it is no longer needed.
+- Preview deploys should derive a deterministic stage from the PR, branch, or issue id and should destroy that stage when it is no longer needed.
 
 Useful commands:
 

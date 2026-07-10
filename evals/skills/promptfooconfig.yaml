@@ -168,24 +168,6 @@ tests:
       - type: icontains
         value: "skill"
 
-  - description: beads-setup blocks starting tracked work in a repo with no .beads/ without recommending or installing beads
-    vars:
-      skill: beads-setup
-      rule: Per ADR-0001, beads (`bd`) is the standard task tracker and persistent agent memory store. When a darkmatter repo has no `.beads/` directory, do not silently fall back to TodoWrite, TODO.md, or MEMORY.md. Recommend installing beads and ask the user, or run `bd init` and the appropriate `bd setup <recipe>` for the user's agent client.
-      scenario: The user asks the agent to carry out a multi-step task in a darkmatter repo that has no `.beads/` directory and no `bd` configuration. The agent must respond with a recommendation and either ask whether to install beads or install it automatically before tracking any work.
-    assert:
-      - type: contains
-        value: "DECISION: BLOCK"
-      - type: icontains
-        value: "beads"
-      - type: icontains-any
-        value:
-          - "install"
-          - "bd init"
-          - "set up beads"
-          - "ask the user"
-          - "recommend"
-          - "beads-setup"
 
   # ---------------------------------------------------------------------------
   # High-value Darkmatter skill behavior evals
@@ -432,24 +414,6 @@ tests:
           - "do not use effect"
           - "no effect"
 
-  - description: beads-linear-sync blocks a real bidirectional sync without dry-runs first
-    vars:
-      skill: beads-linear-sync
-      rule: >-
-        Run dry-runs before any real sync. Use separate pull and push dry-runs so the
-        direction and blast radius are visible, and interpret them before proceeding.
-        Running bidirectional sync first is a mistake.
-      scenario: >-
-        The agent is asked to connect Beads to Linear and immediately runs a real
-        bidirectional bd linear sync (no --dry-run) against the LAB team to get it done.
-    assert:
-      - type: contains
-        value: "DECISION: BLOCK"
-      - type: icontains-any
-        value:
-          - "dry-run"
-          - "dry run"
-          - "--dry-run"
 
   - description: ui-component-architecture blocks reimplementing a primitive that exists in @repo/ui
     vars:
@@ -535,26 +499,6 @@ tests:
           - "managedruntime"
           - "application edge"
 
-  - description: beads-linear-sync blocks storing linear.api_key in Beads config
-    vars:
-      skill: beads-linear-sync
-      rule: >-
-        Do not store personal Linear tokens in Beads config (linear.api_key). Inject them
-        per command — for example LINEAR_API_KEY="$(himitsu read personal/linear-api-key)"
-        bd linear status — so secrets stay in the secret store.
-      scenario: >-
-        To make sync convenient, the agent runs bd config set linear.api_key <token> to
-        persist the Linear API key in Beads config.
-    assert:
-      - type: contains
-        value: "DECISION: BLOCK"
-      - type: icontains-any
-        value:
-          - "himitsu"
-          - "inject"
-          - "linear_api_key"
-          - "secret store"
-          - "per command"
 
   - description: ui-component-architecture allows leaving a one-off wrapper local (no over-extraction)
     vars:

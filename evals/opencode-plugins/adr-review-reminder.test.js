@@ -45,12 +45,12 @@ test("discovers ADR files in numeric order", async () => {
   const root = await mkdtemp(path.join(tmpdir(), "adr-review-reminder-"));
   await mkdir(path.join(root, "docs", "adr"), { recursive: true });
   await writeFile(path.join(root, "docs", "adr", "0004-no-reinvention.md"), "");
-  await writeFile(path.join(root, "docs", "adr", "0001-beads.md"), "");
+  await writeFile(path.join(root, "docs", "adr", "0002-command-surface.md"), "");
   await writeFile(path.join(root, "docs", "adr", "README.md"), "");
 
   const files = await listAdrFiles(root);
 
-  assert.deepEqual(files, ["docs/adr/0001-beads.md", "docs/adr/0004-no-reinvention.md"]);
+  assert.deepEqual(files, ["docs/adr/0002-command-surface.md", "docs/adr/0004-no-reinvention.md"]);
 });
 
 test("builds a direct ADR review prompt with changed-line evidence", () => {

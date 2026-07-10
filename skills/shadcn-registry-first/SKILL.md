@@ -188,8 +188,7 @@ bunx shadcn@latest add @shadcnblocks/hero253 --overwrite
 If a registry call fails with a missing-env-var or auth error, the fix is to
 populate the key from the secret store — not to abandon the registry and
 hand-roll the component. See the `sops-secret-access` skill for the encrypted-
-config side of this, and `beads-linear-sync` for the himitsu key-injection
-pattern.
+config side of this and the expected secret-handling pattern.
 
 ## Relationship to other skills
 

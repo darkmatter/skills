@@ -7,6 +7,11 @@
   ...
 }:
 let
+  skillsWithSubmodules = import ./lib/skills-source.nix {
+    inherit lib pkgs;
+    skillsDir = ./skills;
+  };
+
   # Each subdirectory is one skill. Non-directory entries (.DS_Store,
   # README.md, etc) are skipped so they don't get wrapped as SKILL.md.
   readSkills =
@@ -17,7 +22,7 @@ let
     in
     lib.mapAttrs' (name: _: lib.nameValuePair name (path + "/${name}")) onlyDirs;
 
-  teamSkills = readSkills ./skills;
+  teamSkills = readSkills skillsWithSubmodules;
   personalSkills =
     if personalAgentSkillsPath != null then readSkills personalAgentSkillsPath else { };
 
@@ -38,7 +43,7 @@ in
   programs.agent-skills = lib.mkMerge [
     {
       sources.darkmatter = {
-        path = ./skills;
+        path = skillsWithSubmodules;
         idPrefix = "darkmatter";
       };
 

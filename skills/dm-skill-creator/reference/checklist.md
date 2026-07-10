@@ -21,7 +21,7 @@ Confirm with the user:
 - Lowercase, hyphenated. Directory name will equal the frontmatter `name:` field.
 - Don't prefix with the domain (`screener`, not `hl-screener`) unless the venue is genuinely load-bearing.
 - Check for collisions: `ls skills/`. The id-prefix in `home-manager.nix` namespaces installed skills as `darkmatter:<name>`, so collisions with upstream skill catalogs are not an issue, but collisions inside this repo are.
-- Pick the right grammar for the triggering mode (ADR-0001):
+- Pick the right grammar for the triggering mode:
   - **Auto-triggered** (default): noun-phrase name describing a domain or capability. Examples: `funding-screener`, `codebase-cleanup`.
   - **Manual-invocation** (the action is expensive, irreversible, has side effects on shared resources, or drives a guided workflow): verb-prefixed name from `{run-, kickoff-, setup-, init-, do-}`. Examples: `kickoff-dm-design`, `run-funding-screen`, `setup-vault`.
 
@@ -39,7 +39,7 @@ For a manual-invocation skill (verb-prefixed name + manual-invocation opening li
 scripts/scaffold-skill.sh --manual <name> "Short description ending with a period."
 ```
 
-The script enforces a verb prefix on `--manual` and warns if a verb-prefixed name is passed without `--manual`. You can also create the directory by hand if you prefer — see `skills/README.md` for the format and `docs/adr/0001-skill-naming-convention.md` for the manual-vs-auto rules.
+The script enforces a verb prefix on `--manual` and warns if a verb-prefixed name is passed without `--manual`. You can also create the directory by hand if you prefer — see `skills/README.md` for the format and the manual-vs-auto rules.
 
 ## 4. Fill in SKILL.md
 

@@ -41,7 +41,6 @@
     "oh-my-openagent@latest",
     "@warp-dot-dev/opencode-warp",
     "opencode-claude-auth@latest",
-    "opencode-beads",
   ],
   "enabled_providers": [
     "xai",

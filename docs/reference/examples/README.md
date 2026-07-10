@@ -30,7 +30,7 @@ These examples expand the proposed structure for enforcing engineering practices
 - `hooks.md` — provider-agnostic hook scripts for session start, policy validation, diff review, and pre-commit.
 - `ci-workflows.md` — GitHub Actions examples for this repo and for stamped downstream projects.
 - `validate-agent-project-script.md` — reference `scripts/validate-agent-project.sh`.
-- `skill-policy-validation.md` — stricter `validate-skill.sh` enforcing ADR-0001 and catalog coverage.
+- `skill-policy-validation.md` — stricter `validate-skill.sh` enforcing skill naming policy and catalog coverage.
 
 ## Suggested promotion path
 

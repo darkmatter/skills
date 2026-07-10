@@ -1,0 +1,291 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "agent": {
+    "build": {
+      "enable1mContext": true
+    }
+  },
+  "autoupdate": "notify",
+  "instructions": [
+    "AGENTS.md",
+    "https://raw.githubusercontent.com/nvk/llm-wiki/master/plugins/llm-wiki-opencode/skills/wiki-manager/SKILL.md"
+  ],
+  "lsp": true,
+  "mcp": {
+    "cloudflare-docs": {
+      "enabled": true,
+      "type": "remote",
+      "url": "https://docs.mcp.cloudflare.com/sse"
+    },
+    "context7": {
+      "command": [
+        "npx",
+        "-y",
+        "@upstash/context7-mcp"
+      ],
+      "enabled": true,
+      "environment": {},
+      "type": "local"
+    },
+    "morph-mcp": {
+      "command": [
+        "npx",
+        "-y",
+        "@morphllm/morphmcp"
+      ],
+      "environment": {
+        "ENABLED_TOOLS": "edit_file,warpgrep_codebase_search"
+      },
+      "type": "local"
+    }
+  },
+  "permission": {
+    "*": "allow",
+    "bash": "allow",
+    "edit": "allow",
+    "skill": {
+      "*": "allow"
+    }
+  },
+  "plugin": [
+    "@warp-dot-dev/opencode-warp",
+    "opencode-claude-auth@latest",
+    "oh-my-openagent@latest",
+    "cursor-acp"
+  ],
+  "provider": {
+    "litellm": {
+      "models": {
+        "glm-5.2-fp8": {
+          "limit": {
+            "context": 1048576,
+            "output": 131072
+          },
+          "name": "GLM 5.2 (darkmatter)",
+          "reasoning": true,
+          "temperature": true,
+          "tool_call": true,
+          "variants": {
+            "nothink": {
+              "thinking": {
+                "type": "disabled"
+              }
+            },
+            "thinking": {
+              "thinking": {
+                "reasoningEffort": "max"
+              }
+            }
+          }
+        },
+        "glm-5.2-q5-gguf": {
+          "limit": {
+            "context": 52428,
+            "output": 65072
+          },
+          "name": "GLM 5.2 Q5 (darkmatter)",
+          "reasoning": true,
+          "temperature": true,
+          "tool_call": true,
+          "variants": {
+            "nothink": {
+              "thinking": {
+                "type": "disabled"
+              }
+            },
+            "thinking": {
+              "thinking": {
+                "reasoningEffort": "max"
+              }
+            }
+          }
+        },
+        "gpt-oss-120b": {
+          "limit": {
+            "context": 121000,
+            "output": 4096
+          },
+          "name": "GPT-OSS-120B (darkmatter)",
+          "reasoning": true,
+          "temperature": true,
+          "tool_call": true,
+          "variants": {
+            "high": {
+              "reasoningEffort": "high",
+              "reasoningSummary": "auto",
+              "textVerbosity": "low"
+            },
+            "low": {
+              "reasoningEffort": "low",
+              "reasoningSummary": "auto",
+              "textVerbosity": "low"
+            },
+            "medium": {
+              "reasoningEffort": "medium",
+              "reasoningSummary": "auto",
+              "textVerbosity": "low"
+            }
+          }
+        },
+        "kimi-k2.7-code": {
+          "limit": {
+            "context": 262144,
+            "output": 32768
+          },
+          "name": "Kimi K2.7 Code (darkmatter)",
+          "reasoning": true,
+          "temperature": false,
+          "tool_call": true
+        }
+      },
+      "name": "LiteLLM",
+      "npm": "@ai-sdk/openai-compatible",
+      "options": {
+        "apiKey": "{file:~/.secrets/litellm-api-key}",
+        "baseURL": "https://litellm.drkmttr.dev/v1"
+      }
+    },
+    "cursor-acp": {
+      "name": "Cursor",
+      "npm": "@ai-sdk/openai-compatible",
+      "options": {
+        "baseURL": "http://127.0.0.1:32124/v1"
+      },
+      "models": {
+        "auto": {
+          "name": "Auto",
+          "cost": {
+            "input": 1.25,
+            "output": 6,
+            "cache_read": 0.25,
+            "cache_write": 1.25
+          }
+        },
+        "composer-1.5": {
+          "name": "Composer 1.5",
+          "cost": {
+            "input": 3.5,
+            "output": 17.5,
+            "cache_read": 0.35,
+            "cache_write": 3.5
+          }
+        },
+        "composer-1": {
+          "name": "Composer 1"
+        },
+        "opus-4.6-thinking": {
+          "name": "Claude 4.6 Opus (Thinking)"
+        },
+        "opus-4.6": {
+          "name": "Claude 4.6 Opus"
+        },
+        "sonnet-4.6": {
+          "name": "Claude 4.6 Sonnet"
+        },
+        "sonnet-4.6-thinking": {
+          "name": "Claude 4.6 Sonnet (Thinking)"
+        },
+        "opus-4.5": {
+          "name": "Claude 4.5 Opus"
+        },
+        "opus-4.5-thinking": {
+          "name": "Claude 4.5 Opus (Thinking)"
+        },
+        "sonnet-4.5": {
+          "name": "Claude 4.5 Sonnet"
+        },
+        "sonnet-4.5-thinking": {
+          "name": "Claude 4.5 Sonnet (Thinking)"
+        },
+        "gpt-5.4-high": {
+          "name": "GPT-5.4 High",
+          "cost": {
+            "input": 2.5,
+            "output": 15,
+            "cache_read": 0.25,
+            "cache_write": 2.5,
+            "context_over_200k": {
+              "input": 5,
+              "output": 22.5,
+              "cache_read": 0.5,
+              "cache_write": 5
+            }
+          }
+        },
+        "gpt-5.4-medium": {
+          "name": "GPT-5.4",
+          "cost": {
+            "input": 2.5,
+            "output": 15,
+            "cache_read": 0.25,
+            "cache_write": 2.5,
+            "context_over_200k": {
+              "input": 5,
+              "output": 22.5,
+              "cache_read": 0.5,
+              "cache_write": 5
+            }
+          }
+        },
+        "gpt-5.3-codex": {
+          "name": "GPT-5.3 Codex",
+          "cost": {
+            "input": 1.75,
+            "output": 14,
+            "cache_read": 0.175,
+            "cache_write": 1.75
+          }
+        },
+        "gpt-5.2": {
+          "name": "GPT-5.2",
+          "cost": {
+            "input": 1.75,
+            "output": 14,
+            "cache_read": 0.175,
+            "cache_write": 1.75
+          }
+        },
+        "gemini-3.1-pro": {
+          "name": "Gemini 3.1 Pro",
+          "cost": {
+            "input": 2,
+            "output": 12,
+            "cache_read": 0.2,
+            "cache_write": 2,
+            "context_over_200k": {
+              "input": 4,
+              "output": 18,
+              "cache_read": 0.4,
+              "cache_write": 4
+            }
+          }
+        },
+        "gemini-3-pro": {
+          "name": "Gemini 3 Pro"
+        },
+        "gemini-3-flash": {
+          "name": "Gemini 3 Flash",
+          "cost": {
+            "input": 0.5,
+            "output": 3,
+            "cache_read": 0.05,
+            "cache_write": 0.5
+          }
+        },
+        "grok": {
+          "name": "Grok"
+        },
+        "kimi-k2.5": {
+          "name": "Kimi K2.5",
+          "cost": {
+            "input": 0.6,
+            "output": 3,
+            "cache_read": 0.1,
+            "cache_write": 0.6
+          }
+        }
+      }
+    }
+  },
+  "share": "manual"
+}

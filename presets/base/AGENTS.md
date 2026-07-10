@@ -20,7 +20,6 @@ read that project's `AGENTS.md` first and treat this file as general background.
 
 Decisions in `darkmatter/skills/docs/adr/` that bind every darkmatter project repo. Read the linked ADR before re-litigating any of these:
 
-- **ADR-0001** — Beads (`bd`) is the standard task tracker and persistent agent memory store. Use `bd create` / `bd ready` / `bd close` / `bd remember`, not `TodoWrite` or `MEMORY.md` files.
 - **ADR-0002** — Every project exposes a uniform command surface at `./scripts/<name>` or via `just <name>`: `install`, `setup`, `server`/`run`, `test`, `build`, `ci`, `console`. A fresh clone bootstraps via `./scripts/install && ./scripts/setup && ./scripts/build && ./scripts/server`. Turbo is the one carve-out.
 - **ADR-0003** — Services and cross-language type contracts MUST use Protocol Buffers as the source of truth, with `buf` for codegen and [Connect](https://connectrpc.com) as the default transport. Exceptions: libraries, services with <5 endpoints and a single first-party consumer, and single-language schema-as-code setups (e.g. Drizzle/Effect Schema/Zod with no typed cross-language consumers).
 - **ADR-0007** — TypeScript MUST NOT embed inline SQL strings or tagged SQL templates for application queries. Use a type-checked query builder/ORM, preferably Kysely; Drizzle is allowed but not preferred for complex query-heavy code because of weaker inference.

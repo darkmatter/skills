@@ -5,7 +5,7 @@
 #   scripts/scaffold-skill.sh [--manual] <skill-name> "Short description"
 #
 # Flags:
-#   --manual   Scaffold a manual-invocation skill (per ADR-0001). Requires the
+#   --manual   Scaffold a manual-invocation skill. Requires the
 #              name to start with run- / kickoff- / setup- / init- / do-, and
 #              prepends the manual-invocation opening line to the description
 #              so the agent does not auto-trigger.
@@ -46,11 +46,11 @@ if [[ ! "$NAME" =~ ^[a-z][a-z0-9-]*$ ]]; then
   exit 1
 fi
 
-# Manual skills must use a known verb prefix (ADR-0001).
+# Manual skills must use a known verb prefix.
 if [[ $MANUAL -eq 1 ]]; then
   if [[ ! "$NAME" =~ ^(run|kickoff|setup|init|do)- ]]; then
     echo "error: --manual requires a verb prefix from {run-, kickoff-, setup-, init-, do-} (got: $NAME)" >&2
-    echo "see docs/adr/0001-skill-naming-convention.md for rationale" >&2
+    echo "see skills/dm-skill-creator/SKILL.md for rationale" >&2
     exit 1
   fi
 fi

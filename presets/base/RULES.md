@@ -15,7 +15,7 @@ Hard constraints on agent behavior across all darkmatter projects. These overrid
 9. **Plan before editing** — non-trivial work gets a short plan: goal, files, test strategy, risks, review needed. Don't over-plan trivial edits.
 10. **Fix minimally** — smallest change that resolves root cause. No refactoring while fixing. No opportunistic changes in bugfix PRs.
 11. **Delegate, don't implement** — primary agent orchestrates; specialists execute. Each subagent gets exact context, file paths, expected output, constraints. Verify final artifacts yourself.
-12. **Read before write** — read `AGENTS.md` → `.agent/context/*` → `RULES.md` → policy before work. Track with `bd` (ADR-0001), not markdown TODOs.
+12. **Read before write** — read `AGENTS.md` → `.agent/context/*` → `RULES.md` → policy before work.
 13. **Check ADRs after code changes** — after significant changes, verify diff against standing ADRs. Call out conflicts or state compliance.
 
 ## Must never

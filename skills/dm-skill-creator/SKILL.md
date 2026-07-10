@@ -34,7 +34,7 @@ These come from `skills/README.md` and `scripts/validate-skill.sh`. Following th
 
 3. **Naming.** Lowercase, hyphenated. Directory name must equal the `name:` field. Don't prefix with the domain (`funding-screener`, not `hl-funding-screener`) unless the venue is genuinely load-bearing — `hl-funding-analysis` and `kickoff-dm-design` qualify because they only make sense in those contexts.
 
-   The name's grammar also signals how the skill expects to be triggered (see ADR-0001):
+   The name's grammar also signals how the skill expects to be triggered:
    - **Auto-triggered skills** are noun phrases describing a domain or capability — `<domain>-<aspect>` or compound nouns. The skill reads as a thing the agent consults. Examples: `hl-funding-analysis`, `codebase-cleanup`, `end-of-turn-review`.
    - **Manual-invocation skills** start with an imperative verb prefix from a fixed set: `run-`, `kickoff-`, `setup-`, `init-`, or `do-` as a generic fallback. The verb makes the name read as a command, only sensible at invocation time. Examples: `kickoff-dm-design`, `run-funding-screen`, `setup-vault`.
 
@@ -78,7 +78,7 @@ Fill in these sections. Use the imperative form. Explain the _why_ behind instru
 
   > `Manual-invocation skill — run only when the user explicitly asks for "<name>" or invokes it as a slash command. Do not auto-trigger on adjacent topics.`
 
-  Then describe what the skill does. The verb-prefix in the name plus this opening line together make under-triggering the safe default for these. See ADR-0001 in `docs/adr/` for the full rationale.
+  Then describe what the skill does. The verb-prefix in the name plus this opening line together make under-triggering the safe default for these.
 
 - **When to use** — concrete trigger phrases and situations.
 - **When NOT to use** — adjacent-but-different cases that would naively look like fits.
