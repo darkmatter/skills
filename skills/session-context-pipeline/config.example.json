@@ -1,0 +1,42 @@
+{
+  "summarize": {
+    "interval_seconds": 180,
+    "min_new_bytes": 16384,
+    "model": "gpt-5-mini",
+    "transcript_tail_lines": 350
+  },
+  "enrich": {
+    "enabled": true,
+    "libraries": true,
+    "clone": true,
+    "use_agent": true,
+    "agent_model": "haiku",
+    "max_pending_inject": 3,
+    "excerpt_max_lines": 60,
+    "allow_command_triggers": false
+  },
+  "review": {
+    "mode": "report",
+    "model": "gpt-5.5",
+    "min_changed_lines": 4,
+    "checklist": [
+      "Did the agent invent unconventional solutions where the repo already has an established pattern? Point at the existing pattern.",
+      "Is the change tested — were tests added or updated, and is there evidence they were actually run?",
+      "Any scope creep beyond what the session summary says was asked?",
+      "Leftover debug scaffolding, dead code, commented-out blocks, or TODO/stub placeholders presented as done?",
+      "Are errors swallowed silently, or do fallbacks hide failure instead of surfacing it?",
+      "Do the claims in the final answer match what the diff actually does?"
+    ]
+  },
+  "triggers": [
+    {
+      "name": "example-effect-docs",
+      "match_tags": ["effect", "effect-ts"],
+      "library_patterns": ["effect", "@effect/*"],
+      "note": "This project follows the effect-typescript skill conventions: services as Context.Tag classes, Layers for wiring, typed errors via Data.TaggedError.",
+      "docs_url": "https://effect.website/docs",
+      "repo_url": "https://github.com/Effect-TS/effect",
+      "excerpt_paths": ["README.md"]
+    }
+  ]
+}
