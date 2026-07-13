@@ -5,14 +5,64 @@
 # autonomous, headless execution inside the github-executor container.
 #
 # Inspect the full schema and current values with `omp config list`.
-providers: 
+setupVersion: 1
+modelRoles:
+  default: openai-codex/gpt-5.6-sol:xhigh
+  task: "litellm/glm-local"
+  slow: anthropic/claude-fable-5:xhigh
+  smol: litellm/gpt-oss-120b
+  vision: openai-codex/gpt-5.6-sol:high
+  designer: anthropic/claude-fable-5:high
+  # tiny:
+  advisor: openai-codex/gpt-5.6-sol:xhigh
+  commit: "litellm/glm-local"
+  plan: anthropic/gpt-5.6-sol:xhigh
+retry:
+  enabled: true
+  maxRetries: 3
+  baseDelayMs: 2000
+  fallbackChains:
+    default:
+      - "litellm/glm-local"
+    task:
+      - "litellm/glm-local"
+    slow:
+      - "litellm/glm-local"
+    vision:
+      - openrouter/google/gemini-3.1-pro-preview:high
+      - "litellm/glm-local"
+    designer:
+      - openrouter/google/gemini-3.1-pro-preview:high
+      - "litellm/glm-local"
+    advisor:
+      - "litellm/glm-local"
+    plan:
+      - anthropic/claude-fable-5:xhigh
+      - "litellm/glm-local"
+defaultThinkingLevel: auto
+theme:
+  dark: obsidian
+symbolPreset: nerd
+statusLine:
+  preset: nerd
+  separator: powerline-thin
+  sessionAccent: true
+terminal:
+  showProgress: true
+display:
+  shimmer: classic
+  showTokenUsage: true
+advisor:
+  enabled: true
+
+providers:
   webSearch: auto
-  litellm: 
+  litellm:
     baseUrl: https://litellm.drkmttr.dev/v1
     apiKey: LITELLM_API_KEY
     auth: apiKey
     api: openai-completions
-    discovery: 
+    discovery:
       type: openai-models-list
 # --- Model roles -----------------------------------------------------------
 # Default routing is the darkmatter LiteLLM gateway's `glm-local` alias
