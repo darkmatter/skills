@@ -3,7 +3,10 @@ name: end-of-turn-review
 description: Run a GPT-5.5 critique of the work just produced in the current turn — applied diffs, proposed plans, or both. Triggers at end-of-turn (via Stop hook) or on explicit request ("review what you just did", "critique this plan", "second-opinion this before I commit"). Returns a verdict (LGTM / notes / block) plus specific issues with file:line citations. Do NOT trigger for trivial 1-3 line changes, doc-only edits, or read-only research turns.
 ---
 
-# End-of-turn review
+# End-of-turn review runtime
+
+This client-agnostic hook utility is opt-in, not a shared agent skill. Wire it
+from the target client after reviewing the gateway, cost, and stop-hook behavior.
 
 A second-opinion pass over work just produced. Designed to catch: bugs the implementer missed, edge cases the planner glossed over, regressions in unmodified behavior, and plans that look reasonable but have a load-bearing flaw.
 

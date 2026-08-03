@@ -5,13 +5,16 @@ description: Runtime learning policy — automatically extracts reusable pattern
 
 > **This is a runtime policy document**, not an ordinary task skill. It configures the agent's learning behavior at session end. The agent client (OpenCode) loads this to enforce pattern-extraction-on-stop discipline. It does not implement the extraction logic itself — it _prescribes_ the behavior the client must follow.
 
-# Continuous Learning (OpenCode Skill)
+# Continuous learning runtime (OpenCode)
+
+This opt-in OpenCode runtime supplies the stop-hook assets used by
+`plugins/continuous-learning-stop-hook.js`; it is not a shared agent skill.
 
 Automatically evaluates OpenCode sessions at **session end** and extracts reusable patterns into new “learned skills” for future reuse.
 
 ## When to Activate
 
-Use this skill when you want:
+Use this runtime when you want:
 
 - Automatic pattern extraction from OpenCode sessions
 - A **Stop hook** that evaluates the just-finished session transcript
@@ -54,8 +57,8 @@ The content also includes a `signature:` in frontmatter for deduplication.
 
 Recommended structure:
 
-- `~/.config/opencode/skills/continuous-learning/`
-  - `skill.md` (this file)
+- `~/.config/opencode/runtime/continuous-learning/`
+  - `README.md` (this file)
   - `config.json`
   - `hooks/stop.sh`
   - `bin/evaluate-session.js` (or `evaluate-session.py`)

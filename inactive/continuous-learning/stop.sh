@@ -6,14 +6,15 @@ set -euo pipefail
 TRANSCRIPT_PATH="${OPENCODE_TRANSCRIPT_PATH:-}"
 SESSION_ID="${OPENCODE_SESSION_ID:-}"
 
-CONFIG="$HOME/.config/opencode/skills/continuous-learning/config.json"
+RUNTIME_DIR="${OPENCODE_CONTINUOUS_LEARNING_DIR:-$HOME/.config/opencode/runtime/continuous-learning}"
+CONFIG="$RUNTIME_DIR/config.json"
 
 if [[ -n "$TRANSCRIPT_PATH" && -f "$TRANSCRIPT_PATH" ]]; then
-  node "$HOME/.config/opencode/skills/continuous-learning/bin/evaluate-session.js" \
+  node "$RUNTIME_DIR/bin/evaluate-session.js" \
     --config "$CONFIG" \
     --transcript "$TRANSCRIPT_PATH"
 elif [[ -n "$SESSION_ID" ]]; then
-  node "$HOME/.config/opencode/skills/continuous-learning/bin/evaluate-session.js" \
+  node "$RUNTIME_DIR/bin/evaluate-session.js" \
     --config "$CONFIG" \
     --session-id "$SESSION_ID"
 else
