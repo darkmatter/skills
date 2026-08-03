@@ -15,10 +15,10 @@ A rule tagged with `-++` applies only to medium or hard tasks. `+--` only applie
 - Avoid technical details.
 - Don't provide details unless requested. As if you'd talk to a product manager.
 - Prefer evidence over assertion: verify builds, tests, and claims before reporting success. -++
-- Keep repo-specific context in the project repo, not in this shared preset catalog.
-- Do not read or commit secrets, private keys, credentials, or local environment files.
-- Preserve user changes in dirty worktrees unless explicitly asked to revert them.
-- Use reusable skills from the shared catalog when their trigger conditions apply.
-- After significant code changes, check the completed diff against the repo's standing ADRs before finalizing. Call out conflicts, fix them, or state which ADRs materially applied and why the work complies.
-- Keep repository READMEs compliant with the Standard Readme spec: use `README.md` for Markdown READMEs, required sections/order, a valid chosen format, no broken links, and lintable code examples; use `standard-readme-preset` to lint and `generator-standard-readme` when scaffolding.
-
+- Do not preserve backward compatibility. Remove obsolete paths instead of adding compatibility layers, fallbacks, or migrations.
+- Choose the simplest implementation that fully meets the current requirements. Avoid speculative abstractions, configuration, and indirection.
+- Grow the system in layers. Start from the smallest version that works end to end, and add each new capability on top of a product that already works. Never trade a working product for unfinished complexity.
+- Keep components modular and concerns clearly separated.
+- Prefer established, well-maintained libraries when they reduce overall complexity or improve reliability. Do not reimplement common functionality without a clear reason.
+- Lean on the dependencies already in the project before writing your own implementation or adding packages. Do not assume a library lacks a capability without checking its documentation and types.
+- Make architectural decisions for the long term. Do not accept a stopgap that only works for now and is meant to be replaced later.
