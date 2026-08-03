@@ -3,7 +3,11 @@ name: session-context-pipeline
 description: Hook-driven background pipeline for Claude Code sessions — a throttled summarizer keeps a tags+bullets digest of the running session in a temp file, a watcher enriches context from it (detects libraries in use, clones their repos, injects doc links/excerpts so no API guesswork is needed), and an end-of-turn reviewer checks the turn's diff against a configurable checklist (unconventional solutions? tested? silent failures?). Triggers when the user asks to "set up the session context pipeline", "install session hooks", "summarize my session automatically", "auto-inject library docs", "clone libraries the session uses", "add an end-of-turn review checklist", or wants live session context / background enrichment / turn review wired into hooks. Do NOT trigger for a one-off manual review of a diff or plan (use end-of-turn-review) or for extracting reusable skills from finished sessions (use continuous-learning).
 ---
 
-# Session context pipeline
+# Session context pipeline runtime (Claude Code)
+
+This opt-in Claude Code hook bundle is not a shared agent skill. It may send
+session excerpts and diffs to the configured model gateway; review the privacy
+and cost notes before installation.
 
 Three cooperating hooks that give a coding-agent session a memory, a research
 assistant, and a critic — all off the hot path. Every expensive step runs in a
@@ -67,13 +71,13 @@ malformed JSON — the hooks exit 0 silently and the session proceeds untouched.
 
 ```bash
 # project-level (recommended): <git root>/.claude/settings.json + seeded config
-skills/session-context-pipeline/scripts/install-hooks.sh
+presets/claude/runtime/session-context-pipeline/scripts/install-hooks.sh
 
 # user-level: ~/.claude/settings.json
-skills/session-context-pipeline/scripts/install-hooks.sh --user
+presets/claude/runtime/session-context-pipeline/scripts/install-hooks.sh --user
 
 # remove (same scope flags)
-skills/session-context-pipeline/scripts/install-hooks.sh --uninstall
+presets/claude/runtime/session-context-pipeline/scripts/install-hooks.sh --uninstall
 ```
 
 The installer merges idempotently into existing settings (re-running replaces

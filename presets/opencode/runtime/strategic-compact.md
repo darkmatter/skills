@@ -5,7 +5,11 @@ description: Runtime compaction policy — makes auto-compaction safe for autono
 
 > **This is a runtime policy document**, not an ordinary task skill. It configures the agent's compaction behavior for long autonomous sessions. The agent client loads this to enforce safe-compaction discipline. It does not implement compaction itself — it _prescribes_ the state-preservation behavior the client must follow.
 
-# Strategic Compact (OpenCode) — Autonomous Agent Edition
+# Strategic compaction runtime (OpenCode)
+
+This is the behavioral contract for `plugins/auto-compact.js`, not a shared
+agent skill. Enable the plugin only in OpenCode configurations that opt into
+automatic compaction.
 
 ## Purpose
 

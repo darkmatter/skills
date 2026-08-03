@@ -1,5 +1,6 @@
 { agent-skills }:
 {
+  config,
   lib,
   pkgs,
   personalAgentSkillsPath ? null,
@@ -12,6 +13,25 @@ let
     skillsDir = ./skills;
   };
 
+  defaultDarkmatterSkills = [
+    "alchemy"
+    "choose-dev-entrypoints"
+    "darkmatter-gitops-conventions"
+    "darkmatter-ts-toolchain"
+    "diagnose"
+    "effect-typescript"
+    "nix-flake-organization"
+    "rust-best-practices"
+    "shadcn-registry-first"
+    "sops-secret-access"
+    "tdd"
+    "ui-component-architecture"
+    "ui-ux-pro-max"
+    "vercel-react-best-practices"
+  ];
+  darkmatterSkillId = name:
+    let prefix = config.programs.agent-skills.sources.darkmatter.idPrefix;
+    in if prefix == null || prefix == "" then name else "${prefix}/${name}";
   # Each subdirectory is one skill. Non-directory entries (.DS_Store,
   # README.md, etc) are skipped so they don't get wrapped as SKILL.md.
   readSkills =
@@ -22,7 +42,7 @@ let
     in
     lib.mapAttrs' (name: _: lib.nameValuePair name (path + "/${name}")) onlyDirs;
 
-  teamSkills = readSkills skillsWithSubmodules;
+  teamSkills = lib.filterAttrs (name: _: lib.elem name defaultDarkmatterSkills) (readSkills skillsWithSubmodules);
   personalSkills =
     if personalAgentSkillsPath != null then readSkills personalAgentSkillsPath else { };
 
@@ -47,7 +67,10 @@ in
         idPrefix = "darkmatter";
       };
 
-      skills.enableAll = [ "darkmatter" ];
+      # The source retains archived and client-specific material, but only
+      # these high-signal skills are installed for every agent. Add a skill
+      # deliberately here instead of restoring `enableAll`.
+      skills.enable = map darkmatterSkillId defaultDarkmatterSkills;
 
       targets.agents.enable = true;
       targets.claude.enable = true;

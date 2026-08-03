@@ -4,7 +4,7 @@ import { existsSync } from "node:fs";
 const HOME = process.env.HOME || "";
 const STOP_HOOK_PATH =
   process.env.OPENCODE_CONTINUOUS_LEARNING_STOP_HOOK ||
-  (HOME ? `${HOME}/.config/opencode/skills/continuous-learning/hooks/stop.sh` : "");
+  (HOME ? `${HOME}/.config/opencode/runtime/continuous-learning/hooks/stop.sh` : "");
 
 export const ContinuousLearningStopHookPlugin = async ({ $, client }) => {
   let lastSessionID;
