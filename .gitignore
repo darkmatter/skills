@@ -16,3 +16,4 @@ evals/results/*
 evals/prompt-tests/.cache/
 __pycache__/
 .omo
+.beads
