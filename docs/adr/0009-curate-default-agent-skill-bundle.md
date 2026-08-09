@@ -1,6 +1,6 @@
 # 0009 — Curate the default agent skill bundle
 
-- **Status:** accepted
+- **Status:** superseded by ADR-0010
 - **Date:** 2026-08-03
 - **Deciders:** Darkmatter maintainers
 
