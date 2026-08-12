@@ -1,6 +1,6 @@
 ---
 name: darkmatter-ts-toolchain
-description: The darkmatter TypeScript toolchain contract — Bun (never npm/pnpm), tsgo typecheck, vitest, oxlint/biome, changesets, Effect for I/O, Alchemy deploys (wrangler.toml is prohibited), merge-queue mains, and the no-tiny-functions rule. Use when writing, fixing, building, or shipping TypeScript in any darkmatter repo (platform, nixmac-web, omp-chat, genesis): "fix TS errors", "make CI green", "add a package", "deploy this worker", lockfile complaints, or choosing libraries for I/O-heavy code. Do NOT use for generic TS style (coding-standards) or deep Effect patterns (effect-typescript) — this skill is the org-specific toolchain glue around those.
+description: 'The darkmatter TypeScript toolchain contract - Bun (never npm/pnpm), tsgo typecheck, vitest, oxlint/biome, changesets, Effect for I/O, Alchemy deploys (wrangler.toml is prohibited), merge-queue mains, and the no-tiny-functions rule. Use when writing, fixing, building, or shipping TypeScript in any darkmatter repo (platform, nixmac-web, omp-chat, genesis): "fix TS errors", "make CI green", "add a package", "deploy this worker", lockfile complaints, or choosing libraries for I/O-heavy code. Do NOT use for generic TS style (coding-standards) or deep Effect patterns (effect-typescript) — this skill is the org-specific toolchain glue around those.'
 ---
 
 # Darkmatter TypeScript toolchain
