@@ -1,6 +1,6 @@
 {
   "name": "darkmatter-skills",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Darkmatter's team-wide shared skills catalog, auto-discovered from skills/.",
   "author": {
     "name": "Darkmatter",
