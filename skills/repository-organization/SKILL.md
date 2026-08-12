@@ -23,32 +23,9 @@ Keep each repository easy for humans and agents to navigate by putting durable c
 - The user is asking for one-off implementation notes that do not need to survive beyond the current task.
 - The repository already has a clear local convention that conflicts with this guidance and the user explicitly wants to preserve it. Follow the local convention and note the tradeoff.
 
-## Placement rules
+## Reference repo
 
-Start from the question: who needs this, when do they need it, and does it need to be enforced or merely discoverable?
-
-The root `README.md` "Where to put what" table is the canonical placement table for this repo. This table is a task-focused summary for agents applying that policy.
-
-| Need                                            | Put it here                          | Why                                                                    |
-| ----------------------------------------------- | ------------------------------------ | ---------------------------------------------------------------------- |
-| Org-wide rule every agent must follow           | `presets/base/AGENTS.md`             | Always loaded; keep it short and high-signal.                          |
-| Project entrypoint for agents                   | Root `AGENTS.md` plus provider shims | Lets tools find the canonical project context.                         |
-| Durable project facts and decisions             | `.agent/context/`                    | Always loaded inside that project; use for what is true now.           |
-| Mandatory project policy, gates, and exceptions | `.agent/policy/`                     | Enforceable project-local rules and approved deviations.               |
-| Recurring project procedure                     | `.agent/workflows/`                  | Stable step-by-step task flow.                                         |
-| Project-local reusable capability               | `.agent/skills/`                     | Only useful in that project.                                           |
-| Team-wide reusable capability                   | `skills/<name>/`                     | Useful across multiple darkmatter projects; add `docs/catalog.md` row. |
-| Long skill examples or lookup material          | `skills/<name>/reference/`           | Loaded only after the skill points there.                              |
-| Per-language convention exemplar code           | `references/<language>/`             | Reference codebase read from the repo checkout; prose stays in skills. |
-| Skill-owned deterministic helper                | `skills/<name>/scripts/`             | Travels with the skill through the Home Manager module.                |
-| Repo maintenance automation                     | Top-level `scripts/`                 | Run from this repo; not auto-discovered by clients.                    |
-| Human-readable shared-skill inventory           | `docs/catalog.md`                    | Teammates skim it before adding or choosing skills.                    |
-| OpenCode slash command                          | `presets/opencode/commands/`         | User controls invocation timing.                                       |
-| OpenCode lifecycle hook or integration          | `presets/opencode/plugins/`          | Event-driven runtime behavior.                                         |
-| Model-callable deterministic function           | `presets/opencode/tools/`            | Structured tool result, not prose instructions.                        |
-| OpenCode specialist agent definition            | `presets/opencode/agents/`           | Role-specific agent behavior and permissions.                          |
-
-Prefer one canonical copy plus shims or links. If two files say the same thing, one of them will drift.
+Refer to our living repo which we maintain according to our current prefeerred shape: https://github.com/example-labs/ops-monorepo-demo
 
 ## README standard
 
@@ -82,7 +59,7 @@ When adding or updating ADRs:
 
 ## Organization workflow
 
-1. Inventory existing conventions before moving anything: root README, `AGENTS.md`, `.agent/`, `docs/`, `skills/`, `scripts/`, `presets/`, and ADRs.
+1. Inventory existing conventions before moving anything
 2. Identify the artifact type: always-on rule, project fact, policy, workflow, reusable skill, command, plugin, tool, script, reference doc, or decision.
 3. Choose the narrowest durable home from the placement table.
 4. Preserve public entrypoints and compatibility shims unless the user explicitly approves a breaking cleanup.
@@ -114,10 +91,3 @@ When adding or updating ADRs:
 ## Tools
 
 None. This is a pure prompt and review skill. Use repo-local validators and search commands for verification.
-
-## Reference
-
-- `docs/adr/README.md` in this repo owns ADR format and lifecycle conventions.
-- `README.md` in this repo contains the current "Where to put what" table for shared infrastructure.
-- `docs/opencode-layout.md` maps OpenCode install targets to source paths.
-- `template/.agent/README.md` describes the project-local `.agent/` layout.

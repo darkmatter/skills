@@ -1,13 +1,23 @@
 ---
 name: effect-typescript
-description: Use when TypeScript/Bun code involves meaningful I/O and you are writing, reviewing, or deciding whether to use Effect, especially services, Layers, Config, Schema, typed errors, retries, resources, tests, or Alchemy deployments.
+description: Use as when TypeScript/Bun code involves meaningful I/O and you are writing, reviewing, or deciding whether to use Effect, especially services, Layers, Config, Schema, typed errors, retries, resources, tests, or Alchemy deployments.
 ---
 
 # Effect TypeScript
 
 Use Effect deliberately. The most important trigger is meaningful I/O: external APIs, files, databases, queues, workers, CLIs, config, secrets, clocks, subprocesses, network calls, or deployable runtime boundaries. Effect is excellent when that I/O needs typed failures, dependencies, runtime validation, retries, concurrency, resources, and testable boundaries. It is not a default replacement for simple TypeScript.
 
+
 This skill adapts Effect guidance to darkmatter conventions: use Bun commands instead of pnpm for darkmatter projects, and prefer Alchemy for deployable infrastructure. It carries the upstream `Effect-TS/effect` monorepo as a local submodule at `reference/effect` for current APIs, tests, package layout, docs, and upstream agent instructions.
+
+## Bootstrap
+
+If `effect-solutions` is on in your `$PATH`, install it: `bun add -g effect-solutions@latest`. 
+
+## Guidelines
+
+- Refer to the best practices recommended by the `effect-solutions` CLI when writing effectful code.
+- If you need more specific information, there's a local checkout of the effect source in the reference directory.
 
 ## When to use
 
@@ -46,19 +56,15 @@ If only one is true, prefer plain TypeScript unless the surrounding codebase alr
 - Use Bun commands: `bun install`, `bun test`, `bun run <script>`, `bunx <tool>`.
 - Translate upstream `pnpm` examples mechanically. Example: `pnpm test file.test.ts` becomes `bun test file.test.ts` when the project uses Bun test, or `bun run test file.test.ts` when test is a package script.
 - Prefer Bun runtime packages where relevant, such as `@effect/platform-bun` and `BunRuntime.runMain` for Bun entrypoints.
-- Prefer Alchemy for deployable infrastructure. Put infra in `alchemy.run.ts`, create resources with Alchemy, bind them to workers/services, and call `await app.finalize()`.
-- Do not bake secrets into code or Alchemy resources. Use environment variables and `alchemy.secret(...)` for secret bindings.
-- Keep application logic independent from Alchemy. Alchemy owns infrastructure wiring; Effect services own runtime behavior.
+- Prefer Alchemy for deployable infrastructure. Put infra in `alchemy.run.ts`, create resources with Alchemy, bind them to workers/services, and build up an `Alchemy.Stack`. Refer to the alchemy skill if writing alchemy code or adding new infra code.
 
 ## Upstream Reference
 
-Use `reference/effect` when you need current Effect source or examples instead of relying on memory:
-
+Use `reference/effect` or `effect-solutions` CLI when you need current Effect source or examples instead of relying on memory:
 - `reference/effect/AGENTS.md` — upstream repository rules, including pnpm validation commands, generated barrels, changesets, and `it.effect` conventions.
 - `reference/effect/packages/effect/` — core library source and tests.
 - `reference/effect/packages/platform-bun/` and `reference/effect/packages/platform-node/` — runtime/platform examples.
 - `reference/effect/packages/vitest/` — Effect-aware Vitest helpers.
-- `reference/effect/docs/` and package READMEs — local docs that match the pinned submodule SHA.
 
 If the submodule is missing in a fresh checkout, initialize it before using local references:
 
@@ -68,216 +74,41 @@ git submodule update --init skills/effect-typescript/reference/effect
 
 For darkmatter application work, treat the submodule as read-only and translate upstream pnpm commands to the repo's package manager. For direct upstream Effect contributions, follow `reference/effect/AGENTS.md` exactly; do not apply darkmatter Bun defaults inside the upstream repo.
 
-## Core Patterns
+## JSON Encoding & Decoding
 
-### Program Shape
+Use `Schema.fromJsonString` to parse JSON strings and validate them with your schema in one step. This combines `JSON.parse` + schema decoding in one step, and `JSON.stringify` + schema encoding for the reverse:
 
-- Keep pure logic as plain functions.
-- Put effectful operations in `Effect` values.
-- Use `Effect.gen` for inline effect composition.
-- Use `Effect.fn("Name")` for exported or reusable functions returning Effects; name it after the function for traces.
-- In low-level hot library code, `Effect.fnUntraced` is acceptable when tracing overhead matters.
-- Attach behavior with combinators: `Effect.catchTag`, `Effect.retry`, `Effect.withSpan`, `Effect.annotateLogs`, `Effect.provide`.
+```typescript
+import { Effect, Schema } from "effect"
 
-```ts
-import { Effect, Schema } from "effect";
+const Row = Schema.Literals(["A", "B", "C", "D", "E", "F", "G", "H"])
+const Column = Schema.Literals(["1", "2", "3", "4", "5", "6", "7", "8"])
 
-class InvalidPayload extends Schema.TaggedErrorClass<InvalidPayload>()("InvalidPayload", {
-  message: Schema.String,
+class Position extends Schema.Class<Position>("Position")({
+  row: Row,
+  column: Column,
 }) {}
 
-export const parsePayload = Effect.fn("parsePayload")(function* (input: string) {
-  if (input.length === 0) {
-    return yield* new InvalidPayload({ message: "payload is empty" });
-  }
-  return JSON.parse(input) as unknown;
-});
-```
-
-### Services and Layers
-
-Use `Context.Service` for dependencies. Put the live implementation on `static readonly layer`, and expose test layers separately.
-
-```ts
-import { Context, Effect, Layer, Schema } from "effect";
-
-class ApiError extends Schema.TaggedErrorClass<ApiError>()("ApiError", {
-  message: Schema.String,
-  cause: Schema.Defect,
+class Move extends Schema.Class<Move>("Move")({
+  from: Position,
+  to: Position,
 }) {}
 
-export class UsersApi extends Context.Service<
-  UsersApi,
-  {
-    readonly getUser: (id: string) => Effect.Effect<unknown, ApiError>;
-  }
->()("app/UsersApi") {
-  static readonly layer = Layer.effect(
-    UsersApi,
-    Effect.gen(function* () {
-      const getUser = Effect.fn("UsersApi.getUser")((id: string) =>
-        Effect.tryPromise({
-          try: () => fetch(`https://example.com/users/${id}`).then((r) => r.json()),
-          catch: (cause) => new ApiError({ message: "failed to fetch user", cause }),
-        }),
-      );
+// fromJsonString combines JSON.parse + schema decoding
+// MoveFromJson is a schema that takes a JSON string and returns a Move
+const MoveFromJson = Schema.fromJsonString(Move)
 
-      return UsersApi.of({ getUser });
-    }),
-  );
-}
+const program = Effect.gen(function* () {
+  // Parse and validate JSON string in one step
+  // Use MoveFromJson (not Move) to decode from JSON string
+  const jsonString = '{"from":{"row":"A","column":"1"},"to":{"row":"B","column":"2"}}'
+  const move = yield* Schema.decodeUnknownEffect(MoveFromJson)(jsonString)
+
+  yield* Effect.log("Decoded move", move)
+
+  // Encode to JSON string in one step (typed as string)
+  // Use MoveFromJson (not Move) to encode to JSON string
+  const json = yield* Schema.encodeEffect(MoveFromJson)(move)
+  return json
+})
 ```
-
-Layer rules:
-
-- `Layer.effect(Service, Effect.gen(...))` for effectful construction.
-- `Layer.succeed(Service, impl)` for pure/static implementations.
-- `Layer.unwrap(effectReturningLayer)` when choosing a layer from `Config` or another Effect.
-- Compose layers at the boundary, not inside business logic.
-- Use `ManagedRuntime` only to bridge Effect into non-Effect frameworks or callbacks. Create one runtime from the application layer and dispose it on shutdown.
-
-### Errors
-
-- Model expected failures as tagged errors, preferably with `Schema.TaggedErrorClass`.
-- Use `_tag`-aware handlers: `Effect.catchTag` or `Effect.catchTags`.
-- Preserve unknown causes with `cause: Schema.Defect` or an explicit field.
-- Do not throw for expected domain failures.
-- When a branch terminates inside `Effect.gen`, use `return yield*` so TypeScript understands control flow.
-
-```ts
-if (notFound) {
-  return yield * new UserNotFound({ id });
-}
-```
-
-### Config and Secrets
-
-- Use `Config.string`, `Config.boolean`, `Config.url`, and `Config.redacted` instead of reading `process.env` throughout the codebase.
-- Decode config once in layers, then expose typed services to the rest of the app.
-- Use `Config.withDefault` for safe non-secret defaults.
-- Keep secrets redacted in logs and errors.
-
-### Schema
-
-- Use `Schema` for data crossing trust boundaries: HTTP requests, API responses, queue payloads, config-like JSON, AI outputs, and persisted data.
-- Prefer schema classes for domain entities that move across modules.
-- Decode unknown external data before it enters core business logic.
-- Do not use `as SomeType` to silence unknown JSON from external systems.
-
-### Retries, Schedules, and Time
-
-- Use `Schedule` with `Effect.retry` for transient failures.
-- Make retryability explicit in the error type, such as `retryable: boolean`.
-- Add caps and jitter for production retries.
-- Use `Clock` in Effect code and `TestClock` in tests. Avoid `Date.now()` and `new Date()` in Effectful logic unless you are deliberately at a non-Effect edge.
-
-```ts
-const retryPolicy = Schedule.exponential("250 millis").pipe(Schedule.recurs(5), Schedule.jittered);
-```
-
-### Resources and Scope
-
-- Use `Effect.acquireRelease` for resources that must be closed.
-- Put resource acquisition in a Layer so consumers do not manage lifecycle manually.
-- Use scoped or launched layers for long-running background work.
-- Do not start detached fibers unless detached lifetime is truly intended.
-
-### Running Programs
-
-- At Bun entrypoints, prefer `BunRuntime.runMain(program)` from `@effect/platform-bun`.
-- For long-running service layers, use `Layer.launch(AppLayer)` as the process entrypoint.
-- For framework handlers or callbacks, use `ManagedRuntime.make(AppLayer)` once, call `runtime.runPromise(...)` at the edge, and dispose on shutdown.
-- Do not call `Effect.runPromise` deep inside library or service code. Run Effects at the application boundary.
-
-## Testing
-
-- Use `@effect/vitest` for Effect tests when available.
-- Use `it.effect` for Effect-based tests.
-- Use regular `it` for pure functions.
-- In `it.effect`, use `assert` helpers instead of Vitest `expect`.
-- Do not use `Effect.runSync` inside tests.
-- Use `TestClock` for time-dependent code.
-- Test services through Layers. Provide fake/test layers rather than mocking internals.
-- For shared expensive setup, use `layer(...)` from `@effect/vitest`; otherwise provide a test layer per test for isolation.
-
-```ts
-import { assert, it } from "@effect/vitest";
-import { Effect } from "effect";
-
-it.effect("uses a service", () =>
-  Effect.gen(function* () {
-    const service = yield* UsersApi;
-    const user = yield* service.getUser("123");
-    assert.isObject(user);
-  }).pipe(Effect.provide(UsersApi.layer)),
-);
-```
-
-## Alchemy Deployment
-
-Use Alchemy for infrastructure definitions, especially Cloudflare workers and bound resources.
-
-```ts
-// alchemy.run.ts
-import alchemy from "alchemy";
-import { Worker } from "alchemy/cloudflare";
-
-const app = await alchemy("my-app");
-
-export const worker = await Worker("api", {
-  entrypoint: "./src/worker.ts",
-  bindings: {
-    STAGE: app.stage,
-    API_KEY: alchemy.secret(process.env.API_KEY),
-  },
-});
-
-console.log({ url: worker.url });
-await app.finalize();
-```
-
-Alchemy rules:
-
-- Use `alchemy.run.ts` as the default infra entrypoint.
-- Run Alchemy with Bun: `bunx alchemy dev`, `bunx alchemy deploy`, `bunx alchemy deploy --stage production`, `bunx alchemy destroy`.
-- Always call `await app.finalize()` so orphaned resources are reconciled.
-- Use `Cloudflare.state()` as the state store for Cloudflare stacks, including local development and tests. Do not switch to filesystem/local state just because a stack runs locally.
-- Toggle local Worker execution with Alchemy's dev mode (`bunx alchemy dev`, test harness `dev: true`, or `ALCHEMY_DEV=1`), not by changing the state backend. See the Alchemy local dev docs: https://v2.alchemy.run/tutorial/part-4/
-- Bind infrastructure resources into the runtime environment; then adapt those bindings into Effect services at the worker/app boundary.
-- Keep deploy state and resource names stage-aware. Avoid hard-coded production names in shared examples.
-- Do not hide application logic in `alchemy.run.ts`; keep it in `src/` and test it independently.
-
-## Review Checklist
-
-- Is Effect justified, or would plain TypeScript be clearer?
-- Are pure functions left pure?
-- Are expected failures typed and handled by tag?
-- Is unknown data decoded with `Schema` before use?
-- Are dependencies modeled as `Context.Service` and provided by Layers?
-- Are resources acquired/released safely?
-- Are retries bounded, jittered, and limited to retryable errors?
-- Are Effects run only at the boundary?
-- Are tests using `it.effect`, Layers, and `TestClock` where appropriate?
-- Are commands written for Bun rather than pnpm?
-- Is deployable infra expressed with Alchemy and finalized?
-- Do Cloudflare stacks keep `Cloudflare.state()` while using dev mode for local execution?
-
-## Common Mistakes
-
-- Introducing Effect for a tiny script with no real effect-system benefits.
-- Wrapping every helper in `Effect.succeed` instead of keeping pure code pure.
-- Using `try/catch` inside `Effect.gen` for Effect failures. Use Effect error combinators.
-- Throwing strings or generic `Error` for expected domain errors.
-- Using `Data.TaggedError` in new code when `Schema.TaggedErrorClass` is available; coexist with older code when needed, but prefer schema-backed errors for new boundaries.
-- Forgetting `return yield*` on terminal failures.
-- Calling `Effect.runPromise` inside services instead of at the edge.
-- Reading `process.env` in many places instead of using `Config`.
-- Retrying every failure, including validation and authorization errors.
-- Using real time in tests instead of `TestClock`.
-- Copying upstream `pnpm` commands into darkmatter projects instead of adapting to Bun.
-- Deploying Cloudflare or AWS resources ad hoc instead of encoding them in Alchemy.
-- Replacing `Cloudflare.state()` with filesystem/local state for local dev or PR previews; use Alchemy dev mode instead.
-
-## References
-
-- `reference/effect/` — pinned git submodule of `Effect-TS/effect` for current source, tests, docs, and upstream agent instructions.
