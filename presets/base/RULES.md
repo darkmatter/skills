@@ -1,8 +1,12 @@
 # Rules — darkmatter
 
-Hard constraints on agent behavior across all darkmatter projects. These override conflicting workflow or prompt instructions. Project-specific exceptions go in `.agent/policy/project-exceptions.md`.
+There are 4 types of rules:
 
-## Must always
+**Hard constraints**: Must always/never do - these are non-negotiable.
+**Soft Constraints**: _Should_ do/avoid - guidelines that you may bypass according to best judgment.
+
+
+## MUST ALWAYS DO:
 
 1. **Evidence before claims** — no "done/fixed/passing/deployed" without fresh verification from this session. Cite command, exit code, artifact, URL, diff, or file path. Subagent reports are claims, not evidence.
 2. **Tests before behavior changes** — features, bugfixes, refactors with behavior risk, public API changes require a failing test before impl. TDD: one test → one impl → repeat (vertical slices only). Skip only with approved exception ID.
@@ -18,7 +22,7 @@ Hard constraints on agent behavior across all darkmatter projects. These overrid
 12. **Read before write** — read `AGENTS.md` → `.agent/context/*` → `RULES.md` → policy before work.
 13. **Check ADRs after code changes** — after significant changes, verify diff against standing ADRs. Call out conflicts or state compliance.
 
-## Must never
+## MUST NEVER DO:
 
 1. **Invent data** — if an API or read fails, say the read failed. Never fabricate results.
 2. **Commit secrets** — private keys, seed phrases, API tokens, addresses-with-balance, unredacted credentials. Ever.
@@ -31,7 +35,8 @@ Hard constraints on agent behavior across all darkmatter projects. These overrid
 9. **Self-review as sole reviewer** — use separate reviewer agent, model, human, or CI gate.
 10. **Side-effect in read-only sessions** — unless a workflow explicitly authorizes it.
 
-## Code quality
+
+## You generally should:
 
 - **Readability first** — clear names, self-documenting code, consistent formatting
 - **KISS / DRY / YAGNI** — simplest solution that works; don't build ahead of need
@@ -42,6 +47,13 @@ Hard constraints on agent behavior across all darkmatter projects. These overrid
 - **Type safety** — proper types, no `any`. Schema-decode unknown data at trust boundaries. Typed errors handled by tag, not thrown
 - **No accidental quadratic** — build indexes once, avoid `.find()` inside loops, use streaming/pagination for large inputs
 - **React/JSX** — function components + hooks (classes only for error boundaries); one component per file; stable unique `key` (never array index for dynamic lists); defaults via destructuring, not `defaultProps`; required `alt` + valid ARIA roles, no `accessKey`; `useRef` not string refs; share logic via custom hooks, not mixins/HOCs. Adapted from [Airbnb React](https://github.com/airbnb/javascript/tree/master/react)
+
+
+
+
+## You should generally avoid:
+- Pushing to main: prefer a preview branch via PR. In either case, test your code live - if a user asks for "Add a button to page Y", then you have not completed that task until you load it in a browser. If they say "on production", then you have not completed that task until you test it in a browser on production.
+
 
 ## Authority order
 
