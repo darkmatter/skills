@@ -13,8 +13,9 @@
 #   scripts/sync-sandbox-skills.sh --check   # fail if the tree is stale (CI)
 #
 # The manifest lists one skill name per line (# comments and blank lines
-# ignored); each must exist under skills/. Never edit .agents/skills/ by
-# hand — edit skills/<name>/ or the manifest and rerun this script.
+# ignored). Each name is resolved from skills/<name> first, then
+# inactive/<name>. Never edit .agents/skills/ by hand — edit the source
+# or the manifest and rerun this script.
 
 set -euo pipefail
 
@@ -45,7 +46,10 @@ while IFS= read -r name; do
 
   src="$CATALOG/$name"
   if [[ ! -f "$src/SKILL.md" ]]; then
-    echo "FAIL: manifest lists '$name' but skills/$name/SKILL.md does not exist" >&2
+    src="$REPO_ROOT/inactive/$name"
+  fi
+  if [[ ! -f "$src/SKILL.md" ]]; then
+    echo "FAIL: manifest lists '$name' but neither skills/$name nor inactive/$name has SKILL.md" >&2
     fail=1
     continue
   fi

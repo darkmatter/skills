@@ -31,12 +31,13 @@ a catalogued skill includes it in future installations.
 | `rust-best-practices` | Idiomatic Rust implementation and review guidance. |
 | `shadcn-registry-first` | Reuse configured shadcn registries before hand-building common UI. |
 | `sops-secret-access` | Safe SOPS-backed configuration and registry access. |
-| `tdd` | Test-first implementation when the user asks for TDD. |
+| `test-driven-development` | Opt-in TDD: a few E2E happy-path tests of the public contract, not a unit test per function. |
 | `triage` | Triage incoming work and decide the right next action. |
 | `ui-component-architecture` | Keep shared React UI in the shared component package. |
 | `ui-ux-pro-max` | UI/UX design intelligence across supported stacks. |
 | `using-superpowers` | Apply the Superpowers workflow. |
 | `vercel-react-best-practices` | React and Next.js performance guidance. |
+| `when-to-write-tests` | Decide whether to add a test. Default is no new test. |
 | `writing-skills` | Create and improve agent skills. |
 | `zoom-out` | Step back and reassess a task at a broader level. |
 
