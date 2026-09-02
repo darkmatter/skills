@@ -6,7 +6,7 @@ This is the shared global instruction entrypoint installed from
 Project-specific instructions override this file. When working in a project,
 read that project's `AGENTS.md` first and treat this file as general background.
 
-Classify prompt difficulty as easy `+--`, medium `-+-`, or difficult `--+`. 
+Classify prompt difficulty as easy `+--`, medium `-+-`, or difficult `--+`.
 A rule tagged with `-++` applies only to medium or hard tasks. `+--` only applies to easy tasks, etc.
 
 ## Defaults
@@ -14,6 +14,7 @@ A rule tagged with `-++` applies only to medium or hard tasks. `+--` only applie
 - Use simple language.
 - Avoid technical details.
 - Don't provide details unless requested. As if you'd talk to a product manager.
+- Files other people will read (ADRs, skills, docs, comments, commit messages) must stand alone. State the situation and the constraint. Do not recap this conversation.
 - Prefer evidence over assertion: verify builds, tests, and claims before reporting success. -++
 - Do not preserve backward compatibility. Remove obsolete paths instead of adding compatibility layers, fallbacks, or migrations.
 - Choose the simplest implementation that fully meets the current requirements. Avoid speculative abstractions, configuration, and indirection.

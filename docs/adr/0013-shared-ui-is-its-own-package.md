@@ -6,14 +6,17 @@
 
 ## Context
 
-Darkmatter UI skills named three different homes for reusable React:
-`@repo/ui`, `@native/ui`, and shadcn registry output in the app. Agents
-treated the import path as the rule and argued about package names instead
-of the actual constraint: reusable UI must not live in the screen that
-uses it.
+Reusable React UI must live in its own package, not in the screen, route,
+or page that uses it. That package boundary is the architecture.
 
-Repos already disagree on the name (`packages/ui`, `vendor/native-ui`,
-`@repo/ui`, `@native/ui`). Mandating one alias is false precision.
+Darkmatter apps already do this under different names and layouts. Some
+use `packages/ui` imported as `@repo/ui`. Some vendor a starter imported
+as `@native/ui`. Some keep other workspace aliases. Some still drop shadcn
+output next to the route.
+
+Skills and docs that pin one of those strings make the import path look
+like the rule. The name is per-repo. Mandating one alias is false
+precision.
 
 ## Decision
 

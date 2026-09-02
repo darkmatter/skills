@@ -18,6 +18,9 @@ Each ADR has the same shape (loosely [Nygard][nygard], [MADR][madr]):
 ## Context
 
 What's the situation that forced a decision? What constraints are in play?
+Write this for a teammate who will never see the chat. Do not recap a
+discussion. State the situation so a first-time reader can apply the
+decision.
 
 ## Decision
 
