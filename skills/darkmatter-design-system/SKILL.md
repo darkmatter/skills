@@ -8,27 +8,29 @@ metadata:
 
 # Darkmatter Design System
 
-This is darkmatter's design system: a dark-first, terminal/console aesthetic built on **Tailwind CSS v4**, **React 19**, and **Radix UI**. This skill is the canonical UI source for Darkmatter apps — prefer it over generic shadcn/ui, and never mix in stock Tailwind greyscale or another component library.
+This is darkmatter's design system: a dark-first, terminal/console aesthetic built on **Tailwind CSS v4**, **React 19**, and **Radix UI**. Use it for look, tokens, and component APIs when the app has no other established system. Reusable UI still lives in the repo's own UI package ([ADR-0013](../../docs/adr/0013-shared-ui-is-its-own-package.md)); do not require `@native/ui` or any other alias.
 
 ## Setup — build on the starter
 
-- **`app/globals.css`** imports `tailwindcss`, then the vendored `theme.css` (which imports `native-tokens.css`). This establishes the OKLCH `--n-*` ramp, the shadcn semantic bridge, and the Tailwind palette overrides. Do not add a second Tailwind theme or re-declare tokens.
-- **`app/layout.tsx`** mounts `ThemeProvider` (from `next-themes`, forced dark), loads the fonts (Inter / Space Grotesk / mono numerics), and sets `className="dark"` on `<html>`.
-- **Path aliases** in `tsconfig.json` map `@native/ui/*` → `vendor/native-ui/*` and `@native/shared/*` → `vendor/native-shared/*`. Import components by their real package names, e.g. `import { Button } from "@native/ui/button"`.
+The starter is an example layout, not a required import path.
 
-To build a screen: add routes/components under `app/`, import from `@native/ui/*`, and compose with the system's layout primitives. You do **not** need to re-create the scaffold, re-wire the provider, or re-import globals.
+- **`app/globals.css`** imports `tailwindcss`, then the vendored `theme.css` (which imports `native-tokens.css`). This establishes the OKLCH `--n-*` ramp, the shadcn semantic bridge, and the Tailwind palette overrides. Do not add a second Tailwind theme or re-declare tokens.
+- Root layout mounts `ThemeProvider` (forced dark), loads the fonts (Inter / Space Grotesk / mono numerics), and sets `className="dark"` on `<html>`.
+- Import components from **this repo's UI package**. In the starter that package is vendored as `@native/ui/*`; other repos use a different alias. Discover it from workspaces / `packages/*` / vendor trees.
+
+To build a screen: add routes/components under the app, import from the UI package, and compose with the system's layout primitives. You do **not** need to re-create the scaffold, re-wire the provider, or re-import globals.
 
 ## Import rules
 
-- Import each component from its own module: `@native/ui/button`, `@native/ui/card`, `@native/ui/form`, etc. There is no single barrel to import from in app code — use the per-file paths.
-- `cn` and other helpers live at `@native/ui/lib/utils`.
-- Most interactive components are client components (`"use client"`). In the App Router, put interactive compositions in client components and keep pages as server components where possible.
+- Import each component from the UI package the way that package exports it (per-file paths or a barrel — follow the repo).
+- `cn` and other helpers live next to the components in that package.
+- Most interactive components are client components (`"use client"`). Keep pages as server components where the framework allows it.
 - See `references/components/index.md` for the full list of modules and which task-area file documents each.
 
 ## Source of truth
 
-- The vendored source under `vendor/native-ui/` in the starter is the authority for component APIs, props, and variants. The reference files in this skill cite repo-relative paths like `packages/ui/src/button.tsx`.
-- Tokens come only from `theme.css` + `native-tokens.css`. Never hard-code hex/OKLCH values or reach for stock Tailwind shades that aren't mapped — see `references/foundations/colors.md`.
+- The UI package in the repo is the authority for component APIs, props, and variants. The reference files in this skill cite example paths like `packages/ui/src/button.tsx`.
+- Tokens come only from `theme.css` + `native-tokens.css` (or the repo's copies of those files). Never hard-code hex/OKLCH values or reach for stock Tailwind shades that aren't mapped — see `references/foundations/colors.md`.
 
 ## Routing rules — read before building
 
@@ -52,7 +54,7 @@ To build a screen: add routes/components under `app/`, import from `@native/ui/*
 
 Before finishing any Darkmatter UI:
 
-- All UI comes from `@native/ui/*`; no stray shadcn/ui or other libraries.
+- All reusable UI comes from the repo's UI package; no second component library mixed in.
 - Colors resolve to `--n-*` tokens or mapped utilities; no raw values.
 - Layout uses `PageLayout`/`Grid` and is responsive across breakpoints.
 - Numeric data uses `tabular-nums`.

@@ -102,7 +102,7 @@ Placement rules:
 scripts/new-project.sh ~/git/darkmatter/<name> <name> "Short description"
 cd ~/git/darkmatter/<name>
 $EDITOR .agent/context/overview.md     # describe the project
-./scripts/regen-agent-shims.sh         # regenerate AGENTS.md / CLAUDE.md / .cursorrules
+bun scripts/regen-agent-shims.ts         # regenerate AGENTS.md / CLAUDE.md / .cursorrules
 git init && git add . && git commit -m "bootstrap agent config"
 ```
 

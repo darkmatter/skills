@@ -126,7 +126,7 @@ These are standing asks to *agents*, not product features.
 |---|---|---|
 | 2026-08-04 | prelude / agents-flue | Use **subagents** for the work; the parent only **reviews**. Planner/router delegates; only fixes when reviewing. |
 | 2026-07-21 | centaur-overlay | Prefer `ctx.call_tool` over proxy-style invocation — easier to **grep, type-adapt, and fake**. |
-| standing | * | TDD: red-green-refactor, observable behavioral tests, **no implementation-detail tests**. Approval only when public interfaces actually diverge. |
+| standing | * | Default is no new test. Smoke the changed path. Write a test only if the user asked, or a public contract is uncovered; prefer a few E2E happy-path tests over unit tests of internals. TDD is opt-in. |
 | standing | * | Fail-closed. Explicit error termination. Secret scanners fail on match or error. |
 | standing | * | Inline single-expression functions unless they are durable contracts (3+ call sites, domain concept, or type guard). |
 | standing | * | Dynamic `import()` only for runtime-selected specifiers, and only with an explanatory comment. |

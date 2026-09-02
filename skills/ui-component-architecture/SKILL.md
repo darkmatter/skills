@@ -1,33 +1,35 @@
 ---
 name: ui-component-architecture
 description: >
-  Keep React screens thin and the monorepo's shared UI package (packages/ui,
-  imported as @repo/ui) the home for reusable components. Triggers when
-  authoring or restyling a page, route, screen, or component in an app that's
-  part of a monorepo with a shared UI package — especially when a file is
+  Keep React screens thin and reusable UI in its own package, separate from
+  app screens. Triggers when authoring or restyling a page, route, screen, or
+  component in an app that has a shared UI package — especially when a file is
   trending toward walls of plain <div className="..."> Tailwind markup. Bias
-  toward reusing existing @repo/ui primitives and graduating new reusable units
-  out of screens into @repo/ui, while avoiding premature over-extraction. Do NOT
-  trigger for non-React code, for single-package apps with no shared UI package,
-  or for editing the internals of one existing component.
+  toward reusing existing primitives in that package and graduating new
+  reusable units into it, while avoiding premature over-extraction. Do NOT
+  trigger for non-React code, for single-package apps with no shared UI
+  package, or for editing the internals of one existing component. The package
+  name is per-repo (see ADR-0013); do not require @repo/ui or @native/ui.
 ---
 
 # UI component architecture
 
 The failure mode this corrects: an agent authors a screen as a few hundred lines
 of `<div className="...">` Tailwind soup — reimplementing a `Button`, `Card`, or
-`Badge` that already exists in `@repo/ui`, and never graduating the genuinely
-reusable pieces back into the shared package. The result is duplicated styling,
-drifting visual language, and screens nobody can read.
+`Badge` that already exists in the shared UI package, and never graduating the
+genuinely reusable pieces back into that package. The result is duplicated
+styling, drifting visual language, and screens nobody can read.
 
 The fix is two habits: **reuse before you author**, and **keep screens thin by
-extracting reusable units into `@repo/ui`** — without over-extracting one-off
-layout glue. In these monorepos the shared package lives at `packages/ui` and is
-imported as `@repo/ui`.
+extracting reusable units into the shared UI package** — without over-extracting
+one-off layout glue. That package MUST be its own package. Its path and import
+alias are per-repo ([ADR-0013](../../docs/adr/0013-shared-ui-is-its-own-package.md)).
+Discover them from the workspace (`package.json` workspaces, `packages/*`,
+vendor trees). Do not invent a required name.
 
 ## When to use
 
-- Authoring a new page/route/screen in an app under a monorepo with `packages/ui`.
+- Authoring a new page/route/screen in an app that has a shared UI package.
 - Restyling or refactoring an existing screen that's heavy with inline divs.
 - Building a component that looks like a reusable primitive (button, card,
   badge, input, dialog, empty state, stat, skeleton, avatar).
@@ -47,11 +49,11 @@ imported as `@repo/ui`.
 
 Before writing JSX, inventory what already exists so you don't reinvent it:
 
-- `@repo/ui` — read its barrel (`packages/ui/src/index.ts`) or `package.json`
-  `exports` to see what primitives are available. Grep for the thing you need.
-- External registries — for blocks not yet in `@repo/ui`, see the
+- The shared UI package — read its barrel or `package.json` `exports`. Grep for
+  the thing you need.
+- External registries — for blocks not yet in the shared package, see the
   `shadcn-registry-first` skill. The flow is registry → app screen → graduate the
-  stable pieces into `@repo/ui`.
+  stable pieces into the UI package.
 
 Don't reimplement a `Button`, `Card`, `Badge`, `Input`, `Dialog`, or
 `EmptyState` that already exists.
@@ -64,7 +66,7 @@ that a page's JSX is mostly `<NamedThing .../>` calls and the visual detail live
 inside those components. The moment you're writing the same cluster of divs a
 second time, stop and name it.
 
-### Graduate reusable units into `@repo/ui`
+### Graduate reusable units into the UI package
 
 The load-bearing heuristic for what moves into the shared package:
 
@@ -74,7 +76,7 @@ The load-bearing heuristic for what moves into the shared package:
 - **Stays in the app:** app-specific composition (a particular dashboard's
   layout), one-off glue, and anything carrying data-wiring or business logic.
 - **When unsure, leave it local.** Extract on the _second_ use, not the first.
-  An `@repo/ui` full of single-use components with app-specific props is its own
+  A UI package full of single-use components with app-specific props is its own
   smell (see "Avoiding over-extraction").
 
 ### Style with tokens and variants, not scattered magic values
@@ -89,13 +91,13 @@ The load-bearing heuristic for what moves into the shared package:
 
 ### 1. Inventory the shared UI package
 
-List what `@repo/ui` already exports (read the barrel / `package.json` exports;
-grep for candidates). Note the primitives you'll reuse so you don't rebuild them.
+Find the package (workspace list, `packages/*`, vendor tree). List what it
+already exports. Note the primitives you'll reuse so you don't rebuild them.
 
 ### 2. Sketch the screen as composition
 
 Before writing detail, outline the page as a tree of named components. Tag each
-node: _exists in `@repo/ui`_ / _app-specific composition_ / _new but looks
+node: _exists in the UI package_ / _app-specific composition_ / _new but looks
 reusable_. This tells you what to import, what to inline, and what to extract.
 
 ### 3. Author the screen thin
@@ -107,24 +109,23 @@ readable — if it's growing past a screenful of divs, you're missing a componen
 
 For each piece that meets the graduation heuristic:
 
-- Put it under `packages/ui/src/<component>.tsx`.
-- Export it from the barrel (`packages/ui/src/index.ts`) or `package.json`
-  `exports`.
+- Put it in the UI package, next to its siblings.
+- Export it from the barrel or `package.json` `exports`.
 - Keep props **generic** — no app-specific types, routes, stores, or API clients
-  leaking into a UI primitive. A `@repo/ui` component should be dumb and
+  leaking into a UI primitive. A shared UI component should be dumb and
   presentational; data comes in as props.
 - Co-locate variants with `cn`/`cva`.
 
 ### 5. Verify
 
-- The screen imports primitives from `@repo/ui` rather than redefining them.
+- The screen imports primitives from the UI package rather than redefining them.
 - No app-specific imports (`@/...`, app routers, stores, API clients) inside any
-  `@repo/ui` component.
+  UI-package component.
 - Types and build pass (`lsp_diagnostics`, `check-types`, build).
 
 ## What graduates vs what stays
 
-| Stays in the app                         | Graduates to `@repo/ui`                   |
+| Stays in the app                         | Graduates to the UI package               |
 | ---------------------------------------- | ----------------------------------------- |
 | The `/dashboard` page layout             | `StatCard`, `Badge`, `EmptyState`         |
 | Route-specific data fetching and wiring  | `Button`, `Input`, `Dialog`, `Skeleton`   |
@@ -136,7 +137,7 @@ For each piece that meets the graduation heuristic:
 Over-extraction is the opposite failure and just as costly. Signs you extracted
 too eagerly:
 
-- `@repo/ui` components with props named after one specific screen.
+- UI-package components with props named after one specific screen.
 - A "reusable" component used exactly once.
 - UI primitives importing app stores, routers, or API clients.
 
@@ -148,20 +149,20 @@ it can't be expressed as presentational props, it isn't a shared primitive yet.
 - `reference/agents-md-rule.md` — a short, paste-able always-on rule for a
   consuming repo's `AGENTS.md`. This is the highest-leverage lever: skills are
   loaded on demand and can under-trigger on "every UI edit," whereas an
-  `AGENTS.md` rule is always in context. Drop it into each monorepo that has a
-  `packages/ui`.
+  `AGENTS.md` rule is always in context. Drop it into each repo that has a
+  shared UI package; fill in that repo's actual package path and import alias.
 - `reference/eslint-guardrails.md` — lint rules that enforce the boundaries
   mechanically (no raw hex in app JSX, capped JSX depth, and — most importantly —
-  a boundary rule banning app imports inside `@repo/ui`).
+  a boundary rule banning app imports inside the UI package).
 
 ## Relationship to other skills
 
 - `shadcn-registry-first` — sources _external_ blocks from registries. This skill
   governs _internal_ reuse and extraction. They compose: registry → app screen →
-  graduate stable pieces into `@repo/ui`.
-- `coding-standards` — general DRY, file-size, and module-boundary guidance. This
-  is the React + monorepo specialization of those principles at component
-  granularity.
+  graduate stable pieces into the UI package.
+- `darkmatter-design-system` — visual language and tokens when the app uses that
+  system. Those tokens still live in the UI package; this skill is the package
+  boundary.
 - `repository-organization` — where directories and packages live. This operates
   one level down, at the component-reuse granularity.
 - `vercel-react-best-practices` — performance patterns for the components you

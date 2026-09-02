@@ -116,14 +116,18 @@ installers is fine; assuming any of those are already installed is not.
 A large fraction of darkmatter repos use Nix flakes. Those repos SHOULD
 wrap their scripts to enter the devshell, so a user can run
 `./scripts/test` from a bare shell without first remembering to run
-`nix develop`. The canonical pattern:
+`nix develop`. The inner command is the real implementation. In a TypeScript-only repo
+that is TypeScript ([ADR-0012](0012-ops-scripts-in-typescript.md)). A
+POSIX file, if present, is only a trampoline into the devshell.
 
-| Script              | Implementation                                                 |
-| ------------------- | -------------------------------------------------------------- |
-| `./scripts/console` | `exec nix develop` (drops the user into the devshell).         |
-| `./scripts/server`  | `nix develop -c <runner>` (e.g. `nix develop -c bun run dev`). |
-| `./scripts/test`    | `nix develop -c <test command>`.                               |
-| `./scripts/ci`      | `nix develop -c <ci pipeline>`.                                |
+| Entrypoint          | What it runs                                                                 |
+| ------------------- | ---------------------------------------------------------------------------- |
+| `console`           | `exec nix develop` (drops the user into the devshell).                       |
+| `server`            | TypeScript-only: `bun scripts/server.ts` (or `nix develop -c bun scripts/server.ts`). |
+| `test`              | TypeScript-only: `bun scripts/test.ts` (or the trampoline into that).        |
+| `ci`                | TypeScript-only: `bun scripts/ci.ts` (or the trampoline into that).          |
+
+Non-TypeScript repos fill the same names with that language's runner.
 
 Scripts SHOULD detect whether they are already inside the devshell (e.g.
 checking `$IN_NIX_SHELL` or a project-specific sentinel) and skip
@@ -148,6 +152,13 @@ and dependency-graph benefits.
 Even in the turbo case, a thin `./scripts/<name>` or `justfile` recipe at
 the repo root that shells out to `turbo run <name>` is encouraged so the
 uniform muscle memory still works from a fresh clone.
+
+### TypeScript-only repos
+
+The contract is still these command names. When the project is all
+TypeScript, the implementation is TypeScript — not bash. See
+[ADR-0012](0012-ops-scripts-in-typescript.md). A POSIX file is allowed
+only as a trampoline to install Bun or `exec` into the Nix devshell.
 
 ## Consequences
 

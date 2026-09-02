@@ -49,4 +49,4 @@ Files at the repo root that shim into `.agent/`:
 - `CLAUDE.md` — Claude Code
 - `.cursorrules` — Cursor
 
-Regenerate them after editing `.agent/` content with `scripts/regen-agent-shims.sh`.
+Regenerate them after editing `.agent/` content with `bun scripts/regen-agent-shims.ts`.

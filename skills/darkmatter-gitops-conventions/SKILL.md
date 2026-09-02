@@ -1,6 +1,6 @@
 ---
 name: darkmatter-gitops-conventions
-description: Safe-change playbook for the darkmatter/gitops repo — validation before commit (kubeconform with CI-identical flags, yq, git diff --check), sha-pinned images, KSOPS/SOPS secret editing rules, rollback via revert, and how ArgoCD reconciles. Use for ANY change to darkmatter/gitops (manifests, Helm values, apps/*.yaml, secrets), when asked to bump an image tag, wire a secret, or roll back a deploy. Also use when tempted to kubectl apply/edit/patch anything — the answer is no.
+description: Safe-change playbook for the darkmatter/gitops repo — validation before commit (kubeconform with CI-identical flags, yq for YAML manifests, jq for SOPS JSON, git diff --check), sha-pinned images, KSOPS/SOPS secret editing rules, rollback via revert, and how ArgoCD reconciles. Use for ANY change to darkmatter/gitops (manifests, Helm values, apps/*.yaml, secrets), when asked to bump an image tag, wire a secret, or roll back a deploy. Also use when tempted to kubectl apply/edit/patch anything — the answer is no.
 ---
 
 # Darkmatter gitops conventions
@@ -52,10 +52,14 @@ spec hash churns dependent warm pools automatically.
 
 ## Secrets (KSOPS/SOPS)
 
-- Secrets live encrypted in-repo (`*.sops.yaml`), rendered by KSOPS.
+- Secrets live encrypted in-repo as JSON (`*.sops.json`), rendered by KSOPS.
+  See [ADR-0011](../../docs/adr/0011-sops-files-as-json.md). Do not add new
+  `*.sops.yaml` / `.env.sops`. Convert existing YAML SOPS files when touched.
+  Kubernetes Secret JSON is valid for the API.
 - Editing: decrypt to a `0600` temp file, edit, re-encrypt, then verify
-  structurally (`yq` on the decrypted form) and by diffing key NAMES only —
-  never print values. Clean up the temp file.
+  structurally (`jq empty` on the decrypted form) and by diffing key NAMES
+  only — never print values. Clean up the temp file. Plain non-secret
+  manifests stay YAML; keep using `yq` for those.
 - Reference secrets by name everywhere else; an inline secret value in any
   manifest or log is an incident.
 - Agent/runtime secrets follow the hardened flow (Centaur vault + console

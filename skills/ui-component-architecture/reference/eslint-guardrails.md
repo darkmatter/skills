@@ -3,14 +3,14 @@
 Lint can't enforce "this should have been reused," but it can enforce the
 boundaries that keep the architecture honest. These rules nudge the behavior
 mechanically so it doesn't rely on the model remembering. Add the ones that fit;
-the boundary rule (banning app imports inside `@repo/ui`) is the most valuable.
+the boundary rule (banning app imports inside the UI package) is the most valuable.
 
 Assumes a flat-config (`eslint.config.js`) ESLint 9 setup. Adapt globs to the
-repo's actual layout.
+repo's actual UI package path.
 
-## 1. Ban app imports inside `@repo/ui` (the important one)
+## 1. Ban app imports inside the UI package (the important one)
 
-A shared UI primitive must stay presentational. This rule stops `packages/ui`
+A shared UI primitive must stay presentational. This rule stops the UI package
 from importing app code (`@/...`, routers, stores, API clients), which is the
 single clearest signal of a leaky, over-coupled extraction.
 
@@ -20,7 +20,7 @@ import boundaries from "eslint-plugin-boundaries";
 
 export default [
   {
-    files: ["packages/ui/**/*.{ts,tsx}"],
+    files: ["packages/ui/**/*.{ts,tsx}"], // replace with this repo's UI package glob
     rules: {
       "no-restricted-imports": [
         "error",
@@ -29,11 +29,11 @@ export default [
             {
               group: ["@/*"],
               message:
-                "@repo/ui must not import app code. Keep primitives presentational; pass data as props.",
+                "The UI package must not import app code. Keep primitives presentational; pass data as props.",
             },
             {
               group: ["@repo/api", "@repo/db", "**/stores/*", "**/routes/*"],
-              message: "No app stores/routes/data layers inside @repo/ui.",
+              message: "No app stores/routes/data layers inside the UI package.",
             },
           ],
         },
@@ -66,7 +66,7 @@ Pushes styling onto theme tokens instead of magic hex values scattered through
 }
 ```
 
-Tune to taste — some teams allow arbitrary values in `@repo/ui` itself (where the
+Tune to taste — some teams allow arbitrary values in the UI package itself (where the
 tokens are defined) but ban them in apps.
 
 ## 3. Cap JSX nesting depth

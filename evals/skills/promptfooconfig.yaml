@@ -415,26 +415,28 @@ tests:
           - "no effect"
 
 
-  - description: ui-component-architecture blocks reimplementing a primitive that exists in @repo/ui
+  - description: ui-component-architecture blocks reimplementing a primitive that exists in the shared UI package
     vars:
       skill: ui-component-architecture
       rule: >-
         Don't reimplement a Button, Card, Badge, Input, Dialog, or EmptyState that already
-        exists in @repo/ui. Reuse before you author: inventory what @repo/ui exports before
-        writing JSX, and keep screens thin.
+        exists in the shared UI package. Reuse before you author: inventory what that
+        package exports before writing JSX, and keep screens thin. The package name is
+        per-repo.
       scenario: >-
-        In a monorepo with packages/ui (@repo/ui) that already exports Button and Card, the
+        In a monorepo with a shared UI package that already exports Button and Card, the
         agent writes a new screen with its own hand-rolled button and card built from raw
-        <div> plus Tailwind, without checking @repo/ui.
+        <div> plus Tailwind, without checking the UI package.
     assert:
       - type: contains
         value: "DECISION: BLOCK"
       - type: icontains-any
         value:
-          - "@repo/ui"
           - "reuse"
           - "existing"
           - "inventory"
+          - "UI package"
+          - "shared UI"
 
   - description: coding-standards blocks accidental O(n^2) find-in-loop over large arrays
     vars:
@@ -509,7 +511,7 @@ tests:
         primitives importing app stores/routers, are smells.
       scenario: >-
         The agent builds a layout wrapper used exactly once on one screen and keeps it
-        inline in that screen instead of moving it into @repo/ui, planning to extract only
+        inline in that screen instead of moving it into the shared UI package, planning to extract only
         if a second use appears.
     assert:
       - type: contains

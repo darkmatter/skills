@@ -158,7 +158,7 @@ of `components.json`. In darkmatter repos this is handled per-project:
 - `components.json.template` is committed with the `${SHADCNBLOCKS_API_KEY}`
   placeholder.
 - The key lives in the secret store (himitsu: `himitsu read shadcnblocks-api-key`,
-  or a SOPS-encrypted secret). A small `scripts/setup-components-json.sh` renders
+  or a SOPS-encrypted secret). A small `scripts/setup-components-json.ts` renders
   the template with the key.
 
 ### Before running any `bunx shadcn` command
@@ -166,7 +166,7 @@ of `components.json`. In darkmatter repos this is handled per-project:
 The rendered `components.json` must exist **and be fresh** — a stale one from a
 previous session may carry an expired key. Always do these two steps first:
 
-1. **Build components.json**: run `scripts/setup-components-json.sh` from the repo
+1. **Build components.json**: run `bun scripts/setup-components-json.ts` from the repo
    root. This reads the current key from himitsu and writes the gitignored
    `components.json`. Skip this and you'll get 401 auth failures.
 2. **`cd` into the app directory** (e.g. `apps/web/`) before running
@@ -180,7 +180,7 @@ Typical invocation:
 
 ```bash
 # From repo root:
-scripts/setup-components-json.sh
+bun scripts/setup-components-json.ts
 cd apps/web
 bunx shadcn@latest add @shadcnblocks/hero253 --overwrite
 ```
@@ -189,6 +189,9 @@ If a registry call fails with a missing-env-var or auth error, the fix is to
 populate the key from the secret store — not to abandon the registry and
 hand-roll the component. See the `sops-secret-access` skill for the encrypted-
 config side of this and the expected secret-handling pattern.
+
+Graduate stable pieces from the screen into the repo's shared UI package (name
+is per-repo; see [ADR-0013](../../docs/adr/0013-shared-ui-is-its-own-package.md)).
 
 ## Relationship to other skills
 

@@ -15,7 +15,7 @@ hooks/                   ← session lifecycle hook scripts
 knowledge/               ← knowledge index (project-specific reference material)
 config/                  ← runtime config defaults
 memory/                  ← session-spanning memory (separate from .agent/memory/)
-scripts/regen-agent-shims.sh  ← regenerate provider shims from .agent/
+scripts/regen-agent-shims.ts  ← regenerate provider shims from .agent/
 
 AGENTS.md, CLAUDE.md, .cursorrules  ← provider shims, generated from .agent/
 ```
@@ -25,7 +25,7 @@ AGENTS.md, CLAUDE.md, .cursorrules  ← provider shims, generated from .agent/
 After editing `.agent/`, run:
 
 ```sh
-./scripts/regen-agent-shims.sh
+bun scripts/regen-agent-shims.ts
 ```
 
 The script reads `agent.yaml` for the project name and rewrites `AGENTS.md`, `CLAUDE.md`, and `.cursorrules` to point into `.agent/`.
@@ -40,7 +40,7 @@ Skills shared across darkmatter projects are pulled in via the Nix Home Manager 
 2. Add the first standing decisions to `.agent/context/decisions.md`
 3. Edit `agent.yaml` — at minimum, set `description`
 4. Customize `RULES.md`, `DUTIES.md`, `SOUL.md` to match this project's particulars
-5. Run `./scripts/regen-agent-shims.sh`
+5. Run `bun scripts/regen-agent-shims.ts`
 
 ## Where to start (for agents)
 
