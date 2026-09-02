@@ -31,4 +31,4 @@ Agent: ... (uses this skill to ask clarifying questions and produce a DoD checkl
 
 ## Reference
 
-- `reference/definition-of-done-template.md` — a markdown template for a Definition of Done checklist with sections for functional criteria, non‑functional criteria, testing, documentation, and sign‑off.
+- `reference/definition-of-done-template.md` — a markdown template for a Definition of Done checklist with sections for functional criteria, non-functional criteria, verification, documentation, and sign-off.

@@ -9,6 +9,12 @@ Org-wide contract for TS repos (platform, nixmac-web, and friends). The stack
 is deliberate; substituting familiar defaults (npm, jest, wrangler) creates a
 second convention and breaks CI.
 
+## Ops scripts — TypeScript, not bash
+
+If the repo is TypeScript-only, utility and CI scripts are TypeScript
+(`scripts/*.ts`, `bun scripts/ci.ts`). Do not add `.sh` files. See
+[ADR-0012](../../docs/adr/0012-ops-scripts-in-typescript.md).
+
 ## Package management — Bun only
 
 - Install: `bun install`; CI uses `bun install --frozen-lockfile`. If CI fails

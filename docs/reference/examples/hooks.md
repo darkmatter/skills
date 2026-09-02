@@ -2,6 +2,8 @@
 
 This shows hook entrypoints that can be called by different agent runtimes, git hooks, or CI. Keep the scripts provider-agnostic.
 
+In a TypeScript-only project, hook logic is TypeScript ([ADR-0012](../../adr/0012-ops-scripts-in-typescript.md)). Use `#!/usr/bin/env bun` and `*.ts`. POSIX is only a trampoline to Bun.
+
 Recommended template structure:
 
 ```text

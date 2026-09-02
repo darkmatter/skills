@@ -45,11 +45,11 @@ Files written:
 ├── DUTIES.md
 ├── SOUL.md
 ├── compliance/{risk-assessment.md,regulatory-map.yaml,validation-schedule.yaml}
-├── hooks/{hooks.yaml,scripts/on-start.sh,scripts/on-error.sh}
+├── hooks/{hooks.yaml,scripts/on-start.ts,scripts/on-error.ts}
 ├── knowledge/index.yaml
 ├── config/default.yaml
 ├── memory/{MEMORY.md,memory.yaml}
-└── scripts/regen-agent-shims.sh
+└── scripts/regen-agent-shims.ts
 ```
 
 ## Step 2 — fill in the template
@@ -75,7 +75,7 @@ Customize `RULES.md`, `DUTIES.md`, `SOUL.md` as needed. The defaults are sensibl
 
 ```sh
 cd <target>
-./scripts/regen-agent-shims.sh
+bun scripts/regen-agent-shims.ts
 ```
 
 This rewrites `AGENTS.md`, `CLAUDE.md`, and `.cursorrules` from `agent.yaml` (for the project name) and the `.agent/` structure. Run it any time you significantly change `.agent/` content. You do not need to run it immediately after stamping — the initial shims are already correct.
@@ -96,7 +96,7 @@ If you don't already have the `darkmatter/skills` Nix module wired into your hom
 
 The template is a one-shot stamp, not a live dependency. When the template changes, projects don't auto-update. To pull a template change into an existing project:
 
-- For shim regeneration logic: copy `template/scripts/regen-agent-shims.sh` over the project's copy
+- For shim regeneration logic: copy `template/scripts/regen-agent-shims.ts` over the project's copy
 - For new sections in `RULES.md` / `DUTIES.md` / `SOUL.md`: copy by hand
 - For new `.agent/` subdirectories: `mkdir` and add a starter file
 

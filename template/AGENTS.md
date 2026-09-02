@@ -19,7 +19,7 @@ Then read the project-level config:
 
 For specific tasks see `.agent/workflows/`, `.agent/skills/`, `.agent/prompts/`.
 
-If content here drifts from `.agent/`, the `.agent/` files are authoritative. Regenerate with `scripts/regen-agent-shims.sh`.
+If content here drifts from `.agent/`, the `.agent/` files are authoritative. Regenerate with `bun scripts/regen-agent-shims.ts`.
 
 ## Project bootstrap
 

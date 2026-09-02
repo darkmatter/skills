@@ -12,8 +12,8 @@ contribute.
   Layers, Config, Schema, typed errors, retries, resources, tests.
 - `coding-standards` — universal TS/JS/React/Node readability and
   maintainability standards.
-- `ui-component-architecture` — thin screens, shared `@repo/ui` package in
-  monorepos.
+- `ui-component-architecture` — thin screens; reusable UI in its own package
+  (name is per-repo).
 - `vercel-react-best-practices` — React/Next.js performance patterns.
 - `choose-dev-entrypoints` — where dev/build/test commands live across Nix,
   Just, Bun, Turborepo, and package scripts.
@@ -22,7 +22,7 @@ contribute.
 
 | Topic              | What it should demonstrate                                            | Exemplar |
 | ------------------ | ---------------------------------------------------------------------- | -------- |
-| Project layout     | Bun + Turborepo monorepo shape, package boundaries, `@repo/ui`         | _todo_   |
+| Project layout     | Bun + Turborepo monorepo shape, package boundaries, UI in its own package | _todo_   |
 | Effect services    | Service / Layer / Config wiring for an I/O-heavy module                | _todo_   |
 | Error handling     | Typed errors with Schema, expected failure vs defect                   | _todo_   |
 | Testing            | Effect test layers, unit vs integration layout                         | _todo_   |

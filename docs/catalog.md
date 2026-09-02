@@ -10,36 +10,28 @@ a catalogued skill includes it in future installations.
 | --- | --- |
 | `agent-browser` | Browser automation guidance. |
 | `alchemy` | Darkmatter's Alchemy v2 infrastructure and deployment workflow. |
-| `choose-dev-entrypoints` | Choose the correct Nix, Bun, Turbo, Just, or script entrypoint. |
+| `choose-dev-entrypoints` | Choose the correct Nix, Bun, Turbo, Just, or script entrypoint. TypeScript-only repos implement ops scripts in TypeScript ([ADR-0012](adr/0012-ops-scripts-in-typescript.md)). |
 | `codebase-cleanup` | Safely clean up and simplify an existing codebase. |
-| `darkmatter-gitops-conventions` | Safe GitOps changes, validation, rollout, and rollback. |
-| `darkmatter-ts-toolchain` | Darkmatter TypeScript/Bun toolchain and CI contract. |
-| `definition-of-done` | Define a clear, verifiable completion condition for agentic work. |
+| `darkmatter-design-system` | Darkmatter visual language and tokens. Reusable UI lives in the repo's own package ([ADR-0013](adr/0013-shared-ui-is-its-own-package.md)). |
+| `darkmatter-gitops-conventions` | Safe GitOps changes, validation, rollout, and rollback. SOPS payloads are JSON ([ADR-0011](adr/0011-sops-files-as-json.md)). |
+| `darkmatter-ts-toolchain` | Darkmatter TypeScript/Bun toolchain and CI contract. Ops scripts in TS-only repos are TypeScript ([ADR-0012](adr/0012-ops-scripts-in-typescript.md)). |
+| `definition-of-done` | Define a clear, verifiable completion condition for agentic work. Verification follows `when-to-write-tests`. |
 | `diagnose` | Evidence-led diagnosis of bugs and performance regressions. |
 | `effect-typescript` | Typed Effect patterns for meaningful TypeScript I/O. |
 | `find-skills` | Find available skills for a task. |
-| `finishing-a-development-branch` | Finish and integrate a development branch. |
-| `grill-me` | Challenge and refine an implementation plan. |
-| `grill-with-docs` | Challenge and refine a plan using documentation. |
-| `handoff` | Create a compact handoff for another agent. |
-| `improve-codebase-architecture` | Improve a codebase's architecture. |
-| `nextjs-to-rwsdk-migration` | Migrate a Next.js application to RedwoodSDK. |
+| `flue` | Use when working with the Flue framework. |
+| `keep-codebase-maintainable` | Cleanup and maintainability passes, not feature work. |
 | `nix-flake-organization` | Maintain the Darkmatter Nix flake/module layout. |
-| `prototype` | Build a prototype to evaluate an idea. |
 | `repository-organization` | Organize durable repository context and assets. |
 | `run-ui-registry-variations` | Build and compare UI registry variations. |
 | `rust-best-practices` | Idiomatic Rust implementation and review guidance. |
 | `shadcn-registry-first` | Reuse configured shadcn registries before hand-building common UI. |
-| `sops-secret-access` | Safe SOPS-backed configuration and registry access. |
+| `sops-secret-access` | Safe SOPS-backed configuration and registry access. Payloads are JSON ([ADR-0011](adr/0011-sops-files-as-json.md)). |
 | `test-driven-development` | Opt-in TDD: a few E2E happy-path tests of the public contract, not a unit test per function. |
-| `triage` | Triage incoming work and decide the right next action. |
-| `ui-component-architecture` | Keep shared React UI in the shared component package. |
+| `ui-component-architecture` | Keep reusable React UI in its own package. The package name is per-repo ([ADR-0013](adr/0013-shared-ui-is-its-own-package.md)). |
 | `ui-ux-pro-max` | UI/UX design intelligence across supported stacks. |
-| `using-superpowers` | Apply the Superpowers workflow. |
 | `vercel-react-best-practices` | React and Next.js performance guidance. |
 | `when-to-write-tests` | Decide whether to add a test. Default is no new test. |
-| `writing-skills` | Create and improve agent skills. |
-| `zoom-out` | Step back and reassess a task at a broader level. |
 
 ## Client runtimes
 

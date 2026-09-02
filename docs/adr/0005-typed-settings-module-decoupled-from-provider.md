@@ -213,9 +213,9 @@ defect. The wrapper exists to keep secrets out of logs and error
 messages by construction; logging a redacted value MUST render as a
 placeholder, never the raw value.
 
-Storage of secrets at rest is out of scope for this ADR; see the
-`sops-secret-access` skill for the darkmatter convention on encrypted
-config files.
+Storage of secrets at rest is out of scope for this ADR; encrypted
+files are JSON per [ADR-0011](0011-sops-files-as-json.md). See the
+`sops-secret-access` skill for how to decrypt them.
 
 ### Exceptions
 

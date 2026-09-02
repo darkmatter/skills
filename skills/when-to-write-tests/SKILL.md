@@ -35,6 +35,8 @@ These used to fire too often. Treat them as opt-in; this preference wins:
 - Bundled `test-driven-development` — "any feature or bugfix", "every new function has a test"
 - `using-superpowers` 1% match — does **not** mean invoke TDD on every implement
 - `AGENTS.md` "regression tests for behavior changes" — means public contract, not every internal change
+- `diagnose` Phase 5 — verify with the repro loop; do not add a test unless this skill says so
+- `definition-of-done` — no coverage quota; verification is smoke plus this skill
 - Session advisories asking for another unit test of plumbing
 
 `verification` is end-to-end smoke, not a vitest file.

@@ -1,15 +1,17 @@
 ---
 name: sops-secret-access
-description: Use when a repo stores tool config, API keys, registry URLs, environment variables, or component registry settings in SOPS-encrypted files such as components.sops.json, .env.sops, or secrets/*.sops.yaml.
+description: Use when a repo stores tool config, API keys, registry URLs, environment variables, or component registry settings in SOPS-encrypted files such as components.sops.json or secrets/*.sops.json.
 ---
 
 # SOPS Secret Access
 
 Use the repo's encrypted source of truth when a task depends on secrets or private tool configuration. Do not infer from public fallback files if a matching `*.sops.*` file exists.
 
+New SOPS payloads are JSON (`*.sops.json`). See [ADR-0011](../../docs/adr/0011-sops-files-as-json.md). Decrypt existing non-JSON files if that is what the repo already has; do not add new ones.
+
 ## When to Use
 
-- A project has `components.sops.json`, `.env.sops`, `secrets/*.sops.yaml`, or another SOPS-encrypted config.
+- A project has `components.sops.json`, `secrets/*.sops.json`, or another SOPS-encrypted config.
 - A public config looks incomplete and a private registry, API, MCP server, deployment credential, or provider profile may be hidden behind SOPS.
 - The task mentions shadcnblocks, private shadcn registries, registry auth, SOPS, secrets, env loading, or encrypted project config.
 - A tool only shows public/default config but the repo has a likely encrypted companion file.
@@ -47,3 +49,4 @@ If a tool needs `components.json`, do not overwrite the checked-in public file u
 - Printing full decrypted JSON to the user.
 - Committing generated plaintext config.
 - Adding secrets to `AGENTS.md`, README files, examples, or tests.
+- Creating a new `*.sops.yaml`, `*.sops.yml`, or `.env.sops`. New payloads are `*.sops.json`.

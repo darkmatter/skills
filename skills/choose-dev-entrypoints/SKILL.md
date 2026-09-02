@@ -1,6 +1,6 @@
 ---
 name: choose-dev-entrypoints
-description: Choose the right dev-environment entrypoint and responsibility boundary across Nix, Just, Bun, Turborepo, package scripts, shellHook, and ./scripts. Triggers when the user asks which command should run dev/build/test/install/codegen, whether to put work in nix develop or shellHook, how to split responsibilities between just, bun, turbo, and scripts, or how to make dev environments lazy, cacheable, and understandable. Do NOT trigger for ordinary implementation work, generic shell scripting, or Nix flake layout refactors.
+description: Choose the right dev-environment entrypoint and responsibility boundary across Nix, Just, Bun, Turborepo, package scripts, shellHook, and ./scripts. Triggers when the user asks which command should run dev/build/test/install/codegen, whether to put work in nix develop or shellHook, how to split responsibilities between just, bun, turbo, and scripts, or how to make dev environments lazy, cacheable, and understandable. Do NOT trigger for ordinary implementation work or Nix flake layout refactors. In a TypeScript-only repo, ops scripts are TypeScript (ADR-0012), not bash.
 ---
 
 # Choose dev entrypoints
@@ -25,14 +25,14 @@ just or similar command runner
   owns human-friendly aliases and repo chores
 
 scripts/
-  owns imperative glue that needs real shell/programming logic
+  owns imperative glue (TypeScript in TS-only repos; see ADR-0012)
 ```
 
 The useful question is "who consumes the result?" rather than "which tool is capable of running it?"
 
 ## When to use
 
-- The user asks whether `nix develop`, `shellHook`, `just`, `bun run`, `turbo run`, or `./scripts/*.sh` should own a workflow.
+- The user asks whether `nix develop`, `shellHook`, `just`, `bun run`, `turbo run`, or `./scripts/*` should own a workflow.
 - The user is designing a dev entrypoint such as `dev`, `build`, `test`, `codegen`, `install`, `fmt`, or `watch`.
 - A shell hook is doing too much work on environment entry.
 - A repo has several ways to start a dev server and the user wants a principled split.
@@ -42,7 +42,7 @@ The useful question is "who consumes the result?" rather than "which tool is cap
 ## When NOT to use
 
 - The task is specifically reorganizing Nix flake outputs or module layout. Use `nix-flake-organization`.
-- The task is only writing or debugging a shell script, with no responsibility-boundary question.
+- The task is only writing or debugging an existing script, with no responsibility-boundary question. In a TypeScript-only repo, new ops scripts are TypeScript ([ADR-0012](../../docs/adr/0012-ops-scripts-in-typescript.md)), not bash.
 - The task is only adding one package script in an already-established repo convention.
 - The user asks for current docs or exact CLI syntax. Fetch the relevant docs first, then apply this skill if the ownership decision remains.
 
@@ -65,7 +65,7 @@ The useful question is "who consumes the result?" rather than "which tool is cap
 | `bun run <script>` | Package-local commands and scripts that belong to one package or root JS workspace | Cross-package orchestration that needs graph dependencies and caching |
 | `turbo run <task>` | Monorepo task graph, task dependencies, cacheable inputs and outputs, workspace-wide `build`, `test`, `lint`, `dev` orchestration | Arbitrary shell initialization, secrets loading, one-off imperative logic better expressed as a script |
 | `just <recipe>` | Human-friendly command aliases, repo chores, composition across ecosystems, discoverable shortcuts | Owning hidden build semantics that package scripts or Turbo need to cache |
-| `scripts/*` | Complex imperative glue, traps, port cleanup, service readiness checks, multi-step procedures awkward in JSON | Becoming a second untracked task graph |
+| `scripts/*` | Complex imperative glue, traps, port cleanup, service readiness checks, multi-step procedures awkward in JSON. In a TypeScript-only repo this is TypeScript (`scripts/*.ts`), not bash ([ADR-0012](../../docs/adr/0012-ops-scripts-in-typescript.md)) | Becoming a second untracked task graph; new `.sh` files in a TS-only repo |
 
 ## Common patterns
 
@@ -155,12 +155,12 @@ enter shell -> maybe codegen for everyone
 
 ### Imperative glue
 
-Use `scripts/dev.sh` when startup needs conditionals, traps, process cleanup, readiness checks, or multi-service orchestration that is hard to express in JSON. Call it from `bun run`, `turbo`, or `just` so the public entrypoint remains discoverable.
+Use `scripts/dev.ts` when startup needs conditionals, traps, process cleanup, readiness checks, or multi-service orchestration that is hard to express in JSON. Call it from `bun run`, `turbo`, or `just` so the public entrypoint remains discoverable. In a TypeScript-only repo do not add `scripts/dev.sh` ([ADR-0012](../../docs/adr/0012-ops-scripts-in-typescript.md)).
 
 ```json
 {
   "scripts": {
-    "dev": "scripts/dev.sh"
+    "dev": "bun scripts/dev.ts"
   }
 }
 ```

@@ -43,7 +43,7 @@ For no-design-system Darkmatter work, `darkmatter.io`, and one-off UIs, default 
 Check likely sources in this order:
 
 1. Project docs for registry setup.
-2. `components.sops.json`, `.env.sops`, `secrets/*.sops.*`, or another encrypted project config.
+2. `components.sops.json`, `secrets/*.sops.json`, or another encrypted project config.
 3. Plain `components.json`, `.env.local`, `.env`, or package scripts.
 
 If encrypted config exists, use `sops-secret-access`. Decrypt only what is needed, prefer pipes or temp files, and do not print decrypted contents.
@@ -63,7 +63,7 @@ For each intended source:
 - `Aceternity`: prove an API key/token is present and accepted by an authenticated registry request.
 - `shadcn.darkmatter.io`: prove the registry endpoint is reachable with `curl` or the project's registry tooling.
 
-Use `scripts/validate-registry-access.sh` when the registry URL and env var name are known. If the project uses custom registry tooling, run the smallest read-only command that fetches a registry index or one known component.
+Use `bun scripts/validate-registry-access.ts` (this skill's copy) when the registry URL and env var name are known. If the project uses custom registry tooling, run the smallest read-only command that fetches a registry index or one known component.
 
 If a private provider fails validation, do not use that provider in a variation. Continue with any validated allowed source; if no allowed source validates, stop and report the blocked provider checks.
 
@@ -99,22 +99,22 @@ Present the result using `reference/variation-template.md`. Include:
 
 ## Tools
 
-### `scripts/validate-registry-access.sh`
+### `scripts/validate-registry-access.ts`
 
 Validates that a registry endpoint is reachable, optionally using a token from an environment variable without printing the token.
 
 ```bash
-skills/run-ui-registry-variations/scripts/validate-registry-access.sh \
+bun skills/run-ui-registry-variations/scripts/validate-registry-access.ts \
   shadcnblocks "$SHADCNBLOCKS_REGISTRY_URL" SHADCNBLOCKS_API_KEY
 
-skills/run-ui-registry-variations/scripts/validate-registry-access.sh \
+bun skills/run-ui-registry-variations/scripts/validate-registry-access.ts \
   aceternity "$ACETERNITY_REGISTRY_URL" ACETERNITY_API_KEY
 
-skills/run-ui-registry-variations/scripts/validate-registry-access.sh \
+bun skills/run-ui-registry-variations/scripts/validate-registry-access.ts \
   shadcn-darkmatter https://shadcn.darkmatter.io
 ```
 
-**Deps:** bash and curl. If tokens live in SOPS, load them into the environment through the project-approved SOPS path first.
+**Deps:** Bun (`fetch`). If tokens live in SOPS, load them into the environment through the project-approved SOPS path first.
 
 ## Reference
 
