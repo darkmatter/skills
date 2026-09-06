@@ -104,16 +104,18 @@ Placement rules:
 
 ## Shared instructions
 
-`docs/AGENTS.md` is the single cross-client instruction file: defaults, hard rules, authority order, completion evidence. It is consumed two ways.
+`docs/AGENTS.md` is the single cross-client instruction file: defaults, hard rules, authority order, completion evidence. Only Claude Code expands `@file` references; Codex, OpenCode, and OMP read `AGENTS.md` verbatim. So the shared text is always delivered as a real `AGENTS.md`, never as an import.
 
-**In other repos and clients.** The Nix Home Manager module installs it as the global `AGENTS.md` for OpenCode (`~/.config/opencode/AGENTS.md`, via `programs.opencode.context`), Codex (`~/.codex/AGENTS.md`), and OMP (`~/.omp/agent/AGENTS.md`); those three load it natively. For Claude Code it is copied to `~/.claude/darkmatter/AGENTS.md`, which you import once from `~/.claude/CLAUDE.md` (see below).
-
-**In this repo.** Only Claude Code expands `@file` references; Codex, OpenCode, and OMP read `AGENTS.md` verbatim. So the root `AGENTS.md` carries a rendered copy of `docs/AGENTS.md` between `<!-- BEGIN docs/AGENTS.md -->` / `<!-- END docs/AGENTS.md -->` markers, and `CLAUDE.md` is just `@AGENTS.md`. Edit `docs/AGENTS.md`, then:
+**Into a repo (canonical).** From the repo root:
 
 ```sh
-scripts/render-agents.sh          # rewrite the block
-scripts/render-agents.sh --check  # CI runs this; fails if stale
+nix run github:darkmatter/skills#install            # install or refresh
+nix run github:darkmatter/skills#install -- --check # CI: fail if stale
 ```
+
+This writes `docs/AGENTS.md` into the repo's `AGENTS.md` between `<!-- BEGIN docs/AGENTS.md -->` / `<!-- END docs/AGENTS.md -->` markers, keeping whatever repo-specific text sits outside them. A missing `AGENTS.md` is created with the block on top; a missing `CLAUDE.md` is created as `@AGENTS.md` (an existing one is never touched). Without Nix, run `scripts/render-agents.sh <repo-dir>` from a checkout. This repo's own `AGENTS.md` is maintained the same way and CI checks it.
+
+**Into a machine.** The Home Manager module installs it as the global `AGENTS.md` for OpenCode (`~/.config/opencode/AGENTS.md`, via `programs.opencode.context`), Codex (`~/.codex/AGENTS.md`), and OMP (`~/.omp/agent/AGENTS.md`); those three load it natively. For Claude Code it is copied to `~/.claude/darkmatter/AGENTS.md`, which you import once from `~/.claude/CLAUDE.md` (see below).
 
 On machines without Nix, install `docs/AGENTS.md` into a client config dir manually:
 

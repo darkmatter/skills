@@ -33,22 +33,39 @@
         homeManagerModules.shared = import ./home-manager.nix { inherit agent-skills; };
       };
 
-      perSystem = _: {
-        treefmt = {
-          projectRootFile = "flake.nix";
-          settings = {
-            global.excludes = [
-              "skills/writing-skills/anthropic-best-practices.md"
-            ];
+      perSystem =
+        { pkgs, ... }:
+        {
+          # `nix run github:darkmatter/skills#install [-- --check] [<repo>]`
+          # renders docs/AGENTS.md into a repo's AGENTS.md (creating it and a
+          # CLAUDE.md shim when missing). The script resolves the source via
+          # DARKMATTER_AGENTS_MD because the flake source is not a checkout it
+          # can locate relative to its own path.
+          apps.install = {
+            type = "app";
+            program = toString (
+              pkgs.writeShellScript "darkmatter-install" ''
+                export DARKMATTER_AGENTS_MD=${./docs/AGENTS.md}
+                exec ${pkgs.bash}/bin/bash ${./scripts/render-agents.sh} "$@"
+              ''
+            );
           };
-          programs = {
-            oxfmt.enable = true;
-            nixf-diagnose.enable = true;
-            nixfmt.enable = true;
-            shellcheck.enable = true;
-            beautysh.enable = true;
+
+          treefmt = {
+            projectRootFile = "flake.nix";
+            settings = {
+              global.excludes = [
+                "skills/writing-skills/anthropic-best-practices.md"
+              ];
+            };
+            programs = {
+              oxfmt.enable = true;
+              nixf-diagnose.enable = true;
+              nixfmt.enable = true;
+              shellcheck.enable = true;
+              beautysh.enable = true;
+            };
           };
         };
-      };
     };
 }

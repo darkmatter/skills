@@ -135,7 +135,13 @@ later sections may depend on earlier ones:
 12. **Docs** — architecture.md, getting-started.md, README.md
 13. **Effect source code** — services, data models, errors, config
     (consult `effect-solutions show` for each area)
-14. **AGENTS.md** — last, because it documents everything else
+14. **AGENTS.md** — last, because it documents everything else. First run
+    `nix run github:darkmatter/skills#install` in the repo root: it writes the
+    org-wide shared instructions into `AGENTS.md` between
+    `<!-- BEGIN docs/AGENTS.md -->` / `<!-- END docs/AGENTS.md -->` markers
+    and creates `CLAUDE.md` as `@AGENTS.md` if missing. Never edit inside
+    the markers; put repo-specific text below them. Add
+    `nix run github:darkmatter/skills#install -- --check` to CI.
 
 Adaptation rules:
 - Replace `ops-monorepo-demo` / `@ops-demo/web` with the target repo's
