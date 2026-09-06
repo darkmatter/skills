@@ -19,6 +19,7 @@ A rule tagged with `-++` applies only to medium or hard tasks. `+--` only applie
 - Lean on the dependencies already in the project before writing your own implementation or adding packages. Do not assume a library lacks a capability without checking its documentation and types.
 - Make architectural decisions for the long term. Do not accept a stopgap that only works for now and is meant to be replaced later.
 - Repos must be PORTABLE - other than nix, the only requirement our repos have is the ablilty to decrypt with SOPS.
+- Make every second count - Anything that is not absolutely required to accomplish the goal should be done at the END. Do the absolute minimum to get it "working", mention steps to test it, then go back to completing the ancillary work.
 
 ## Showing code
 
