@@ -15,3 +15,5 @@ jobs:
         run: scripts/validate-skill.sh
       - name: Check sandbox skill subset is in sync
         run: scripts/sync-sandbox-skills.sh --check
+      - name: Check AGENTS.md is rendered from docs/AGENTS.md
+        run: scripts/render-agents.sh --check

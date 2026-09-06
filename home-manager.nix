@@ -92,7 +92,7 @@ in
     #   theme = "aura";
     # };
 
-    context = ./base/AGENTS.md;
+    context = ./docs/AGENTS.md;
     commands = ./presets/opencode/commands;
     agents = ./presets/opencode/agents;
     themes = ./presets/opencode/themes;
@@ -103,11 +103,11 @@ in
     skills = teamSkills // personalSkills;
   };
 
-  # Shared base instructions (base/AGENTS.md) installed into every LLM
-  # client's config directory. Symlinked via home.file so they stay
-  # in sync with this repo; the copies for ~/.claude use an activation below.
-  home.file.".codex/AGENTS.md".source = ./base/AGENTS.md;
-  home.file.".omp/agent/AGENTS.md".source = ./base/AGENTS.md;
+  # Shared instructions (docs/AGENTS.md) installed as each client's global
+  # AGENTS.md. Symlinked via home.file so they stay in sync with this repo;
+  # the copy for ~/.claude uses an activation below.
+  home.file.".codex/AGENTS.md".source = ./docs/AGENTS.md;
+  home.file.".omp/agent/AGENTS.md".source = ./docs/AGENTS.md;
   # Claude Code base instructions (~/.claude/darkmatter/). Copied as real
   # files rather than symlinked: Claude Code treats ~/.claude as
   # user-writable and a home.file symlink there can conflict with
@@ -116,7 +116,7 @@ in
   # itself because Claude Code treats it as personal user config — add
   # `@~/.claude/darkmatter/AGENTS.md` to it once to import this.
   home.activation.claudeBaseInstructions = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
-    _cb_src="${toString ./base}"
+    _cb_src="${toString ./docs}"
     _cb_dst="$HOME/.claude/darkmatter"
     mkdir -p "$_cb_dst"
     _f="$_cb_src"/AGENTS.md

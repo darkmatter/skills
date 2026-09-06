@@ -33,7 +33,7 @@ from pathlib import Path
 
 # Resolve repo root: evals/prompt-tests/snapshot_config.py -> repo root
 REPO_ROOT = Path(__file__).resolve().parent.parent.parent
-BASE_PRESET_DIR = REPO_ROOT / "base"
+BASE_PRESET_DIR = REPO_ROOT / "docs"
 
 # Base-preset instruction files copied into every snapshot, in load order.
 # These are the canonical cross-client darkmatter rules.
@@ -65,9 +65,8 @@ def write_snapshot(dest_dir, model=None):
         src = BASE_PRESET_DIR / name
         if not src.is_file():
             raise FileNotFoundError(
-                f"Base-preset instruction file missing: {src}. "
-                "The prompt-test config snapshot depends on base/ "
-                "shipping these files."
+                f"Shared instruction file missing: {src}. "
+                "The prompt-test config snapshot depends on docs/AGENTS.md."
             )
         shutil.copy2(src, dest / name)
         instruction_rel_paths.append(name)

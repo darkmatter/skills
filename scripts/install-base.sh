@@ -11,7 +11,7 @@
 #   --dry-run       Print actions without writing anything.
 #   --help, -h      Show this help text.
 #
-# Installs base/AGENTS.md as AGENTS.md.
+# Installs docs/AGENTS.md as AGENTS.md.
 # Backs up conflicting non-symlink files as <name>.bak.<timestamp>.
 # Never deletes user data.
 set -euo pipefail
@@ -55,7 +55,7 @@ if [[ -z "$TARGET" ]]; then
 fi
 
 REPO_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
-BASE="$REPO_ROOT/base"
+BASE="$REPO_ROOT/docs"
 STAMP="$(date +%Y%m%d%H%M%S)"
 
 run() {

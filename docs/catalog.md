@@ -44,7 +44,7 @@ the bundle:
   contract implemented by the OpenCode plugin.
 - `presets/claude/runtime/session-context-pipeline/` is an opt-in Claude Code
   hook bundle.
-- `base/runtime/end-of-turn-review/` is an opt-in cross-client review
+- `runtime/end-of-turn-review/` is an opt-in client-agnostic review
   utility.
 
 ## Add or reactivate a skill

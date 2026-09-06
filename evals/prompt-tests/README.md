@@ -24,7 +24,7 @@ For each test case the provider (`provider.py`):
 3. `git init` + commits a baseline so a later `git diff` is meaningful.
 4. Writes a base-preset config snapshot (`snapshot_config.py`) and points
    `OPENCODE_CONFIG` at it, so the agent runs under the real darkmatter rules
-   (`base/AGENTS.md`).
+   (`docs/AGENTS.md`).
 5. Runs `opencode run --dir <checkout> --pure --dangerously-skip-permissions
    -m <model> --format json "<prompt>"`.
 6. Captures `git diff --no-color HEAD` and returns it as the provider output.
@@ -119,7 +119,7 @@ evals/prompt-tests/
 ├── README.md             ← this file
 ├── promptfooconfig.yaml  ← scenarios (repo + sha + prompt + checks)
 ├── provider.py           ← clone-cache, config snapshot, opencode run, diff
-├── snapshot_config.py    ← builds OPENCODE_CONFIG from base/
+├── snapshot_config.py    ← builds OPENCODE_CONFIG from docs/AGENTS.md
 ├── prewarm.py            ← clones every (repo, sha) up front
 ├── assertions.js         ← pure diff-inspection helpers
 ├── assertions.test.js    ← unit tests for the helpers

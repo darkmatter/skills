@@ -29,7 +29,7 @@ jobs:
       - name: Validate base instruction files
         run: |
           set -eu
-          required='base/AGENTS.md base/RULES.md'
+          required='docs/AGENTS.md'
           for path in $required; do
             test -e "$path" || { echo "missing $path"; exit 1; }
           done

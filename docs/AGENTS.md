@@ -59,7 +59,6 @@ That is the start-of-turn commit vs the working tree (committed work this turn p
 9. **Self-review as sole reviewer** — use separate reviewer agent, model, human, or CI gate.
 10. **Side-effect in read-only sessions** — unless a workflow explicitly authorizes it.
 11. **Depend on the thread** — durable text must make sense without this conversation. No recaps of the chat, no "agents argued", no example lists that only make sense if you were here.
-12. **Push to main** — prefer a preview branch via PR. Either way, test the change live: "add a button to page Y" is not done until it is loaded in a browser; "on production" means tested in a browser on production.
 
 ## Should
 
@@ -72,6 +71,7 @@ That is the start-of-turn commit vs the working tree (committed work this turn p
 - **Type safety** — proper types, no `any`. Schema-decode unknown data at trust boundaries. Typed errors handled by tag, not thrown
 - **No accidental quadratic** — build indexes once, avoid `.find()` inside loops, use streaming/pagination for large inputs
 - **React/JSX** — function components + hooks (classes only for error boundaries); one component per file; stable unique `key` (never array index for dynamic lists); defaults via destructuring, not `defaultProps`; required `alt` + valid ARIA roles, no `accessKey`; `useRef` not string refs; share logic via custom hooks, not mixins/HOCs. Adapted from [Airbnb React](https://github.com/airbnb/javascript/tree/master/react)
+- **Prefer a preview branch via PR over pushing to main** — either way, test the change live: "add a button to page Y" is not done until it is loaded in a browser; "on production" means tested in a browser on production
 
 ## Authority order
 

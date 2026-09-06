@@ -14,10 +14,10 @@ When installed globally, this directory maps to `~/.config/opencode/`:
 - `themes/` -> TUI themes
 - `modes/` -> optional mode definitions
 
-One file is installed from the repository-level `base/` directory (shared
+One file is installed from the repository-level `docs/AGENTS.md` (shared
 across all clients) rather than from here:
 
-- `AGENTS.md` (from `../../base/AGENTS.md`) -> global agent instructions
+- `AGENTS.md` (from `../../docs/AGENTS.md`) -> global agent instructions
 
 Shared skills are installed from the repository-level `skills/` directory rather
 than duplicated here. Runtime behavior stays here instead: `runtime/continuous-learning`

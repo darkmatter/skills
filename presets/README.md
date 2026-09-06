@@ -8,9 +8,9 @@ directories without making the repo root itself a client config directory.
 
 ## Packs
 
-Shared cross-client instructions live in the repository-level `base/`
-directory; every pack installs them. The packs here add client-specific
-behavior on top:
+Shared cross-client instructions live in the repository-level `docs/AGENTS.md`;
+every pack installs it as the client's global `AGENTS.md`. The packs here add
+client-specific behavior on top:
 
 - `claude/` - Claude Code-native themes and opt-in runtime integrations.
 - `opencode/` - OpenCode-native config, commands, agents, plugins, tools, and TUI settings.

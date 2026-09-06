@@ -9,7 +9,7 @@ This repo ships five things:
 
 1. **OpenCode-first presets** (`presets/`) — installable source packs for LLM clients.
 2. **A catalog of shared skills** (`skills/`) — installed across all darkmatter projects via Nix Home Manager, or as a Claude Code plugin (see [Claude Code plugin marketplace](#claude-code-plugin-marketplace)).
-3. **Cross-client base instructions** (`base/`) — the `AGENTS.md` global instruction file installed into every LLM client (OpenCode, Codex, OMP, Claude).
+3. **Shared instructions** (`docs/AGENTS.md`) — the global instruction file installed into every LLM client (OpenCode, Codex, OMP, Claude) and rendered into this repo's own `AGENTS.md`.
 4. **Reference codebases** (`references/`) — per-language exemplar code agents consult for preferred conventions.
 5. **Tooling** (`scripts/`) — installers, sync scripts, and validation helpers.
 
@@ -26,17 +26,18 @@ darkmatter/skills/
 ├── README.md                ← this file
 ├── flake.nix                ← Nix entry; exports the Home Manager module
 ├── home-manager.nix         ← HM module that wires skills/ into agent CLIs
-├── base/                    ← cross-client global instructions (AGENTS.md)
+├── runtime/                 ← client-agnostic opt-in hook utilities (end-of-turn-review)
 ├── lib/                     ← Nix library helpers (skills source, submodules)
 ├── presets/                 ← installable source packs, especially OpenCode
 ├── skills/                  ← team-wide shareable skills (the catalog)
 ├── references/              ← per-language reference codebases (rust, go, typescript)
 ├── scripts/
-│   ├── install-base.sh       ← install base/AGENTS.md into a client dir
+│   ├── install-base.sh      ← install docs/AGENTS.md into a client dir
+│   ├── render-agents.sh     ← inline docs/AGENTS.md into the root AGENTS.md
 │   ├── install-omp.sh       ← install the OMP preset into ~/.omp/agent
 │   ├── install-opencode.sh  ← install the OpenCode preset into ~/.config/opencode
-│   ├── sync-omp.sh          ← sync base/ + skills/ into OMP's config dir
-│   ├── sync-opencode.sh     ← sync base/ + skills/ into ~/.config/opencode
+│   ├── sync-omp.sh          ← sync docs/AGENTS.md + skills/ into OMP's config dir
+│   ├── sync-opencode.sh     ← sync docs/AGENTS.md + skills/ into ~/.config/opencode
 │   ├── sync-sandbox-skills.sh ← regenerate .agents/skills/ from the manifest
 │   └── validate-skill.sh    ← sanity-check skills/ catalog
 ├── evals/
@@ -70,7 +71,7 @@ trying the catalog before wiring up Nix).
 ## OpenCode presets
 
 OpenCode-native assets live in `presets/opencode/`. Shared cross-client
-instructions live in `base/`, and shared skills remain in `skills/`.
+instructions live in `docs/AGENTS.md`, and shared skills remain in `skills/`.
 
 See `docs/opencode-layout.md` for the source-to-install mapping.
 
@@ -80,7 +81,7 @@ Use this table before adding a new instruction, skill, command, hook, or tool. T
 
 | Need                                                         | Put it here                                                                        | Loaded when                           | Examples / notes                                                                                    |
 | ------------------------------------------------------------ | ---------------------------------------------------------------------------------- | ------------------------------------- | --------------------------------------------------------------------------------------------------- |
-| Org-wide rules that must apply in every session              | `base/AGENTS.md`                                                                  | Always, as global agent instructions  | Keep short: safety, verification, preserving user changes, secret handling, evidence-before-claims. |
+| Org-wide rules that must apply in every session              | `docs/AGENTS.md`                                                                   | Always, as global agent instructions  | Keep short: safety, verification, preserving user changes, secret handling, evidence-before-claims. |
 | Project-specific rules and decisions                         | Target project's own `AGENTS.md`, `.agent/context/*`, `.agent/policy/*`            | Always inside that project            | Stack choices, local conventions, approved exceptions, project state. Owned by each project repo.   |
 | Reusable task guidance the model should choose when relevant | `skills/<name>/SKILL.md`                                                           | On demand via skill discovery         | Debugging, TDD, Effect, Neon, Nix, codebase cleanup. Add a row in `docs/catalog.md`.                |
 | Long skill detail, examples, fixtures, or lookup data        | `skills/<name>/reference/`                                                         | Only after the skill points there     | Use for large docs so `SKILL.md` stays concise.                                                     |
@@ -95,23 +96,26 @@ Use this table before adding a new instruction, skill, command, hook, or tool. T
 
 Placement rules:
 
-1. If it must always be followed, put the shortest possible rule in `base/AGENTS.md` or the target project's `AGENTS.md`; do not rely on an on-demand skill.
+1. If it must always be followed, put the shortest possible rule in `docs/AGENTS.md` or the target project's `AGENTS.md`; do not rely on an on-demand skill.
 2. If it is detailed guidance for a domain or workflow, make it a skill and keep `SKILL.md` focused on discovery and navigation.
 3. If it has side effects or the user should control timing, prefer a manual command or a manual-invocation skill.
 4. If it must run deterministically on an event, implement it as a plugin/hook rather than prose.
 5. If it is executable logic, prefer `tools/` or `scripts/` over asking the model to follow a long procedure by hand.
 
-## Base instructions
+## Shared instructions
 
-`base/` holds the cross-client global instruction layer, shared by every LLM client this repo feeds:
+`docs/AGENTS.md` is the single cross-client instruction file: defaults, hard rules, authority order, completion evidence. It is consumed two ways.
 
-- `base/AGENTS.md` — global instructions that apply in every session, in
-  every client.
-- `base/runtime/end-of-turn-review/` — an opt-in review hook utility.
+**In other repos and clients.** The Nix Home Manager module installs it as the global `AGENTS.md` for OpenCode (`~/.config/opencode/AGENTS.md`, via `programs.opencode.context`), Codex (`~/.codex/AGENTS.md`), OMP (`~/.omp/agent/AGENTS.md`), and Claude (`~/.claude/darkmatter/AGENTS.md`). Every client reads its global `AGENTS.md` natively, so no import syntax is involved.
 
-The Nix Home Manager module installs it for OpenCode (`~/.config/opencode/AGENTS.md`, via `programs.opencode.context`), Codex (`~/.codex/AGENTS.md`), OMP (`~/.omp/agent/AGENTS.md`), and Claude (`~/.claude/darkmatter/AGENTS.md`).
+**In this repo.** Only Claude Code expands `@file` references; Codex, OpenCode, and OMP read `AGENTS.md` verbatim. So the root `AGENTS.md` carries a rendered copy of `docs/AGENTS.md` between `<!-- BEGIN docs/AGENTS.md -->` / `<!-- END docs/AGENTS.md -->` markers, and `CLAUDE.md` is just `@AGENTS.md`. Edit `docs/AGENTS.md`, then:
 
-On machines without Nix, install it manually:
+```sh
+scripts/render-agents.sh          # rewrite the block
+scripts/render-agents.sh --check  # CI runs this; fails if stale
+```
+
+On machines without Nix, install `docs/AGENTS.md` into a client config dir manually:
 
 ```sh
 scripts/install-base.sh --target <client config dir>
@@ -122,6 +126,8 @@ Home Manager deliberately does not write `~/.claude/CLAUDE.md` — Claude Code t
 ```markdown
 @~/.claude/darkmatter/AGENTS.md
 ```
+
+`runtime/end-of-turn-review/` is a separate, client-agnostic opt-in review hook utility.
 
 ## Bootstrap a new project
 

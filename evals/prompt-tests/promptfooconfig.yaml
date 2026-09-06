@@ -3,8 +3,8 @@
 # Real-repo prompt-test evals (LOCAL/MANUAL ONLY).
 #
 # Each test checks out a REAL darkmatter repo at a PINNED commit SHA, runs the
-# real `opencode` CLI against it under a snapshot of the base-preset config
-# (base/), captures the git diff the agent produced, and asserts on it.
+# real `opencode` CLI against it under a snapshot of the shared instructions
+# (docs/AGENTS.md), captures the git diff the agent produced, and asserts on it.
 #
 # This suite makes real model calls + network clones, so it is NOT wired into
 # CI. Run it manually:  npm run eval:prompt-tests
