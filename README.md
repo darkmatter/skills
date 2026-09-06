@@ -106,7 +106,7 @@ Placement rules:
 
 `docs/AGENTS.md` is the single cross-client instruction file: defaults, hard rules, authority order, completion evidence. It is consumed two ways.
 
-**In other repos and clients.** The Nix Home Manager module installs it as the global `AGENTS.md` for OpenCode (`~/.config/opencode/AGENTS.md`, via `programs.opencode.context`), Codex (`~/.codex/AGENTS.md`), OMP (`~/.omp/agent/AGENTS.md`), and Claude (`~/.claude/darkmatter/AGENTS.md`). Every client reads its global `AGENTS.md` natively, so no import syntax is involved.
+**In other repos and clients.** The Nix Home Manager module installs it as the global `AGENTS.md` for OpenCode (`~/.config/opencode/AGENTS.md`, via `programs.opencode.context`), Codex (`~/.codex/AGENTS.md`), and OMP (`~/.omp/agent/AGENTS.md`); those three load it natively. For Claude Code it is copied to `~/.claude/darkmatter/AGENTS.md`, which you import once from `~/.claude/CLAUDE.md` (see below).
 
 **In this repo.** Only Claude Code expands `@file` references; Codex, OpenCode, and OMP read `AGENTS.md` verbatim. So the root `AGENTS.md` carries a rendered copy of `docs/AGENTS.md` between `<!-- BEGIN docs/AGENTS.md -->` / `<!-- END docs/AGENTS.md -->` markers, and `CLAUDE.md` is just `@AGENTS.md`. Edit `docs/AGENTS.md`, then:
 
