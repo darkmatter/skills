@@ -20,6 +20,8 @@ Smoke the changed path (run the thing). That is verification.
 
 If you write one, make it end-to-end on that happy path. Do not add a unit-test layer underneath.
 
+Put it next to the source as `<file>.test.ts`, not in a separate `test/` or `tests/` directory. Only a test that spawns the real server or CLI, or spans packages, goes in the repo-root `tests/`.
+
 ## Do not write a test for
 
 - Comment / docs-only edits

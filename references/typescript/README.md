@@ -25,6 +25,6 @@ contribute.
 | Project layout     | Bun + Turborepo monorepo shape, package boundaries, UI in its own package | _todo_   |
 | Effect services    | Service / Layer / Config wiring for an I/O-heavy module                | _todo_   |
 | Error handling     | Typed errors with Schema, expected failure vs defect                   | _todo_   |
-| Testing            | Effect test layers, unit vs integration layout                         | _todo_   |
+| Testing            | Effect test layers; `*.test.ts` beside the source, root `tests/` only for end-to-end | _todo_   |
 | Tooling            | `tsconfig` baseline, lint/format choice, CI wiring                     | _todo_   |
 | Preferred packages | Blessed picks for common needs (validation, HTTP, dates, CLI)          | _todo_   |

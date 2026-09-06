@@ -38,10 +38,16 @@ single package), the repo-wide gates before handing off. All three must pass
 on main; merge queues enforce required checks — prefer a PR over a direct
 push even when your credentials technically bypass protection.
 
+Test files are `<file>.test.ts` beside the source they cover; vitest picks
+them up anywhere (`include: ["**/*.test.ts"]`). Do not add a `test/` or
+`tests/` directory per package. The repo-root `tests/` exists only for
+end-to-end tests that spawn the real server or span packages.
+
 ## Effect for meaningful I/O
 
 Code with real I/O (network, DB, queues, retries) uses Effect — services,
-Layers, typed errors, `Config` for env. Load the `effect-typescript` skill
+Layers, typed errors, `Config` for configuration (named config files, with
+env vars and flags as overrides: [ADR-0014](../../docs/adr/0014-named-config-files-over-flags-and-env.md)). Load the `effect-typescript` skill
 for patterns. Plain async/await is fine for trivial glue; don't wrap a single
 fetch in ceremony.
 

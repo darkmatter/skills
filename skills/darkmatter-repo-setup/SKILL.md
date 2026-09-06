@@ -9,10 +9,10 @@ description: >-
   conventions.
 license: Proprietary. See LICENSE at repo root.
 compatibility: >-
-  Requires Bun 1.3.x, Nix with flake-parts, access to the darkmatter
-  template repo at /home/cm/git/darkmatter/template, and the
-  effect-solutions CLI (bun add -g effect-solutions@latest). Optional:
-  Docker for compose validation, SOPS + age for secrets.
+  Requires Bun 1.3.x, Nix with flake-parts, network access to clone
+  git@github.com:darkmatter/template.git, and the effect-solutions CLI
+  (bun add -g effect-solutions@latest). Optional: Docker for compose
+  validation, SOPS + age for secrets.
 metadata:
   author: darkmatter
   version: "1.0"
@@ -26,14 +26,22 @@ fill in what's missing, update what's outdated, and validate the result.
 
 ## Canonical template
 
-The canonical reference template lives at:
+Clone the canonical template repo to a temp directory and read from it:
 
-    /home/cm/git/darkmatter/template
+```sh
+git clone --depth 1 git@github.com:darkmatter/template.git /tmp/darkmatter-template
+```
 
-Read files from there to understand the target state. Adapt content to the
-target repo — do not blindly copy project names, package names, or app
-logic. The structure and conventions are the standard; the specific app
-is the example.
+Read files from `/tmp/darkmatter-template` to understand the target state.
+Adapt content to the target repo — do not blindly copy project names,
+package names, or app logic. The structure and conventions are the
+standard; the specific app is the example.
+
+Clean up when done:
+
+```sh
+rm -rf /tmp/darkmatter-template
+```
 
 ## Effect best practices
 
@@ -71,6 +79,12 @@ over assumptions or stale memory.
 
 ### 1. Pre-flight
 
+Clone the template repo first (you will need it throughout):
+
+```sh
+git clone --depth 1 git@github.com:darkmatter/template.git /tmp/darkmatter-template
+```
+
 Determine the repo's current state:
 
 - Run `git rev-parse --show-toplevel` to find the repo root.
@@ -101,12 +115,12 @@ count of ✅ / ⚠️ / ❌ items.
 ### 3. Remediate
 
 For each ❌ or ⚠️ item, create or update the file. Read the corresponding
-file from the canonical template, adapt it to the target repo, and write
-it. Work section by section in this order — later sections may depend on
-earlier ones:
+file from the cloned template at `/tmp/darkmatter-template`, adapt it to
+the target repo, and write it. Work section by section in this order —
+later sections may depend on earlier ones:
 
 1. **package.json** — root manifest, scripts, catalog, engines
-2. **packages/tooling** — shared `typescript/`, `oxlint/`, `vitest/` config
+2. **packages/tooling** — shared tsconfig and oxc config
 3. **TypeScript configs** — root + per-package (consult
    `effect-solutions show tsconfig`)
 4. **Linting & formatting** — oxlint.config.ts, .oxfmtrc.json
@@ -155,6 +169,12 @@ If any step fails, attempt to fix it. If a step is not applicable (e.g.,
 no Docker), note it and skip. Report the final status of each step.
 
 ### 5. Report
+
+Clean up the cloned template:
+
+```sh
+rm -rf /tmp/darkmatter-template
+```
 
 Produce a final summary:
 

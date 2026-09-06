@@ -1,6 +1,6 @@
 # Reference example — PR checklist
 
-This is a reference shape for `template/.github/pull_request_template.md` or `.agent/checklists/pr.md`.
+This is a reference shape for `.github/pull_request_template.md` in the `darkmatter/template` repo, or `.agent/checklists/pr.md`.
 
 ````md
 ## Summary

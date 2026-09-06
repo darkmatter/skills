@@ -50,7 +50,7 @@ while [[ $# -gt 0 ]]; do
 done
 
 REPO_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
-BASE="$REPO_ROOT/presets/base"
+BASE="$REPO_ROOT/base"
 OC="$REPO_ROOT/presets/opencode"
 SKILLS="$REPO_ROOT/skills"
 STAMP="$(date +%Y%m%d%H%M%S)"

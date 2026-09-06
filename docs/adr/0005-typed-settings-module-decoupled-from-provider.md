@@ -97,7 +97,9 @@ independent of _where_ values come from and _how_ the program executes:
   into actual values: environment variables, a JSON or YAML file, a
   SOPS-encrypted bundle, a secret manager (Vault, AWS SSM, 1Password),
   a database row, a literal in-memory map for tests. Multiple providers
-  MAY be composed (env wins over file wins over default). Switching
+  MAY be composed (env wins over file wins over default). Which source
+  is primary, and the override order, are decided by
+  [ADR-0014](0014-named-config-files-over-flags-and-env.md). Switching
   providers MUST NOT require changes to the description layer or to
   any consumer.
 - **Runtime layer.** Whatever host actually executes the program —

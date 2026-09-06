@@ -92,7 +92,7 @@ in
     #   theme = "aura";
     # };
 
-    context = ./presets/base/AGENTS.md;
+    context = ./base/AGENTS.md;
     commands = ./presets/opencode/commands;
     agents = ./presets/opencode/agents;
     themes = ./presets/opencode/themes;
@@ -102,6 +102,28 @@ in
     # documented in this module's history.
     skills = teamSkills // personalSkills;
   };
+
+  # Shared base instructions (base/AGENTS.md) installed into every LLM
+  # client's config directory. Symlinked via home.file so they stay
+  # in sync with this repo; the copies for ~/.claude use an activation below.
+  home.file.".codex/AGENTS.md".source = ./base/AGENTS.md;
+  home.file.".omp/agent/AGENTS.md".source = ./base/AGENTS.md;
+  # Claude Code base instructions (~/.claude/darkmatter/). Copied as real
+  # files rather than symlinked: Claude Code treats ~/.claude as
+  # user-writable and a home.file symlink there can conflict with
+  # Claude-managed state; cp -Lf tolerates pre-existing unmanaged copies
+  # where a symlink would fail activation. We do NOT write ~/.claude/CLAUDE.md
+  # itself because Claude Code treats it as personal user config — add
+  # `@~/.claude/darkmatter/AGENTS.md` to it once to import this.
+  home.activation.claudeBaseInstructions = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+    _cb_src="${toString ./base}"
+    _cb_dst="$HOME/.claude/darkmatter"
+    mkdir -p "$_cb_dst"
+    _f="$_cb_src"/AGENTS.md
+    _name=$(basename "$_f")
+    cp -Lf "$_f" "$_cb_dst/$_name"
+    chmod u+w "$_cb_dst/$_name"
+  '';
 
   home.activation.opencodeJson = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
     _oc_src="${opencodeJsonFile}"

@@ -9,9 +9,9 @@ This repo ships five things:
 
 1. **OpenCode-first presets** (`presets/`) — installable source packs for LLM clients.
 2. **A catalog of shared skills** (`skills/`) — installed across all darkmatter projects via Nix Home Manager, or as a Claude Code plugin (see [Claude Code plugin marketplace](#claude-code-plugin-marketplace)).
-3. **Reference codebases** (`references/`) — per-language exemplar code agents consult for preferred conventions.
-4. **A project template** (`template/`) — `.agent/`, config, and shims to stamp into a new project repo.
-5. **Tooling** (`scripts/`) — generators, installers, sync scripts, and validation helpers.
+3. **Cross-client base instructions** (`base/`) — the `AGENTS.md` global instruction file installed into every LLM client (OpenCode, Codex, OMP, Claude).
+4. **Reference codebases** (`references/`) — per-language exemplar code agents consult for preferred conventions.
+5. **Tooling** (`scripts/`) — installers, sync scripts, and validation helpers.
 
 It is **provider-agnostic**. Skills and `.agent/` content target any agent tool (Claude Code, Codex, OpenCode, Cursor, Aider, etc.) by following the cross-vendor `AGENTS.md` convention plus the per-vendor shims (`CLAUDE.md`, `.cursorrules`).
 
@@ -26,12 +26,17 @@ darkmatter/skills/
 ├── README.md                ← this file
 ├── flake.nix                ← Nix entry; exports the Home Manager module
 ├── home-manager.nix         ← HM module that wires skills/ into agent CLIs
+├── base/                    ← cross-client global instructions (AGENTS.md)
+├── lib/                     ← Nix library helpers (skills source, submodules)
 ├── presets/                 ← installable source packs, especially OpenCode
 ├── skills/                  ← team-wide shareable skills (the catalog)
 ├── references/              ← per-language reference codebases (rust, go, typescript)
-├── template/                ← the per-project bootstrap (stamped by new-project.sh)
 ├── scripts/
-│   ├── new-project.sh       ← stamp template/ into a target dir
+│   ├── install-base.sh       ← install base/AGENTS.md into a client dir
+│   ├── install-omp.sh       ← install the OMP preset into ~/.omp/agent
+│   ├── install-opencode.sh  ← install the OpenCode preset into ~/.config/opencode
+│   ├── sync-omp.sh          ← sync base/ + skills/ into OMP's config dir
+│   ├── sync-opencode.sh     ← sync base/ + skills/ into ~/.config/opencode
 │   ├── sync-sandbox-skills.sh ← regenerate .agents/skills/ from the manifest
 │   └── validate-skill.sh    ← sanity-check skills/ catalog
 ├── evals/
@@ -39,7 +44,7 @@ darkmatter/skills/
 │   └── prompt-tests/        ← real-repo opencode evals (local/manual only)
 └── docs/
     ├── catalog.md           ← what's in skills/
-    └── new-project-guide.md ← walkthrough for bootstrapping a project
+    └── opencode-layout.md   ← source-to-install mapping for OpenCode
 ```
 
 ## Claude Code plugin marketplace
@@ -65,7 +70,7 @@ trying the catalog before wiring up Nix).
 ## OpenCode presets
 
 OpenCode-native assets live in `presets/opencode/`. Shared cross-client
-instructions live in `presets/base/`, and shared skills remain in `skills/`.
+instructions live in `base/`, and shared skills remain in `skills/`.
 
 See `docs/opencode-layout.md` for the source-to-install mapping.
 
@@ -75,8 +80,8 @@ Use this table before adding a new instruction, skill, command, hook, or tool. T
 
 | Need                                                         | Put it here                                                                        | Loaded when                           | Examples / notes                                                                                    |
 | ------------------------------------------------------------ | ---------------------------------------------------------------------------------- | ------------------------------------- | --------------------------------------------------------------------------------------------------- |
-| Org-wide rules that must apply in every session              | `presets/base/AGENTS.md`                                                           | Always, as global agent instructions  | Keep short: safety, verification, preserving user changes, secret handling, evidence-before-claims. |
-| Project-specific rules and decisions                         | Target project `AGENTS.md`, `.agent/context/*`, `.agent/policy/*` from `template/` | Always inside that project            | Stack choices, local conventions, approved exceptions, project state.                               |
+| Org-wide rules that must apply in every session              | `base/AGENTS.md`                                                                  | Always, as global agent instructions  | Keep short: safety, verification, preserving user changes, secret handling, evidence-before-claims. |
+| Project-specific rules and decisions                         | Target project's own `AGENTS.md`, `.agent/context/*`, `.agent/policy/*`            | Always inside that project            | Stack choices, local conventions, approved exceptions, project state. Owned by each project repo.   |
 | Reusable task guidance the model should choose when relevant | `skills/<name>/SKILL.md`                                                           | On demand via skill discovery         | Debugging, TDD, Effect, Neon, Nix, codebase cleanup. Add a row in `docs/catalog.md`.                |
 | Long skill detail, examples, fixtures, or lookup data        | `skills/<name>/reference/`                                                         | Only after the skill points there     | Use for large docs so `SKILL.md` stays concise.                                                     |
 | Per-language convention exemplar code                        | `references/<language>/`                                                           | On demand, from the repo checkout     | Reference codebases (rust, go, typescript). Code lives here; prose stays in skills. See ADR-0008.   |
@@ -85,28 +90,44 @@ Use this table before adding a new instruction, skill, command, hook, or tool. T
 | OpenCode specialist agent definition                         | `presets/opencode/agents/`                                                         | Invoked by agent routing or user      | Use for role-specific behavior and permissions, not reusable task instructions.                     |
 | OpenCode lifecycle behavior                                  | `presets/opencode/plugins/`                                                        | Event driven                          | Use for hooks, startup/stop behavior, observers, and client integrations.                           |
 | Model-callable deterministic function                        | `presets/opencode/tools/`                                                          | Tool call during a session            | Use for code that returns structured results and should not be prose instructions.                  |
-| Repo maintenance helper                                      | `scripts/`                                                                         | Human/agent command from this repo    | Validators, scaffolders, bootstrap scripts. Not auto-discovered by clients.                         |
+| Repo maintenance helper                                      | `scripts/`                                                                         | Human/agent command from this repo    | Installers, sync scripts, validators. Not auto-discovered by clients.                               |
 | Human-readable inventory of shared skills                    | `docs/catalog.md`                                                                  | Manual lookup and review              | Track skill purpose, triggers, mode/kind, overlaps, deprecations, and operational notes.            |
 
 Placement rules:
 
-1. If it must always be followed, put the shortest possible rule in `presets/base/AGENTS.md` or the target project's `AGENTS.md`; do not rely on an on-demand skill.
+1. If it must always be followed, put the shortest possible rule in `base/AGENTS.md` or the target project's `AGENTS.md`; do not rely on an on-demand skill.
 2. If it is detailed guidance for a domain or workflow, make it a skill and keep `SKILL.md` focused on discovery and navigation.
 3. If it has side effects or the user should control timing, prefer a manual command or a manual-invocation skill.
 4. If it must run deterministically on an event, implement it as a plugin/hook rather than prose.
 5. If it is executable logic, prefer `tools/` or `scripts/` over asking the model to follow a long procedure by hand.
 
-## Bootstrap a new project
+## Base instructions
+
+`base/` holds the cross-client global instruction layer, shared by every LLM client this repo feeds:
+
+- `base/AGENTS.md` — global instructions that apply in every session, in
+  every client.
+- `base/runtime/end-of-turn-review/` — an opt-in review hook utility.
+
+The Nix Home Manager module installs it for OpenCode (`~/.config/opencode/AGENTS.md`, via `programs.opencode.context`), Codex (`~/.codex/AGENTS.md`), OMP (`~/.omp/agent/AGENTS.md`), and Claude (`~/.claude/darkmatter/AGENTS.md`).
+
+On machines without Nix, install it manually:
 
 ```sh
-scripts/new-project.sh ~/git/darkmatter/<name> <name> "Short description"
-cd ~/git/darkmatter/<name>
-$EDITOR .agent/context/overview.md     # describe the project
-bun scripts/regen-agent-shims.ts         # regenerate AGENTS.md / CLAUDE.md / .cursorrules
-git init && git add . && git commit -m "bootstrap agent config"
+scripts/install-base.sh --target <client config dir>
 ```
 
-See [`docs/new-project-guide.md`](docs/new-project-guide.md) for the full walkthrough.
+Home Manager deliberately does not write `~/.claude/CLAUDE.md` — Claude Code treats that file as personal user config. Add this one-line import to it once to pull in the shared instructions:
+
+```markdown
+@~/.claude/darkmatter/AGENTS.md
+```
+
+## Bootstrap a new project
+
+Project bootstrap is owned by the **`darkmatter-repo-setup` skill** (`skills/darkmatter-repo-setup/SKILL.md`), which reads the separate **`darkmatter/template` repo** as the canonical template and applies it to the target repository.
+
+To bootstrap: open the target repo in your LLM client, invoke the `darkmatter-repo-setup` skill, and let it audit, fill in, and validate the project against the `darkmatter/template` repo.
 
 ## Shared skills via Nix
 
@@ -193,4 +214,4 @@ deploy needed.
 
 ## For agents reading this file
 
-This repo is **not itself an agent project** — it ships infrastructure for them. There is no `.agent/` here, and no `agent.yaml`. Each darkmatter project (zkXMR, Stackpanel, the trading vault, etc.) has its own `.agent/`, stamped from `template/` and customized.
+This repo is **not itself an agent project** — it ships infrastructure for them. There is no `.agent/` here, and no `agent.yaml`. Each darkmatter project (zkXMR, Stackpanel, the trading vault, etc.) has its own `.agent/`, bootstrapped via the `darkmatter-repo-setup` skill from the `darkmatter/template` repo and customized per project.

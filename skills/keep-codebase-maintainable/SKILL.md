@@ -43,7 +43,7 @@ These override default "helpful agent" instincts.
 3. **One owner, one name.** Twins drift (two schedulers, `menu` vs `x`, `ManualCommitStep` leftover after a unify). After a collapse, grep the retired name and delete the twin.
 4. **Native over custom.** If the library already has the hook / client / convention, use it and delete the wrapper. Keep customizations thin. Heuristic > extra flag.
 5. **Short honest names.** `@czxtm/utils` not `workflow-contracts`. Public docs use the canonical surface (`x`), never the legacy alias.
-6. **Package = unit of cohesion.** Prefer self-contained packages over a root split of docs/tests/src that "feels fragmented."
+6. **Package = unit of cohesion.** Prefer self-contained packages over a root split of docs/tests/src that "feels fragmented." Unit tests sit beside their source as `*.test.ts`; only end-to-end tests get a `tests/` directory.
 7. **Surgical diff.** Stage specific paths. Never `git add -A`. One concern per commit. Revert unauthorized extras without arguing. "Cleanup approved" is not "land on main."
 8. **Live user instruction beats advisory AGENTS.md.** Binders about commits/pushes still apply to *remote* mutations. They do not authorize you to spawn extra agents or expand scope.
 9. **Comment the why.** Design intent, invariants, edge-case rationale. No `// increment counter`. Stale docs are a contract bug — update or delete.

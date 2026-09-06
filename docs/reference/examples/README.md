@@ -1,6 +1,6 @@
 # Reference examples for engineering-practice enforcement
 
-These examples expand the proposed structure for enforcing engineering practices across agents and the team. They are reference shapes, not yet canonical policy. Copy/adapt them into `policy/`, `template/`, `.github/`, or downstream project `.agent/` directories as needed.
+These examples expand the proposed structure for enforcing engineering practices across agents and the team. They are reference shapes, not yet canonical policy. Copy/adapt them into `policy/`, the `darkmatter/template` repo, `.github/`, or downstream project `.agent/` directories as needed.
 
 ## Policy examples
 
@@ -22,7 +22,7 @@ These examples expand the proposed structure for enforcing engineering practices
 
 ## Checklist examples
 
-- `pr-checklist.md` — PR template/checklist requiring practice evidence, verification, review, and exception IDs.
+- `pr-checklist.md` — pull-request checklist requiring practice evidence, verification, review, and exception IDs.
 - `completion-checklist.md` — final-response evidence checklist for agents before claiming done/fixed/passing.
 
 ## Enforcement examples
@@ -35,8 +35,8 @@ These examples expand the proposed structure for enforcing engineering practices
 ## Suggested promotion path
 
 1. Copy policy examples into top-level `policy/`.
-2. Copy project-local policy, workflows, checklists, hooks, and CI examples into `template/`.
+2. Copy project-local policy, workflows, checklists, hooks, and CI examples into the `darkmatter/template` repo.
 3. Add the validator scripts under `scripts/`.
-4. Update `scripts/new-project.sh` if needed so new template files are stamped.
-5. Update `docs/new-project-guide.md` to explain policy inheritance and project exceptions.
+4. Update the `darkmatter/template` repo if needed so new template files are stamped into new projects.
+5. Update the `darkmatter-repo-setup` skill (`skills/darkmatter-repo-setup/SKILL.md`) to explain policy inheritance and project exceptions.
 6. Convert any example that becomes canonical from `docs/reference/examples/` into its final location.

@@ -4,7 +4,7 @@
 #
 # Each test checks out a REAL darkmatter repo at a PINNED commit SHA, runs the
 # real `opencode` CLI against it under a snapshot of the base-preset config
-# (presets/base/), captures the git diff the agent produced, and asserts on it.
+# (base/), captures the git diff the agent produced, and asserts on it.
 #
 # This suite makes real model calls + network clones, so it is NOT wired into
 # CI. Run it manually:  npm run eval:prompt-tests
@@ -57,7 +57,7 @@ tests:
           checks:
             # Agent must actually edit something.
             - { op: nonEmpty }
-            # Scoped edit only — RULES.md "fix minimally".
+            # Scoped edit only — AGENTS.md "fix minimally".
             - { op: scopedTo, prefixes: ["README.md"] }
             # New wording added, old wording removed.
             - { op: addsLine, pattern: "natural language" }

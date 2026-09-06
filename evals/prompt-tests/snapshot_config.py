@@ -4,7 +4,7 @@ Build an OpenCode config snapshot from the darkmatter base preset.
 
 The prompt-test suite runs the real `opencode` CLI against a real repo
 checkout. To exercise the actual darkmatter agent behavior, the agent must
-run under the base-preset instructions (AGENTS.md + RULES.md) rather than
+run under the base-preset instructions (AGENTS.md) rather than
 whatever happens to be in the runner's global ~/.config/opencode.
 
 This module writes a self-contained `opencode.json` into a snapshot
@@ -33,11 +33,11 @@ from pathlib import Path
 
 # Resolve repo root: evals/prompt-tests/snapshot_config.py -> repo root
 REPO_ROOT = Path(__file__).resolve().parent.parent.parent
-BASE_PRESET_DIR = REPO_ROOT / "presets" / "base"
+BASE_PRESET_DIR = REPO_ROOT / "base"
 
 # Base-preset instruction files copied into every snapshot, in load order.
 # These are the canonical cross-client darkmatter rules.
-BASE_INSTRUCTION_FILES = ["AGENTS.md", "RULES.md"]
+BASE_INSTRUCTION_FILES = ["AGENTS.md"]
 
 
 def write_snapshot(dest_dir, model=None):
@@ -66,7 +66,7 @@ def write_snapshot(dest_dir, model=None):
         if not src.is_file():
             raise FileNotFoundError(
                 f"Base-preset instruction file missing: {src}. "
-                "The prompt-test config snapshot depends on presets/base/ "
+                "The prompt-test config snapshot depends on base/ "
                 "shipping these files."
             )
         shutil.copy2(src, dest / name)

@@ -179,8 +179,9 @@ only as a trampoline to install Bun or `exec` into the Nix devshell.
 **Costs**
 
 - Every project must implement and maintain the surface, including an
-  idempotent `install` and a reproducible `setup`. Greenfield repos stamp
-  it from `template/`; existing repos require a one-time migration.
+  idempotent `install` and a reproducible `setup`. Greenfield repos get it
+  from the `darkmatter/template` repo via the `darkmatter-repo-setup` skill;
+  existing repos require a one-time migration.
 - Some repos will need both a justfile recipe and a script wrapper for
   ergonomics, doubling the surface area. The wrappers are one-liners — a
   small cost.

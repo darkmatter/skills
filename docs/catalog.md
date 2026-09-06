@@ -17,7 +17,7 @@ a catalogued skill includes it in future installations.
 | `darkmatter-ts-toolchain` | Darkmatter TypeScript/Bun toolchain and CI contract. Ops scripts in TS-only repos are TypeScript ([ADR-0012](adr/0012-ops-scripts-in-typescript.md)). |
 | `definition-of-done` | Define a clear, verifiable completion condition for agentic work. Verification follows `when-to-write-tests`. |
 | `diagnose` | Evidence-led diagnosis of bugs and performance regressions. |
-| `effect-typescript` | Typed Effect patterns for meaningful TypeScript I/O. |
+| `effect-typescript` | Typed Effect patterns for meaningful TypeScript I/O. Configuration is named config files read through `Config`, picked from a list rather than a flag; env vars and flags only override ([ADR-0014](adr/0014-named-config-files-over-flags-and-env.md)). |
 | `find-skills` | Find available skills for a task. |
 | `flue` | Use when working with the Flue framework. |
 | `keep-codebase-maintainable` | Cleanup and maintainability passes, not feature work. |
@@ -31,7 +31,7 @@ a catalogued skill includes it in future installations.
 | `ui-component-architecture` | Keep reusable React UI in its own package. The package name is per-repo ([ADR-0013](adr/0013-shared-ui-is-its-own-package.md)). |
 | `ui-ux-pro-max` | UI/UX design intelligence across supported stacks. |
 | `vercel-react-best-practices` | React and Next.js performance guidance. |
-| `when-to-write-tests` | Decide whether to add a test. Default is no new test. |
+| `when-to-write-tests` | Decide whether to add a test. Default is no new test. Tests sit beside their source; `tests/` is end-to-end only. |
 
 ## Client runtimes
 
@@ -44,7 +44,7 @@ the bundle:
   contract implemented by the OpenCode plugin.
 - `presets/claude/runtime/session-context-pipeline/` is an opt-in Claude Code
   hook bundle.
-- `presets/base/runtime/end-of-turn-review/` is an opt-in cross-client review
+- `base/runtime/end-of-turn-review/` is an opt-in cross-client review
   utility.
 
 ## Add or reactivate a skill

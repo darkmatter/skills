@@ -20,7 +20,7 @@ environment.
 
 | Source | Installed to | Purpose |
 |---|---|---|
-| `../base/AGENTS.md` | `AGENTS.md` | Shared global agent instructions (user-level context) |
+| `../../base/AGENTS.md` | `AGENTS.md` | Shared global agent instructions (user-level context) |
 | `RULES.md` | `RULES.md` | Always-apply safety rules (destructive-command policy) |
 | `config.yml` | `config.yml` | Settings: model roles, approval mode, behavior — copied, since omp mutates it |
 | `models.yml` | `models.yml` | Model/provider config (darkmatter LiteLLM gateway + OpenRouter) — copied |

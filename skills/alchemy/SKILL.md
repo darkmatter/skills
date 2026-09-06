@@ -150,7 +150,7 @@ Canonical shape for a provider namespace such as `src/Verda/`:
 - `Errors.ts`, `Types.ts`, `Wire.ts`, `Mapping.ts`, `Status.ts`, `Selection.ts`, and other focused helpers are preferred over multi-hundred-line resource files when they isolate typed errors, wire schemas, pure selection logic, and domain mapping.
 - `index.ts` re-exports the namespace's public surface so app code imports `./ProviderNamespace/index.ts` rather than a monolithic resource file.
 
-Testing convention for provider refactors: extract pure helpers where possible (selection, name normalization, status classification, mapping) and write focused Vitest tests for them before moving production code. For Effect-dependent provider lifecycle, test through Layers/fakes where practical; otherwise typecheck with `bun tsc -b` and avoid changing behavior during layout-only refactors.
+Testing convention for provider refactors: extract pure helpers where possible (selection, name normalization, status classification, mapping) and write focused Vitest tests for them (beside the source: `Selection.test.ts` next to `Selection.ts`) before moving production code. For Effect-dependent provider lifecycle, test through Layers/fakes where practical; otherwise typecheck with `bun tsc -b` and avoid changing behavior during layout-only refactors.
 
 ## Local development
 
@@ -367,7 +367,7 @@ Use these rules:
 
 - Prefer provider profiles or CI secrets for deploy credentials.
 - Use Alchemy secret resources or provider-native secret resources for runtime secrets.
-- Keep plain environment variables for non-secret config.
+- Keep non-secret config out of secret resources. Runtime configuration is a named config file in the repo, read through `effect/Config`; on Workers, bundle the named configs and let the deploy set only the selector var ([ADR-0014](../../docs/adr/0014-named-config-files-over-flags-and-env.md)).
 - In darkmatter repos, route durable secrets through the repo's existing SOPS/Himitsu/CI secret path instead of inventing a new `.env` convention.
 - Document which profile, account, zone, region, or project owns each deploy target.
 

@@ -8,9 +8,13 @@ directories without making the repo root itself a client config directory.
 
 ## Packs
 
-- `base/` - cross-client instructions and shared policy for all clients.
+Shared cross-client instructions live in the repository-level `base/`
+directory; every pack installs them. The packs here add client-specific
+behavior on top:
+
 - `claude/` - Claude Code-native themes and opt-in runtime integrations.
 - `opencode/` - OpenCode-native config, commands, agents, plugins, tools, and TUI settings.
+- `omp/` - oh-my-pi agent-dir config: model roles, providers, and omp-specific safety rules.
 
 Shared skills stay in the repository-level `skills/` catalog so they can be
 installed into OpenCode, Claude-compatible, and generic agent-compatible targets.

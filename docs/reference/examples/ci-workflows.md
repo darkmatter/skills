@@ -3,7 +3,7 @@
 This shows two CI examples:
 
 1. Validation for the `darkmatter/skills` infrastructure repo.
-2. Validation stamped into downstream project repos.
+2. Validation in the `darkmatter/template` repo, stamped into downstream project repos.
 
 ## `darkmatter/skills` repo workflow
 
@@ -26,10 +26,10 @@ jobs:
       - name: Validate skills
         run: scripts/validate-skill.sh
 
-      - name: Validate template has required files
+      - name: Validate base instruction files
         run: |
           set -eu
-          required='template/AGENTS.md template/RULES.md template/DUTIES.md template/SOUL.md template/agent.yaml template/.agent/README.md template/.agent/context/overview.md template/.agent/context/decisions.md'
+          required='base/AGENTS.md base/RULES.md'
           for path in $required; do
             test -e "$path" || { echo "missing $path"; exit 1; }
           done
@@ -59,12 +59,12 @@ jobs:
       - name: Shellcheck scripts
         uses: ludeeus/action-shellcheck@master
         with:
-          scandir: "./scripts ./template/scripts ./template/hooks/scripts"
+          scandir: "./scripts"
 ```
 
 ## Downstream project workflow
 
-Path: `template/.github/workflows/agent-policy.yml`
+Path: `.github/workflows/agent-policy.yml` in the `darkmatter/template` repo (stamped into downstream project repos).
 
 ```yaml
 name: agent policy

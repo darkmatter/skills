@@ -31,6 +31,12 @@ Bad: a test per helper, encoder, or bind-list rewrite.
 
 Prefer real collaborators over mocks. Prefer the route/store/UI path over isolated functions. Supporting notes: [tests.md](tests.md), [mocking.md](mocking.md).
 
+## Where tests live
+
+Next to the source: `foo.test.ts` beside `foo.ts`. Do not create a separate top-level `test/` or `tests/` directory in a package for these.
+
+Exception: an end-to-end test that spawns the real server or CLI, or spans packages, lives in the repo-root `tests/` (for example `tests/smoke.test.ts`).
+
 ## Cycle (only when this skill applies)
 
 1. Name the happy path in one sentence.

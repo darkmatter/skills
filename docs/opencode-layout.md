@@ -9,7 +9,7 @@ client, but the repo root is not itself an OpenCode config directory.
 | ----------------------------------- | ----------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `~/.config/opencode/opencode.jsonc` | `presets/opencode/opencode.nix` via Home Manager overlays; `presets/opencode/opencode.jsonc` for shell sync | Runtime config: models, permissions, agents, MCP servers, instructions, plugins, formatters. Installed as a mutable file so OpenCode can write runtime changes. |
 | `~/.config/opencode/tui.json`       | `presets/opencode/tui.json`                                                                                 | TUI-only config: theme, keybinds, diff style, mouse behavior.                                                                                                   |
-| `~/.config/opencode/AGENTS.md`      | `presets/base/AGENTS.md`                                                                                    | Global shared instructions.                                                                                                                                     |
+| `~/.config/opencode/AGENTS.md`      | `base/AGENTS.md`                                                                                            | Global shared instructions.                                                                                                                                     |
 | `~/.config/opencode/agents/`        | `presets/opencode/agents/`                                                                                  | Markdown agent definitions.                                                                                                                                     |
 | `~/.config/opencode/commands/`      | `presets/opencode/commands/`                                                                                | Slash-command prompt templates.                                                                                                                                 |
 | `~/.config/opencode/plugins/`       | `presets/opencode/plugins/`                                                                                 | JS/TS OpenCode lifecycle hooks and event extensions.                                                                                                            |
@@ -32,8 +32,10 @@ client, but the repo root is not itself an OpenCode config directory.
 - `skills/` are reusable instruction bundles loaded on demand.
 - `scripts/` are repo maintenance and install helpers. OpenCode does not auto-discover them.
 
-## Project bootstrap files
+## Project-local files
 
-The `template/` directory remains separate. It creates project-local files such
-as `AGENTS.md`, `CLAUDE.md`, `.cursorrules`, and `.agent/` context. Those files
-belong in individual project repositories, not in global OpenCode config.
+Project-local files such as `AGENTS.md`, `CLAUDE.md`, `.cursorrules`, and
+`.agent/` context belong to the individual project repositories, not to this
+repo and not to global OpenCode config. New projects are bootstrapped via the
+`darkmatter-repo-setup` skill, which reads the separate `darkmatter/template`
+repo as the canonical template.

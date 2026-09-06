@@ -57,6 +57,11 @@ If only one is true, prefer plain TypeScript unless the surrounding codebase alr
 - Translate upstream `pnpm` examples mechanically. Example: `pnpm test file.test.ts` becomes `bun test file.test.ts` when the project uses Bun test, or `bun run test file.test.ts` when test is a package script.
 - Prefer Bun runtime packages where relevant, such as `@effect/platform-bun` and `BunRuntime.runMain` for Bun entrypoints.
 - Prefer Alchemy for deployable infrastructure. Put infra in `alchemy.run.ts`, create resources with Alchemy, bind them to workers/services, and build up an `Alchemy.Stack`. Refer to the alchemy skill if writing alchemy code or adding new infra code.
+- Configuration comes from named config files (`config/<name>.json`) read through `Config`. There is no selector flag: an interactive run picks from a list (`Prompt.select`), a non-interactive run reads `APP_CONFIG` or fails listing the names. Env vars and flags are per-key overrides chained with `ConfigProvider.orElse`; secrets come from the `.sops.json` sibling via `effect-sops`. Do not design the setup of a program as a list of flags or env vars. See [ADR-0014](../../docs/adr/0014-named-config-files-over-flags-and-env.md).
+
+## Package layout reference
+
+For the canonical Effect package shape - which directory/file owns which Effect export (domain, services, adapters, workflows, CLI/HTTP boundaries, tests, Alchemy deploy) - see the effect-package-map.md file next to this SKILL.md. Use it when scaffolding a new package or reviewing where an Effect import landed.
 
 ## Upstream Reference
 
