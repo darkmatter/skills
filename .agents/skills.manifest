@@ -10,9 +10,8 @@
 # external services (Slack, Linear) stay out unless sandboxes gain
 # those capabilities.
 
-brainstorming
 caveman-commit
-definition-of-done
+planning
 diagnose
 handoff
 receiving-code-review
