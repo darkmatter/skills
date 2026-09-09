@@ -21,7 +21,7 @@ a catalogued skill includes it in future installations.
 | `flue` | Use when working with the Flue framework. |
 | `keep-codebase-maintainable` | Cleanup and maintainability passes, not feature work. |
 | `nix-flake-organization` | Maintain the Darkmatter Nix flake/module layout. |
-| `planning` | Automatic planning, progressive clarification, domain checks, and proportionate acceptance criteria; exhaustive interviews only on explicit request. |
+| `progressive-clarification` | Automatic planning, progressive clarification, domain checks, and proportionate acceptance criteria; exhaustive interviews only on explicit request. |
 | `repository-organization` | Organize durable repository context and assets. |
 | `run-ui-registry-variations` | Build and compare UI registry variations. |
 | `rust-best-practices` | Idiomatic Rust implementation and review guidance. |

@@ -66,7 +66,7 @@ Show counts and a one-line summary per issue. Let the maintainer pick.
 
 3. **Reproduce (bugs only).** Before planning clarification, attempt reproduction: read the reporter's steps, trace the relevant code, run tests or commands. Report what happened — successful repro with code path, failed repro, or insufficient detail (a strong `needs-info` signal). A confirmed repro makes a much stronger agent brief.
 
-4. **Plan (if needed).** Use `planning` to refine the scope and acceptance criteria from the available evidence. Its progressive clarification is the default; exhaustive interviewing requires an explicit request.
+4. **Plan (if needed).** Use `progressive-clarification` to refine the scope and acceptance criteria from the available evidence. Its progressive clarification is the default; exhaustive interviewing requires an explicit request.
 
 5. **Apply the outcome:**
    - `ready-for-agent` — post an agent brief comment ([AGENT-BRIEF.md](AGENT-BRIEF.md)).
@@ -78,7 +78,7 @@ Show counts and a one-line summary per issue. Let the maintainer pick.
 
 ## Quick state override
 
-If the maintainer says "move #42 to ready-for-agent", trust them and apply the role directly. Confirm what you're about to do (role changes, comment, close), then act. Use `planning` to derive the agent brief from existing context; ask only when a material unresolved decision prevents a useful handoff.
+If the maintainer says "move #42 to ready-for-agent", trust them and apply the role directly. Confirm what you're about to do (role changes, comment, close), then act. Use `progressive-clarification` to derive the agent brief from existing context; ask only when a material unresolved decision prevents a useful handoff.
 
 ## Needs-info template
 

@@ -1,9 +1,9 @@
 ---
-name: planning
+name: progressive-clarification
 description: Use when creating, reviewing, or refining plans, making design decisions, defining acceptance criteria or a definition of done, or encountering a new planning fork during investigation, implementation, or validation. Also use when explicitly asked to stress-test a design or conduct an exhaustive interview.
 ---
 
-# Planning
+# Progressive clarification
 
 Use automatically whenever planning is involved; no slash command is needed.
 Loading this skill does not require an interview, a formal plan, or a new approval
