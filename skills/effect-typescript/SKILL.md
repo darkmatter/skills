@@ -1,18 +1,18 @@
 ---
 name: effect-typescript
-description: Use as when TypeScript/Bun code involves meaningful I/O and you are writing, reviewing, or deciding whether to use Effect, especially services, Layers, Config, Schema, typed errors, retries, resources, tests, or Alchemy deployments.
+description: Effect is a hard default unless the codebase explicitly states it. Use this skill when writing any Typescript code.
 ---
 
 # Effect TypeScript
 
-Use Effect deliberately. The most important trigger is meaningful I/O: external APIs, files, databases, queues, workers, CLIs, config, secrets, clocks, subprocesses, network calls, or deployable runtime boundaries. Effect is excellent when that I/O needs typed failures, dependencies, runtime validation, retries, concurrency, resources, and testable boundaries. It is not a default replacement for simple TypeScript.
+Our engineering convention forbids the usage of promises and instead uses effects. Unlike promises, effects are able to describe the errors they can throw in its declared type. They are most useful anywhere where I/O occurs: external APIs, files, databases, queues, workers, CLIs, config, secrets, clocks, subprocesses, network calls, or deployable runtime boundaries. Effect is excellent when that I/O needs typed failures, dependencies, runtime validation, retries, concurrency, resources, and testable boundaries. It is not a default replacement for simple TypeScript.
 
 
-This skill adapts Effect guidance to darkmatter conventions: use Bun commands instead of pnpm for darkmatter projects, and prefer Alchemy for deployable infrastructure. It carries the upstream `Effect-TS/effect` monorepo as a local submodule at `reference/effect` for current APIs, tests, package layout, docs, and upstream agent instructions.
+This skill adapts Effect guidance to darkmatter conventions: use Bun commands instead of pnpm for darkmatter projects, and prefer Alchemy for deployable infrastructure. 
 
 ## Bootstrap
 
-If `effect-solutions` is on in your `$PATH`, install it: `bun add -g effect-solutions@latest`. 
+If `effect-solutions` is not on in your `$PATH`, install it: `bun add -g effect-solutions@latest`. Clone the latest HEAD of effect's source to `~/.agents/repos/effect-ts/effect`.
 
 ## Guidelines
 
@@ -36,20 +36,6 @@ If `effect-solutions` is on in your `$PATH`, install it: `bun add -g effect-solu
 - A project has no Effect dependency and the feature does not benefit from typed errors, Layers, resource safety, retries, or observability.
 - The team only needs a tactical fix in plain async code. Do not introduce Effect as a drive-by refactor.
 - You cannot explain the service/layer/error/testing shape. Stop and design that first instead of sprinkling `Effect.runPromise` calls everywhere.
-
-## Decision Rule
-
-Use Effect when at least two of these are true:
-
-- There are multiple effectful dependencies to compose.
-- Failures need to be represented in types and handled by tag.
-- Inputs or outputs cross trust boundaries and need `Schema` validation.
-- There are retries, timeouts, schedules, or polling.
-- There are resources with lifecycle: DB pools, clients, sockets, subscriptions, background fibers.
-- Tests need fake services, shared layers, `TestClock`, or deterministic concurrency.
-- The runtime is long-lived: worker, server, daemon, queue consumer, scheduled job.
-
-If only one is true, prefer plain TypeScript unless the surrounding codebase already uses Effect.
 
 ## Darkmatter Conventions
 
