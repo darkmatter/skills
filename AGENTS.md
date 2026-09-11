@@ -18,8 +18,7 @@ A rule tagged with `-++` applies only to medium or hard tasks. `+--` only applie
 - Prefer established, well-maintained libraries when they reduce overall complexity or improve reliability. Do not reimplement common functionality without a clear reason.
 - Lean on the dependencies already in the project before writing your own implementation or adding packages. Do not assume a library lacks a capability without checking its documentation and types.
 - Make architectural decisions for the long term. Do not accept a stopgap that only works for now and is meant to be replaced later.
-- Repos must be PORTABLE - other than nix, the only requirement our repos have is the ablilty to decrypt with SOPS.
-- Make every second count - Anything that is not absolutely required to accomplish the goal should be done at the END. Do the absolute minimum to get it "working", mention steps to test it, then go back to completing the ancillary work.
+- For framework adoption, migration, or architecture/library recommendations that depend materially on upstream-supported usage, consult the relevant official guides or examples before settling the design. Version-matched bundled docs count; a link alone or source inspection alone does not establish the documented approach. Reconcile docs with the project's pinned version and source, cite the sources behind key choices, and distinguish documented support from inference. When a safe local probe can resolve a material compatibility question, run it before recommending a workaround or asking the user to choose an architecture. Keep this proportional: routine edits with no API, compatibility, or design uncertainty need no extra docs pass, and relevant docs already reviewed for the unchanged version need not be reread. If docs are unavailable, use version-matched official source/tests, disclose the limit, and defer only decisions that depend on missing evidence. Documentation informs choices; it does not authorize upgrades, scope expansion, or overriding user/project constraints.
 
 ## Showing code
 
@@ -46,8 +45,8 @@ That is the start-of-turn commit vs the working tree (committed work this turn p
 9. **Side effects are explicit** — before deploys/sends/transfers/destructive writes: state target, action, expected effect, rollback plan. Cron/read-only sessions: no side effects unless workflow authorizes.
 10. **Plan before editing** — non-trivial work gets a short plan: goal, files, test strategy, risks, review needed. Don't over-plan trivial edits.
 11. **Fix minimally** — smallest change that resolves root cause. No refactoring while fixing. No opportunistic changes in bugfix PRs.
+12. **Delegate, don't implement** — primary agent orchestrates; specialists execute. Each subagent gets exact context, file paths, expected output, constraints. Verify final artifacts yourself.
 13. **Check ADRs after code changes** — after significant changes, verify diff against standing ADRs. Call out conflicts or state compliance.
-14. **E2E first** - If there are no end-to-end tests, do not write unit tests - write the End-to-end test. It must take the same path a real user would (e.g. via web browser if a web app). E2E is only for the primary happy paths, dont overuse them and slow down CI.
 
 ## Must never
 
