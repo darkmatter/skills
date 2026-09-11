@@ -17,6 +17,7 @@ a catalogued skill includes it in future installations.
 | `darkmatter-ts-toolchain` | Darkmatter TypeScript/Bun toolchain and CI contract. Ops scripts in TS-only repos are TypeScript ([ADR-0012](adr/0012-ops-scripts-in-typescript.md)). |
 | `definition-of-done` | Define a clear, verifiable completion condition for agentic work. Verification follows `when-to-write-tests`. |
 | `diagnose` | Evidence-led diagnosis of bugs and performance regressions. |
+| `domain-organization` | Organize source by domain owner, role, and module; plan file moves, public boundaries, naming, and scoped enforcement. |
 | `effect-typescript` | Typed Effect patterns for meaningful TypeScript I/O. Configuration is named config files read through `Config`, picked from a list rather than a flag; env vars and flags only override ([ADR-0014](adr/0014-named-config-files-over-flags-and-env.md)). |
 | `find-skills` | Find available skills for a task. |
 | `flue` | Use when working with the Flue framework. |
