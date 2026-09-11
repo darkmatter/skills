@@ -100,6 +100,22 @@ framework routes, configuration files, declaration files, migration numbering,
 SQL, scripts, and generated or registry-managed names through narrow exceptions.
 Move ordinary helpers out of component directories when their role differs.
 
+When at least three sibling implementation modules repeat a prefix naming the
+same concept, make that concept a subdirectory and remove the prefix from the
+filenames:
+
+```text
+composer-attachments.ts → composer/attachments.ts
+composer-images.ts     → composer/images.ts
+composer-text.ts       → composer/text.ts
+```
+
+Keep the grouping within its owner and role, such as `utils/composer/text.ts`,
+and apply the casing conventions above to the shorter names. Count distinct
+implementation modules; companion tests and fixtures follow their source.
+Retain descriptive operation names such as `parse-row.ts` when their words
+describe the operation itself.
+
 ## Preserve public boundaries
 
 Where a package has `src/`, keep implementation there and use thin, explicit
