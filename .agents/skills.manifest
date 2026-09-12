@@ -10,13 +10,10 @@
 # external services (Slack, Linear) stay out unless sandboxes gain
 # those capabilities.
 
-brainstorming
-caveman-commit
+codebase-design
 definition-of-done
 diagnose
-handoff
-receiving-code-review
+domain-organization
 repository-organization
-requesting-code-review
 test-driven-development
 when-to-write-tests

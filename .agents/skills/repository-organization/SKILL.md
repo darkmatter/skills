@@ -7,6 +7,13 @@ description: Organize darkmatter repositories, READMEs, agent context, docs, scr
 
 Keep each repository easy for humans and agents to navigate by putting durable context, reusable guidance, automation, and decisions in the right layer. Prefer the smallest durable home that will be loaded at the time it matters.
 
+For source conventions, apply [codebase-design](../codebase-design/SKILL.md):
+keep each capability together, expose complete operations, and extract only
+when the split improves understanding. Use
+[domain-organization](../domain-organization/SKILL.md) for domain/role paths.
+Keep the governing rule short in always-on instructions and link the full
+examples; maintain one canonical definition instead of competing style lists.
+
 ## When to use
 
 - A user asks where to put a new instruction, convention, policy, skill, command, script, workflow, reference doc, or ADR.
@@ -62,7 +69,7 @@ When adding or updating ADRs:
 1. Inventory existing conventions before moving anything
 2. Identify the artifact type: always-on rule, project fact, policy, workflow, reusable skill, command, plugin, tool, script, reference doc, or decision.
 3. Choose the narrowest durable home from the placement table.
-4. Preserve public entrypoints and compatibility shims unless the user explicitly approves a breaking cleanup.
+4. Keep meaningful public entrypoints. Follow the repository's compatibility policy; update callers and remove obsolete paths where required instead of adding forwarding chains.
 5. Move one concern at a time and update links in the same change.
 6. If a decision explains the new structure, add or update the ADR before claiming the structure is settled.
 7. Verify with repo-specific checks plus targeted searches for stale paths, duplicate guidance, and outdated catalog rows.
@@ -87,6 +94,7 @@ When adding or updating ADRs:
 - ADR-worthy decisions are recorded or intentionally deferred with a clear reason.
 - Accepted ADRs are not silently rewritten; supersession chains are explicit.
 - Links, shims, catalog rows, and examples still point at the new paths.
+- Source conventions agree with codebase-design; size thresholds prompt a cohesive split or a documented narrow exception, not mechanical fragmentation.
 
 ## Tools
 

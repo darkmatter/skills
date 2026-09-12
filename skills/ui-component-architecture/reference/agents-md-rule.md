@@ -15,11 +15,13 @@ import alias (workspaces, `packages/*`, vendor trees). Do not assume a name.
 - **Reuse first.** Before authoring a screen, check what the UI package already
   exports and use it. Do not reimplement `Button`, `Card`, `Badge`, `Input`,
   `Dialog`, `EmptyState`, `Skeleton`, etc.
-- **Keep screens thin.** Page/route files should read as composition — a handful
-  of named components plus data wiring, not walls of `<div className="...">`.
-- **Extract on the second use.** When a visual unit is reused twice, or is a
-  self-contained presentational primitive, move it into the UI package and
-  import it back. Don't extract one-off layout glue speculatively.
+- **Keep capabilities together.** Keep an interaction's state, handlers, and
+  private components with its owner. Routes compose meaningful capabilities;
+  private components may share a file.
+- **Extract useful units.** Move reusable presentational units into the UI
+  package. Repeated use is evidence; the unit must have an independent interface.
+  Keep local layout and app-specific behavior local. A split should hide
+  complexity, not merely forward props or shorten a file.
 - **Keep shared components dumb.** No app routes, stores, API clients, or
   app-specific types inside the UI package. Data comes in as props.
 - **Style with tokens and variants.** Use theme tokens and a `cn`/`cva` variant
@@ -28,6 +30,10 @@ import alias (workspaces, `packages/*`, vendor trees). Do not assume a name.
 ---
 
 ## Why this works where a skill alone doesn't
+
+Keep this UI-specific excerpt aligned with
+[codebase-design](../../codebase-design/SKILL.md), the complete module convention.
+For a consuming repo, resolve the installed skill location before adding a link.
 
 A skill in the shared catalog is loaded on demand by description match. "Writing
 any UI" is so common that relying on the skill to fire every time is fragile —

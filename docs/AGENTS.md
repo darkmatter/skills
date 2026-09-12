@@ -13,7 +13,7 @@ A rule tagged with `-++` applies only to medium or hard tasks. `+--` only applie
 - Do not preserve backward compatibility. Remove obsolete paths instead of adding compatibility layers, fallbacks, or migrations.
 - Choose the simplest implementation that fully meets the current requirements. Avoid speculative abstractions, configuration, and indirection.
 - Grow the system in layers. Start from the smallest version that works end to end, and add each new capability on top of a product that already works. Never trade a working product for unfinished complexity.
-- Keep components modular and concerns clearly separated.
+- Keep each capability cohesive and expose a small, complete interface.
 - Prefer established, well-maintained libraries when they reduce overall complexity or improve reliability. Do not reimplement common functionality without a clear reason.
 - Lean on the dependencies already in the project before writing your own implementation or adding packages. Do not assume a library lacks a capability without checking its documentation and types.
 - Make architectural decisions for the long term. Do not accept a stopgap that only works for now and is meant to be replaced later.
@@ -34,7 +34,7 @@ That is the start-of-turn commit vs the working tree (committed work this turn p
 ## Must always
 
 1. **Evidence before claims** — no "done/fixed/passing/deployed" without fresh verification from this session. Cite command, exit code, artifact, URL, diff, or file path. Subagent reports are claims, not evidence.
-2. **Tests before behavior changes** — features, bugfixes, refactors with behavior risk, public API changes require a failing test before impl. TDD: one test → one impl → repeat (vertical slices only). Skip only with approved exception ID.
+2. **Verify behavior** — run existing tests through the public interface and add meaningful regression coverage for changed behavior; use test-first development when explicitly requested or required by project policy, one failing test → one implementation → repeat. Documentation edits and behavior-preserving refactors covered by existing tests need no new tests or exception ID.
 3. **Reproduce before fixing** — bug fix requires reproduction step, failing test, log trace, or minimal repro. State root cause before patching. After 3 failed fix attempts: stop, revert, consult.
 4. **Review non-trivial work** — multi-file, security, public API, money/auth, migrations, dep upgrades, releases require review. Agents must not self-review as sole reviewer. BLOCK findings: fix or waive with ID + approver + expiry.
 5. **Durable decisions stay durable** — architecture, vendor, risk, scope decisions → ADRs or `decisions.md`. Chat history is not a decision store. Don't re-litigate settled decisions without flagging intent.
@@ -61,17 +61,34 @@ That is the start-of-turn commit vs the working tree (committed work this turn p
 10. **Side-effect in read-only sessions** — unless a workflow explicitly authorizes it.
 11. **Depend on the thread** — durable text must make sense without this conversation. No recaps of the chat, no "agents argued", no example lists that only make sense if you were here.
 
+## Readability and module design
+
+Keep each capability together, make it simple to use, and split it only when the split improves understanding.
+
+1. **Organize by domain, then role:** keep models, services, adapters, and workflows under their owning domain, adding role directories when useful.
+2. **Keep related implementation together:** colocate the operations, private helpers, queries, and mappings readers must understand together.
+3. **Expose complete operations:** let callers request an outcome through a small interface that owns the required steps and ordering.
+4. **Make extraction earn its place:** extract only to hide complexity or enable useful reuse; keep simple private helpers local.
+5. **Define each data contract once:** colocate a schema with its inferred type when runtime validation is needed.
+6. **Convert execution models at the edge:** adapt external APIs once and use one execution model within the module.
+7. **Own work through completion:** finish required work, propagate failure, and clean up before reporting success, or explicitly transfer responsibility.
+8. **Keep line limits with narrow exceptions:** follow configured caps and split at meaningful responsibilities; document a file-specific cap or exception when a split would scatter cohesive code.
+9. **Comment on reasons and invariants:** explain constraints and decisions the code cannot express clearly.
+10. **Test observable behavior:** exercise outcomes through the public interface instead of asserting private calls or creating a test for every helper.
+
+For package design, extraction decisions, or readability review, use the `codebase-design` skill for good and bad examples when it is installed; these rules also apply when it is unavailable.
+
 ## Should
 
 - **Readability first** — clear names, self-documenting code, consistent formatting
 - **KISS / DRY / YAGNI** — simplest solution that works; don't build ahead of need
 - **Complexity is a design constraint** — know input size, write code whose Big-O fits. Pre-index with `Map`/`Set` when repeatedly searching. Optimize asymptotic shape first; micro-opts only after measurement
 - **Immutability at boundaries** — API, state, props, cache, shared data. Local mutation OK only when private to the function and cannot leak
-- **One file, one responsibility** — ~300 lines → extract; ~50 line fn → split; 4+ nesting → guard clauses
+- **Size checks** — retain configured line limits; when adding a new file limit, start at 300 nonblank, noncomment lines and use documented file-specific caps when justified. Reduce nesting with clear control flow; extraction must satisfy the module design rules above.
 - **Comments explain WHY** — not WHAT. Named constants over magic numbers
 - **Type safety** — proper types, no `any`. Schema-decode unknown data at trust boundaries. Typed errors handled by tag, not thrown
 - **No accidental quadratic** — build indexes once, avoid `.find()` inside loops, use streaming/pagination for large inputs
-- **React/JSX** — function components + hooks (classes only for error boundaries); one component per file; stable unique `key` (never array index for dynamic lists); defaults via destructuring, not `defaultProps`; required `alt` + valid ARIA roles, no `accessKey`; `useRef` not string refs; share logic via custom hooks, not mixins/HOCs. Adapted from [Airbnb React](https://github.com/airbnb/javascript/tree/master/react)
+- **React/JSX** — function components + hooks (classes only for error boundaries); keep private components local unless extraction improves understanding or reuse; stable unique `key` (never array index for dynamic lists); defaults via destructuring, not `defaultProps`; required `alt` + valid ARIA roles, no `accessKey`; `useRef` not string refs; share logic via custom hooks, not mixins/HOCs. Adapted from [Airbnb React](https://github.com/airbnb/javascript/tree/master/react)
 - **Prefer a preview branch via PR over pushing to main** — either way, test the change live: "add a button to page Y" is not done until it is loaded in a browser; "on production" means tested in a browser on production
 
 ## Authority order

@@ -8,6 +8,10 @@ the boundary rule (banning app imports inside the UI package) is the most valuab
 Assumes a flat-config (`eslint.config.js`) ESLint 9 setup. Adapt globs to the
 repo's actual UI package path.
 
+Apply [codebase-design](../../codebase-design/SKILL.md) when interpreting size
+diagnostics. These examples are optional additions to the current toolchain;
+they do not authorize downgrading existing checks or fragmenting cohesive UI.
+
 ## 1. Ban app imports inside the UI package (the important one)
 
 A shared UI primitive must stay presentational. This rule stops the UI package
@@ -69,10 +73,12 @@ Pushes styling onto theme tokens instead of magic hex values scattered through
 Tune to taste — some teams allow arbitrary values in the UI package itself (where the
 tokens are defined) but ban them in apps.
 
-## 3. Cap JSX nesting depth
+## 3. Review JSX nesting depth
 
-A blunt proxy for "this screen is a wall of divs and needs decomposition." When a
-file trips it, the fix is almost always to extract a component.
+Depth is a readability signal, not proof that another component is needed.
+Simplify redundant layout or conditions first. Extract only when the new
+component hides meaningful presentation or behavior. Use a documented, narrow
+exception when deeper markup remains the clearest representation.
 
 ```js
 {
@@ -83,8 +89,10 @@ file trips it, the fix is almost always to extract a component.
 }
 ```
 
-Start permissive (6–8) and tighten once the codebase is decomposed; setting it
-too low on a legacy screen just produces noise.
+For a new rule, start permissive (6–8) and assess its diagnostics against real
+screens. Retain configured file limits; use 300 nonblank, noncomment lines when
+introducing a file limit, with documented narrow increases for cohesive
+components.
 
 ## 4. Tailwind class hygiene (optional)
 
@@ -100,7 +108,6 @@ export default [...tailwind.configs["flat/recommended"]];
 
 ## Rollout note
 
-Land these as `warn` first, not `error`, on an existing codebase — a hard error
-on day one blocks every build over pre-existing screens. Burn down the warnings,
-then promote the boundary rule (rule 1) to `error` since new violations there are
-always real architecture leaks.
+Add new rules as `warn` first on existing code, then promote verified scopes.
+Keep existing errors and required checks intact. Resolve needless indirection
+and actual boundary leaks; do not lower a gate to make an extraction pass.

@@ -7,6 +7,12 @@ description: Use when reorganizing Nix flakes, flake-parts outputs, NixOS module
 
 Keep `flake/` as the public output layer and `src/` as the implementation layer. The flake tree names, routes, and re-exports outputs; feature behavior, module bodies, package derivations, app scripts, and helper logic live under `src/<name>/...`.
 
+Apply [codebase-design](../codebase-design/SKILL.md) within those boundaries:
+keep each feature's implementation together and extract only to hide complexity
+or enable useful reuse. Nix output adapters are meaningful public entrypoints;
+additional internal forwarding files need their own purpose. Preserve Nix's
+roles rather than imposing TypeScript `models/` and `services/` directories.
+
 ## When to use
 
 - A user asks to reorganize or refactor a Nix flake layout.
@@ -24,7 +30,7 @@ Keep `flake/` as the public output layer and `src/` as the implementation layer.
 
 Use this improved prompt when turning the request into an implementation plan:
 
-> Reorganize this repo so its public flake surface lives in a top-level `flake/` directory: `flake/apps`, `flake/packages`, `flake/lib`, and `flake/modules/{flake-parts,home-manager,darwin,nixos}` where applicable. Keep `flake.nix` as a minimal entrypoint and keep every file under `flake/` thin: it may declare output names, import implementation files, compose flake-parts modules, and provide compatibility aliases, but it must not contain derivation logic, app scripts, option/config bodies, service behavior, or long helper functions. Move those implementation details into feature-oriented `src/<name>/...` paths. Preserve existing output attribute names unless the user explicitly approves a breaking change. Verify with `nix flake show`, `nix flake check`, and representative package/module evals or builds.
+> Reorganize this repo so its public flake surface lives in a top-level `flake/` directory: `flake/apps`, `flake/packages`, `flake/lib`, and `flake/modules/{flake-parts,home-manager,darwin,nixos}` where applicable. Keep `flake.nix` as a minimal entrypoint and keep every file under `flake/` thin: it may declare output names, import implementation files, compose flake-parts modules, and adapt public calling conventions, but it must not contain derivation logic, app scripts, option/config bodies, service behavior, or helper implementations. Keep those implementation details together in feature-oriented `src/<name>/...` paths. Preserve existing output attribute names during structural moves; follow the repository's compatibility policy when changing the public interface. Verify with `nix flake show`, `nix flake check`, and representative package/module evals or builds.
 
 ## Target shape
 
@@ -63,7 +69,7 @@ Feature-oriented means grouping by domain concept, not by output type. If a conc
 | `flake.nix`                 | Inputs, minimal `outputs`, import `./flake` | Package/module implementation                     |
 | `flake/apps`                | App output names and imports                | Shell scripts, wrappers, runtime behavior         |
 | `flake/packages`            | Package output names and imports            | `mkDerivation`, overlays, build logic             |
-| `flake/lib`                 | Public helper re-exports                    | Long helper implementations                       |
+| `flake/lib`                 | Public helper re-exports                    | Helper implementations                            |
 | `flake/checks`              | Check output names and imports              | Test harness implementation                       |
 | `flake/devShells`           | Dev shell output names and imports          | Tool setup logic, shell hooks                     |
 | `flake/overlays`            | Overlay output names and imports            | Package overrides and build logic                 |
@@ -72,6 +78,11 @@ Feature-oriented means grouping by domain concept, not by output type. If a conc
 | `src/<name>/...`            | All implementation details                  | Public output schema decisions                    |
 
 Thin does not mean empty. A thin file can adapt calling conventions, pass `inputs`, `self`, or `pkgs`, and preserve public attribute names. It should be understandable without reading implementation details.
+
+Keep configured file limits. If a cohesive module exceeds one, first look for an
+independent responsibility; otherwise document a narrow increase or exception.
+Keep options, defaults, assertions, and configuration local when they explain
+one feature, even when that makes a module longer.
 
 For module outputs, thin means the `flake/modules/<platform>/default.nix` file is a re-export point. It imports the full module from `src/` and wires it into the public output attribute. It does not mean splitting options from config inside a single module; options and config stay together in `src/<name>/modules/<platform>.nix`.
 
@@ -100,7 +111,7 @@ In flake-parts repos, `perSystem` often owns `packages`, `apps`, `checks`, and `
 4. Create the `flake/` directories as output shims and move one output family at a time.
 5. Move implementation into feature-oriented `src/<name>/...`; avoid recreating the `flake/` tree under `src/` unless the repo is already platform-oriented.
 6. Keep shared implementation in `src/<name>/lib.nix` or `src/shared/<name>.nix`, not in `flake/lib`.
-7. Add compatibility aliases when downstream users may import old paths or output names.
+7. Follow the repository's compatibility policy for renamed outputs. Keep aliases only when that policy requires them; otherwise update consumers and remove obsolete paths.
 8. Give outputs without an example directory, such as `formatter`, their own thin `flake/<output>/` shim or leave them in the nearest existing composition file; do not fold them into unrelated directories.
 9. Verify after each family move with `nix flake show`, `nix flake check`, and targeted builds/evals.
 
@@ -158,7 +169,7 @@ This keeps scripts usable outside Nix, makes the Nix coupling easy to audit, avo
 
 ## Review checklist
 
-- `flake/` files are mostly imports, attr names, re-exports, and compatibility glue.
+- `flake/` files are mostly imports, attr names, re-exports, and public calling-convention adapters.
 - `src/<name>/...` contains derivations, scripts, options, config, services, assertions, and helpers.
 - Existing public output names still work or have deliberate migration notes.
 - Module families are separated: `home-manager`, `darwin`, `nixos`, and `flake-parts` do not leak platform-specific logic into each other.

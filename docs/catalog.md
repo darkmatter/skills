@@ -12,6 +12,7 @@ a catalogued skill includes it in future installations.
 | `alchemy` | Darkmatter's Alchemy v2 infrastructure and deployment workflow. |
 | `choose-dev-entrypoints` | Choose the correct Nix, Bun, Turbo, Just, or script entrypoint. TypeScript-only repos implement ops scripts in TypeScript ([ADR-0012](adr/0012-ops-scripts-in-typescript.md)). |
 | `codebase-cleanup` | Safely clean up and simplify an existing codebase. |
+| `codebase-design` | Canonical module conventions with good/bad examples: cohesive capabilities, small public interfaces, meaningful extraction, and retained line limits ([ADR-0015](adr/0015-cohesive-modules.md)). |
 | `darkmatter-design-system` | Darkmatter visual language and tokens. Reusable UI lives in the repo's own package ([ADR-0013](adr/0013-shared-ui-is-its-own-package.md)). |
 | `darkmatter-gitops-conventions` | Safe GitOps changes, validation, rollout, and rollback. SOPS payloads are JSON ([ADR-0011](adr/0011-sops-files-as-json.md)). |
 | `darkmatter-ts-toolchain` | Darkmatter TypeScript/Bun toolchain and CI contract. Ops scripts in TS-only repos are TypeScript ([ADR-0012](adr/0012-ops-scripts-in-typescript.md)). |

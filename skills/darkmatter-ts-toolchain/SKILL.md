@@ -1,6 +1,6 @@
 ---
 name: darkmatter-ts-toolchain
-description: 'The darkmatter TypeScript toolchain contract - Bun (never npm/pnpm), tsgo typecheck, vitest, oxlint/biome, changesets, Effect for I/O, Alchemy deploys (wrangler.toml is prohibited), merge-queue mains, and the no-tiny-functions rule. Use when writing, fixing, building, or shipping TypeScript in any darkmatter repo (platform, nixmac-web, omp-chat, genesis): "fix TS errors", "make CI green", "add a package", "deploy this worker", lockfile complaints, or choosing libraries for I/O-heavy code. Do NOT use for generic TS style (coding-standards) or deep Effect patterns (effect-typescript) — this skill is the org-specific toolchain glue around those.'
+description: 'The darkmatter TypeScript toolchain contract: Bun, tsgo, Vitest, oxlint/biome, changesets, Effect I/O, Alchemy deploys, and required checks. Use when writing, fixing, building, or shipping TypeScript in a darkmatter repo. Use codebase-design for module boundaries and effect-typescript for deep Effect patterns.'
 ---
 
 # Darkmatter TypeScript toolchain
@@ -8,6 +8,10 @@ description: 'The darkmatter TypeScript toolchain contract - Bun (never npm/pnpm
 Org-wide contract for TS repos (platform, nixmac-web, and friends). The stack
 is deliberate; substituting familiar defaults (npm, jest, wrangler) creates a
 second convention and breaks CI.
+
+Apply [codebase-design](../codebase-design/SKILL.md) for readability and module
+boundaries. Toolchain checks support cohesive implementations and small public
+interfaces; function length alone does not determine whether a helper belongs.
 
 ## Ops scripts — TypeScript, not bash
 
@@ -51,6 +55,16 @@ env vars and flags as overrides: [ADR-0014](../../docs/adr/0014-named-config-fil
 for patterns. Plain async/await is fine for trivial glue; don't wrap a single
 fetch in ceremony.
 
+Convert a Promise-based driver to Effect at its adapter boundary and keep
+internal operations in Effect. Own persistence, failure, and cleanup through
+completion instead of returning success while work is still unobserved.
+
+Keep database queries and decoding with the owning adapter. Use existing typed
+query tools when useful; parameterized SQL is also allowed with row validation
+and behavioral query verification. A row generic does not validate data, and a
+readability change does not require an ORM migration. See
+[ADR-0015](../../docs/adr/0015-cohesive-modules.md).
+
 ## Deploys — Alchemy, never wrangler
 
 - Infrastructure is code in `alchemy.run.ts`; `wrangler.toml` is prohibited.
@@ -69,10 +83,16 @@ Changesets are the release source of truth: user-facing changes ship with a
 
 ## Style rules that surprise newcomers
 
-- **No tiny functions**: don't extract a function whose whole body is one
-  expression/return — inline it unless the name is a durable contract with
-  multiple call sites (enforced as `ts-no-tiny-functions`).
+- **Useful helpers:** extract when a name hides a meaningful decision or enables
+  useful reuse. Inline pure forwarding wrappers; short or single-use helpers can
+  still earn their place. Inspect existing lint diagnostics and fix unnecessary
+  indirection rather than silently disabling a rule.
+- **File limits:** retain configured limits; use 300 nonblank, noncomment lines
+  when introducing one. Split by responsibility, or document a narrow increase
+  or exception when the module is cohesive. Do not manufacture forwarding files
+  to satisfy the counter.
 - Conventional Commits, subject ≤50 chars; body only when the why isn't
   obvious.
-- Fix problems at the source; no leftover shims, aliases, or re-exports after
-  a refactor.
+- Fix problems at the source and remove obsolete compatibility paths. Keep
+  explicit public re-exports and adapters that translate real external APIs;
+  remove internal forwarding chains that add no useful contract.
