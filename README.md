@@ -15,6 +15,11 @@ This repo ships five things:
 
 It is **provider-agnostic**. Skills and `.agent/` content target any agent tool (Claude Code, Codex, OpenCode, Cursor, Aider, etc.) by following the cross-vendor `AGENTS.md` convention plus the per-vendor shims (`CLAUDE.md`, `.cursorrules`).
 
+Code conventions follow [codebase-design](skills/codebase-design/SKILL.md): keep
+each capability together, make it simple to use, and split it only when the split
+improves understanding. The skill contains the canonical rules and good/bad
+examples; [ADR-0015](docs/adr/0015-cohesive-modules.md) records the decision.
+
 ## Layout
 
 ```
@@ -186,7 +191,7 @@ The module enables every `darkmatter/*` skill and syncs them to Claude, Codex, a
 5. Document it in `docs/catalog.md`.
 6. Open a PR — CI runs `scripts/validate-skill.sh` across all skills via `.github/workflows/validate-skills.yml`.
 
-See [`skills/README.md`](skills/README.md) for the skill format spec.
+See the [skill catalog](docs/catalog.md) for existing capabilities and registration.
 
 If the skill should also reach Centaur sandboxes, add its name to
 `.agents/skills.manifest` and run `scripts/sync-sandbox-skills.sh` (see below).

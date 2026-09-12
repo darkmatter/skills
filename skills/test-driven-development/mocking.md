@@ -15,7 +15,9 @@ Don't mock:
 
 ## Designing for Mockability
 
-At system boundaries, design interfaces that are easy to mock:
+At system boundaries, follow [codebase-design](../codebase-design/SKILL.md):
+interfaces should hide complexity for callers and support useful substitution.
+Do not introduce a forwarding layer solely to make a mock convenient.
 
 **1. Use dependency injection**
 
@@ -36,7 +38,10 @@ function processPayment(order) {
 
 **2. Prefer SDK-style interfaces over generic fetchers**
 
-Create specific functions for each external operation instead of one generic function with conditional logic:
+Prefer an existing typed SDK when it meets the need. A custom adapter should
+validate responses, classify failures, or hide a meaningful protocol. The
+following shorthand illustrates operation names, not a requirement to create
+one-line wrappers or separate files:
 
 ```typescript
 // GOOD: Each function is independently mockable

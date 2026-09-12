@@ -32,10 +32,13 @@ Find duplicated and near-duplicated type / interface / struct / class definition
 
 When you find duplicates that should unify:
 
-1. **Pick the canonical home** — the package / module that "owns" the concept. If unclear, the most-imported definition wins, or the lowest-level package (closest to data layer).
-2. **Move / promote** — if the canonical home doesn't yet have the type, move the strongest definition there.
-3. **Re-export** if needed for ergonomic imports at the old locations (only as a transitional measure, not a permanent re-export pyramid).
-4. **Update imports** — change all consumers to import from the canonical home.
+1. **Pick the canonical home** — the domain that owns the concept. Import count
+   or proximity to a database does not establish ownership; investigate if unclear.
+2. **Keep the contract together** — colocate a schema and its inferred type.
+   Reuse an existing generated or library contract when it fits.
+3. **Expose deliberately** — use explicit public package entries for consumers,
+   without chains of internal barrels or old-location forwarding modules.
+4. **Update imports** — change consumers to the owning module or public entry.
 5. **Delete the duplicates.**
 
 Avoid creating a `types/` mega-package as a generic dumping ground for all shared types. Each type should live in the package that owns its concept.

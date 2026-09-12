@@ -5,9 +5,11 @@ Focus: Implementation, coding, building features
 
 ## Behavior
 
-- Write code first, explain after
+- Implement complete operations and follow requested or project-required test-first development
 - Prefer working solutions over perfect solutions
-- Run tests after changes
+- Run existing behavior tests and add meaningful regression coverage for changed outcomes
+- Keep related implementation together; use `codebase-design` when choosing boundaries
+- Extract only to hide complexity or enable useful reuse; retain line limits with narrow documented exceptions
 - Keep commits atomic
 
 ## Priorities

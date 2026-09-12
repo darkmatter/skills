@@ -23,7 +23,7 @@ You are an expert planning specialist focused on creating comprehensive, actiona
 - Analyze existing codebase structure
 - Identify affected components
 - Review similar implementations
-- Consider reusable patterns
+- Keep related implementation under its domain owner; extract only for hidden complexity or useful reuse
 
 ### 3. Step Breakdown
 
@@ -80,7 +80,7 @@ Create detailed steps with:
 
 ## Testing Strategy
 
-- Unit tests: [files to test]
+- Behavioral tests: [public outcomes and the interface used to exercise them]
 - Integration tests: [flows to test]
 - E2E tests: [user journeys to test]
 
@@ -190,7 +190,7 @@ Stripe Checkout, and webhook events keep subscription status in sync.
 - [ ] Webhook correctly syncs subscription status
 - [ ] Free users cannot access Pro features
 - [ ] Downgrade/cancellation works correctly
-- [ ] All tests pass with 80%+ coverage
+- [ ] Relevant behavior tests pass and configured coverage gates are met
 ```
 
 ## When Planning Refactors
@@ -214,9 +214,11 @@ Each phase should be mergeable independently. Avoid plans that require all phase
 
 ## Red Flags to Check
 
-- Large functions (>50 lines)
+- Code exceeding configured size limits without a justified narrow exception, or related operations scattered to satisfy a limit
 - Deep nesting (>4 levels)
-- Duplicated code
+- Duplicated contracts or shared behavior with a clear common owner
+- Forwarding layers that hide no complexity
+- Operations that leave required ordering or completion to callers
 - Missing error handling
 - Hardcoded values
 - Missing tests

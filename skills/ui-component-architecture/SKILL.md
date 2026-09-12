@@ -27,6 +27,11 @@ alias are per-repo ([ADR-0013](../../docs/adr/0013-shared-ui-is-its-own-package.
 Discover them from the workspace (`package.json` workspaces, `packages/*`,
 vendor trees). Do not invent a required name.
 
+Apply [codebase-design](../codebase-design/SKILL.md) when choosing component
+boundaries. Keep state, handlers, private components, and layout together when
+they explain one capability. An extraction should hide behavior or enable useful
+reuse; neither JSX length nor a second call site establishes that on its own.
+
 ## When to use
 
 - Authoring a new page/route/screen in an app that has a shared UI package.
@@ -37,10 +42,8 @@ vendor trees). Do not invent a required name.
 
 ## When NOT to use
 
-- Non-React code, or a single-package app with no shared UI package to reuse into
-  (still keep components small, but there's nothing to graduate to).
-- A genuinely one-off layout wrapper used exactly once — extract on the _second_
-  use, not speculatively.
+- Non-React code, or a single-package app with no shared UI package to reuse into.
+- A one-off layout wrapper with no independent responsibility to extract.
 - Editing the internals of one existing component, not adding a new surface.
 
 ## Principles
@@ -60,24 +63,25 @@ Don't reimplement a `Button`, `Card`, `Badge`, `Input`, `Dialog`, or
 
 ### Keep screens thin
 
-A screen should read as _composition_: a handful of named components plus data
-wiring. If a route file is a wall of Tailwind, that's the smell. The target is
-that a page's JSX is mostly `<NamedThing .../>` calls and the visual detail lives
-inside those components. The moment you're writing the same cluster of divs a
-second time, stop and name it.
+A route should make its data and major visual capabilities easy to follow.
+Compose existing primitives and extract components with a meaningful interface.
+Keep cohesive state and event handling with the UI they control. A component
+that only forwards a screen's props and markup adds navigation without hiding
+complexity. Private components may share a file with their owner.
 
 ### Graduate reusable units into the UI package
 
 The load-bearing heuristic for what moves into the shared package:
 
-- **Graduates:** reused 2+ times (in this app or another), **or** a self-contained
-  visual primitive — `Button`, `Card`, `Badge`, `Avatar`, `EmptyState`, `Stat`,
-  `Skeleton`, `Input`, `Dialog`.
+- **Graduates:** a reusable presentational unit with an independent interface,
+  **or** a self-contained visual primitive — `Button`, `Card`, `Badge`, `Avatar`,
+  `EmptyState`, `Stat`, `Skeleton`, `Input`, `Dialog`. Reuse in a second place is
+  evidence to inspect; visual similarity alone does not establish one unit.
 - **Stays in the app:** app-specific composition (a particular dashboard's
   layout), one-off glue, and anything carrying data-wiring or business logic.
-- **When unsure, leave it local.** Extract on the _second_ use, not the first.
-  A UI package full of single-use components with app-specific props is its own
-  smell (see "Avoiding over-extraction").
+- **When unsure, leave it local.** A single-use component can hide substantial
+  behavior, but app-specific props belong in the app. A second use is a prompt
+  to review the boundary, not to move app state into the shared package.
 
 ### Style with tokens and variants, not scattered magic values
 
@@ -85,7 +89,7 @@ The load-bearing heuristic for what moves into the shared package:
   sprinkled through `className`.
 - For components with variants, use a `cn` + variant map (or `cva`) rather than
   conditional class-string soup.
-- Centralize a repeated cluster of classes into a component, don't copy-paste it.
+- Centralize styles for a reusable visual unit; keep incidental layout local.
 
 ## Workflow
 
@@ -102,8 +106,9 @@ reusable_. This tells you what to import, what to inline, and what to extract.
 
 ### 3. Author the screen thin
 
-Compose existing primitives. Inline only app-specific layout. Keep the route file
-readable — if it's growing past a screenful of divs, you're missing a component.
+Compose existing primitives and keep each interaction understandable in one
+place. If a file exceeds its configured limit, split at a useful responsibility
+or document a narrow increase; file height alone does not select a component.
 
 ### 4. Extract the reusable pieces
 
@@ -121,7 +126,9 @@ For each piece that meets the graduation heuristic:
 - The screen imports primitives from the UI package rather than redefining them.
 - No app-specific imports (`@/...`, app routers, stores, API clients) inside any
   UI-package component.
-- Types and build pass (`lsp_diagnostics`, `check-types`, build).
+- Types and build pass using the repository's commands.
+- Interactions complete through the component's public interface; tests observe
+  user behavior rather than its private hook or helper calls.
 
 ## What graduates vs what stays
 
@@ -138,11 +145,13 @@ Over-extraction is the opposite failure and just as costly. Signs you extracted
 too eagerly:
 
 - UI-package components with props named after one specific screen.
-- A "reusable" component used exactly once.
+- A component that forwards a long prop list without hiding an interaction or
+  presentation decision.
 - UI primitives importing app stores, routers, or API clients.
 
-Fix: pull the app-specifics back up into the app and keep the primitive dumb. If
-it can't be expressed as presentational props, it isn't a shared primitive yet.
+Fix: keep app-specific behavior in a cohesive app component. Extract the shared
+primitive only when it has a useful presentational interface. Keep local helpers
+and private components nearby even when they are used once.
 
 ## Reference
 

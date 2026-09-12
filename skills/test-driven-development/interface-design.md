@@ -1,8 +1,9 @@
 # Interface Design for Testability
 
-Good interfaces make testing natural:
+Follow [codebase-design](../codebase-design/SKILL.md). Good interfaces hide
+implementation details and make behavior tests natural:
 
-1. **Accept dependencies, don't create them**
+1. **Inject external capabilities where substitution or lifetime matters**
 
    ```typescript
    // Testable
@@ -14,7 +15,7 @@ Good interfaces make testing natural:
    }
    ```
 
-2. **Return results, don't produce side effects**
+2. **Keep calculations pure; make side-effect completion explicit**
 
    ```typescript
    // Testable
@@ -26,6 +27,9 @@ Good interfaces make testing natural:
    }
    ```
 
+   A persistence operation may have side effects. It should return only after
+   required writes finish, or explicitly hand ownership to its caller.
+
 3. **Small surface area**
-   - Fewer methods = fewer tests needed
-   - Fewer params = simpler test setup
+   - Expose complete operations rather than steps callers must assemble
+   - Keep private helpers private; do not add exports or injection solely for tests

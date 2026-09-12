@@ -21,6 +21,8 @@ Record ✅ present, ⚠️ partial, or ❌ missing.
 - [ ] Defines the `ops/` boundary — what goes in ops vs source-adjacent config
 - [ ] States the toolchain contract (Bun, tsgo, oxlint/oxfmt, Vitest)
 - [ ] States package conventions (catalog, workspace, # imports)
+- [ ] Applies [codebase-design](../../codebase-design/SKILL.md): domain ownership,
+  explicit public entries, complete operations, and cohesive implementations
 - [ ] Documents the Nix devshell and `x` / `justfile` commands
 - [ ] Documents testing, secrets, CI, and validation steps
 - [ ] Forbids adding any additional top-level directories (or ask permission)
@@ -43,7 +45,8 @@ Record ✅ present, ⚠️ partial, or ❌ missing.
 ## 4. Linting & formatting
 
 - [ ] oxlint config extends the tsgo preset
-- [ ] File-size limit enforced (split files that exceed it)
+- [ ] File-size limit enforced; splits follow responsibilities, with documented
+  file-specific increases where splitting would scatter a coherent implementation
 - [ ] SOPS files ignored by linter and formatter
 - [ ] oxfmt configured as the sole formatter (Prettier disabled in Zed)
 
@@ -51,7 +54,10 @@ Record ✅ present, ⚠️ partial, or ❌ missing.
 
 - [ ] Vitest configured at the root with node environment
 - [ ] Vitest excludes `.direnv/**`
-- [ ] Unit tests use `@effect/vitest` with `it.effect` and test layers
+- [ ] Tests exercise public behavior, including required failure/completion/cleanup
+- [ ] Effect tests use the installed version's test helpers and Layers; public
+  pure calculations can have direct tests without Effect wrappers
+- [ ] Private helpers are not exported or extracted solely to test them
 - [ ] Smoke tests spawn the real server end-to-end
 
 ## 6. Zed editor config
@@ -132,7 +138,9 @@ See [effect-solutions.md](effect-solutions.md) for the topic list.
 - [ ] TypeScript config follows `show tsconfig`
 - [ ] Source code follows `show basics` (Effect.gen, Effect.fn conventions)
 - [ ] Services use Context.Service + Layer per `show services-and-layers`
-- [ ] Data modeling uses Schema per `show data-modeling`
+- [ ] Schemas and inferred types live together under their domain owner
+- [ ] Adapters decode external data and adapt Promise drivers once; internal
+  Effect code does not round-trip through `runPromise`
 - [ ] Errors use Schema.TaggedError per `show error-handling`
 - [ ] Config uses Effect.Config per `show config`
 - [ ] Tests use @effect/vitest with it.effect per `show testing`

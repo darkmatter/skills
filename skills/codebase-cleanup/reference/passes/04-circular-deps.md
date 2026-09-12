@@ -30,11 +30,16 @@ Detect import cycles between modules / packages and untangle them. Cycles cause:
 
 When a cycle exists, the fix is usually one of these:
 
-1. **Extract** — pull the shared piece into a new module that both A and B depend on. The most common, lowest-risk fix.
-2. **Invert** — one direction of the cycle was wrong. Move the function to the side that should own it.
-3. **Inline** — if A only needs one tiny thing from B and the dependency feels wrong, inline that thing into A.
-4. **Type-only-ize** — if the cycle is purely for types (TS), use `import type` to break the runtime edge.
-5. **Lazy import** — last resort. Defers the problem rather than solving it. Only use when the call site is a slow path and refactoring is out of scope.
+1. **Correct ownership** — move logic to the side that owns it, or merge modules
+   that form one responsibility and require each other to be understood.
+2. **Extract** — share a coherent concept when it hides complexity or enables
+   useful reuse. A new generic `shared` file is not automatically an improvement.
+3. **Inline** — keep an operation-local detail with its owner when that removes
+   an unnecessary dependency.
+4. **Type-only-ize** — if the cycle is purely for types (TS), use `import type` to
+   break the runtime edge.
+5. **Lazy import** — last resort. Defers the problem rather than solving it.
+   Only use when the call site is a slow path and refactoring is out of scope.
 
 Avoid: introducing dependency-injection or interfaces _just_ to break a cycle. That's a structural change masquerading as a cleanup.
 
@@ -56,5 +61,7 @@ Per the protocol. Include a list of all cycles with the fix strategy and confide
 ## Out-of-scope
 
 - Don't introduce `interfaces/` or `types/` directories as a generic "fix architecture" move. That's a redesign, not a cleanup.
-- Don't merge the cycling modules into one. That hides the cycle, doesn't fix it.
+- Do not merge unrelated domains just to remove a graph edge. Merging a single
+  scattered responsibility is valid; retain file limits with a documented,
+  targeted exception where justified.
 - Don't fix the cycle by making one module re-export the other's symbols transitively. Same hiding problem.

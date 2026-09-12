@@ -2,7 +2,12 @@
 
 Use this reference when contributing **upstream to `alchemy-effect`** — adding or editing resources, capabilities, event sources, or test fixtures under `packages/alchemy/src/`. For app-level deploy work, stay in `SKILL.md` and `upstream-concepts.md`.
 
-The upstream `AGENTS.md` is the canonical source. This file distills the rules that catch agents most often. Re-check upstream before landing a PR.
+The upstream `AGENTS.md` is the canonical source for contributions to that
+repository. This file records upstream-specific shapes; it does not prescribe
+them for Darkmatter application packages. Re-check the pinned upstream source
+before landing a PR. App packages follow
+[codebase-design](../../codebase-design/SKILL.md) and the layout in
+[the Alchemy skill](../SKILL.md#effect-native-provider-module-layout).
 
 ## Core vocabulary
 
@@ -226,7 +231,11 @@ Never use `async`/`await`, raw `Promise`, `node:fs/promises`, `node:fs`, `node:o
 | `Effect.promise(() => listSqlFiles(dir))`   | Make `listSqlFiles` return `Effect` and `yield*` it  |
 | `new Promise((res) => setTimeout(res, ms))` | `yield* Effect.sleep(Duration.millis(ms))`           |
 
-Sync, CPU-only Node APIs (`crypto.createHash`, `process.cwd`, `Buffer`, `TextEncoder`) still go through `Effect.sync(...)` or `Effect.try(...)`:
+Check upstream rules for required wrappers in an upstream contribution. In
+Darkmatter app code, suspend environment reads and side effects in Effect and
+classify expected failures at external boundaries. Pure transformations remain
+plain TypeScript; `Effect.sync` does not make a CPU calculation interruptible.
+An upstream-specific wrapper may look like:
 
 ```ts
 const hash = yield * Effect.sync(() => crypto.createHash("sha256").update(input).digest("hex"));

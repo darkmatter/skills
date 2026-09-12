@@ -7,7 +7,7 @@ license: MIT
 metadata:
   hermes:
     tags: [cleanup, maintainability, refactor, prune, hygiene, conventions]
-    related_skills: [simplify-code, requesting-code-review, plan]
+    related_skills: [codebase-design, codebase-cleanup, code-review]
 ---
 
 # Keep a Codebase Maintainable
@@ -16,7 +16,10 @@ A maintainability job is **not** a feature with extra polish. The deliverable is
 
 Mined from Cooper's OMP Hindsight bank (how he actually prompts coding agents). Source instances: `references/instances.md` (copy also at `/var/lib/hermes/workspace/omp-maintainability-asks.md`).
 
-**Core principle:** If it isn't the ask, it doesn't ship. Prefer delete over abstract. Prefer the library over a wrapper. Prefer one owner over two that will drift.
+**Core principle:** Keep the requested scope. Follow
+[codebase-design](../codebase-design/SKILL.md) for shared readability rules and
+examples. Remove abstractions that only forward calls; retain ones that hide
+complexity, enforce invariants, or translate an external interface.
 
 ## When to Use
 
@@ -30,7 +33,7 @@ Load this when the user (or the task) sounds like any of:
 - comment the why / docs are stale / fix AGENTS.md
 - keep it maintainable / reduce maintenance / cohesion
 
-**Don't use for:** implementing a requested feature, fixing a failing behavior, or a post-feature pass over *your own just-written diff* — that last one is `simplify-code`.
+**Don't use for:** implementing a requested feature, fixing a failing behavior, or a post-feature pass over *your own just-written diff* — use the repository's review guidance for that pass.
 
 If the user mixes "add X and also clean Y", split the commits. This skill owns Y.
 
@@ -41,9 +44,9 @@ These override default "helpful agent" instincts.
 1. **Deletion test.** A symbol/file/package/dep/flag/scope dies if it has zero real importers **and** is not a public contract (exported API, framework peer, Helm value a live app still declares). Grep the name. Then grep the old name. `knip` / `ts-prune` / `depcheck` are hints, not proof — they flag framework peers and dynamic imports.
 2. **Don't recreate the dead.** Removing a stale git declaration is the fix. Syncing / applying / resurrecting the resource to "clear Missing" is the bug. Same for reserved-for-later knobs: clean cutover, not a tombstone comment.
 3. **One owner, one name.** Twins drift (two schedulers, `menu` vs `x`, `ManualCommitStep` leftover after a unify). After a collapse, grep the retired name and delete the twin.
-4. **Native over custom.** If the library already has the hook / client / convention, use it and delete the wrapper. Keep customizations thin. Heuristic > extra flag.
-5. **Short honest names.** `@czxtm/utils` not `workflow-contracts`. Public docs use the canonical surface (`x`), never the legacy alias.
-6. **Package = unit of cohesion.** Prefer self-contained packages over a root split of docs/tests/src that "feels fragmented." Unit tests sit beside their source as `*.test.ts`; only end-to-end tests get a `tests/` directory.
+4. **Native over custom.** Use the library when it supplies the needed capability. Keep a local adapter when it owns decoding, errors, resource lifetime, or a simpler complete operation; delete wrappers that only rename a call.
+5. **Short honest names.** Name the owning capability, such as `@repo/billing`; avoid a shared `utils` dumping ground. Within an owner, use familiar role directories. Public docs use the canonical surface (`x`), never the legacy alias.
+6. **Package = unit of cohesion.** Expose complete operations through explicit public entries; keep implementation under `src/`, grouped by owner then role. Keep related SQL and helpers with their adapter. Tests exercise observable behavior through the interface and follow repository placement conventions.
 7. **Surgical diff.** Stage specific paths. Never `git add -A`. One concern per commit. Revert unauthorized extras without arguing. "Cleanup approved" is not "land on main."
 8. **Live user instruction beats advisory AGENTS.md.** Binders about commits/pushes still apply to *remote* mutations. They do not authorize you to spawn extra agents or expand scope.
 9. **Comment the why.** Design intent, invariants, edge-case rationale. No `// increment counter`. Stale docs are a contract bug — update or delete.
@@ -84,7 +87,11 @@ Done when: every candidate has a grep result (including "zero hits") and a contr
 | **CAREFUL** | unused file with no importers, dep with no app import, rename to the short name, collapse a twin helper | Delete/rename, then run the targeted test/lint for that package. |
 | **RISKY** | anything with a live binding, public export, Helm/Argo resource, secret, peer dependency, "zero knip hits" | Verify live consumers. If any exist, stop and say so. Never delete by name-group. |
 
-Do not add a helper, flag, service, or abstraction as part of this job unless the user asked for that specific thing. The cleanup *is* the absence.
+Do not add speculative flags, services, or abstractions. A cleanup may introduce
+a local helper or coherent module when it demonstrably improves understanding
+within the authorized scope. Extraction must hide complexity or enable useful
+reuse. Retain configured line limits; document targeted exceptions instead of
+splitting into forwarding files to satisfy a number.
 
 Done when: every SAFE/CAREFUL item is applied or explicitly skipped with a reason, and no RISKY item was applied without a live-consumer check.
 
@@ -115,7 +122,8 @@ Done when: `git diff` against the starting point is explainable line-by-line fro
 Recurring shapes from real asks — match these, don't invent new ones:
 
 - **Catalogue audit** — remove broken commands, prefix the rest, one grouping scheme.
-- **Diff diet** — net-negative lines; misplaced tests pulled out of the commit.
+- **Diff diet** — unnecessary indirection removed; behavior coverage preserved.
+  Net line count is evidence about size, not a quality target.
 - **Replace a custom stack** with the library hook (bash-preexec, Polar SDK, vendor client).
 - **Collapse to one owner** (one SessionHost, one scheduler, one SDK repo, two-repo end state).
 - **Delete the reserved knob** rather than keep it "for the bounded API later."
@@ -142,7 +150,9 @@ Recurring shapes from real asks — match these, don't invent new ones:
 - [ ] Inventory table exists; every delete has a grep + contract verdict
 - [ ] Live bindings checked for RISKY items
 - [ ] Old name greps clean (or points at the new name)
-- [ ] No new abstraction / flag / service was introduced
+- [ ] Every retained or new abstraction hides complexity or enables useful reuse
+- [ ] Configured line limits remain, with any targeted exception documented
+- [ ] Tests verify behavior and required completion/error/cleanup contracts
 - [ ] Diff is explainable from the inventory; no unauthorized files
 - [ ] Targeted tests/lint for touched packages ran; only pre-existing failures remain
 - [ ] Stale docs / AGENTS.md / menu entries that the change falsified were updated or deleted

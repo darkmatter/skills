@@ -42,11 +42,11 @@ Write a short plan with:
 
 For multi-step work, save the plan under `docs/plans/YYYY-MM-DD-feature-name.md`.
 
-## Gate 3 — RED
+## Gate 3 — Behavior coverage
 
-Add a failing test first.
+Identify the public behavior and run existing relevant tests. Add meaningful regression coverage for the new behavior. When TDD is explicitly requested or required by project policy, write one failing test before its implementation and use the RED/GREEN sequence below; otherwise verify the behavior alongside implementation without manufacturing a failing test.
 
-Run the targeted test and confirm:
+For TDD, run the targeted test and confirm:
 
 - It fails
 - The failure is expected
@@ -60,9 +60,9 @@ Result: FAIL, expected missing behavior assertion
 ```
 ````
 
-## Gate 4 — GREEN
+## Gate 4 — Implementation
 
-Implement the smallest change that passes the failing test.
+Implement the smallest complete operation that satisfies the behavior; in TDD, make the current failing test pass.
 
 Run the targeted test again and confirm pass.
 
@@ -75,13 +75,14 @@ Result: PASS
 
 ## Gate 5 — Refactor
 
-Clean up only after GREEN.
+Clean up after the relevant behavior checks pass.
 
 Allowed:
 
 - Rename for clarity
 - Remove duplication
-- Extract small helpers
+- Extract only when it hides complexity or enables useful reuse; keep private helpers local otherwise
+- Keep related code under its domain owner and retain configured line limits with documented narrow exceptions
 - Improve boundaries without changing behavior
 
 Not allowed:

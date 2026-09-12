@@ -17,6 +17,8 @@ Review code changes for quality, security, and maintainability: $ARGUMENTS
 
 ## Check Categories
 
+Apply the shared `AGENTS.md` readability rules and use `codebase-design` for examples when available; organization follows domain then role.
+
 ### Security Issues (CRITICAL)
 
 - [ ] Hardcoded credentials, API keys, tokens
@@ -29,26 +31,29 @@ Review code changes for quality, security, and maintainability: $ARGUMENTS
 
 ### Code Quality (HIGH)
 
-- [ ] Functions > 50 lines
-- [ ] Files > 800 lines
+- [ ] Related implementation scattered across forwarding modules
+- [ ] Public operations leave ordering, failure, or required completion to callers
+- [ ] Extractions hide no complexity and enable no useful reuse
+- [ ] Configured line limits exceeded without documented narrow exceptions
+- [ ] Duplicate contracts or repeated internal execution-model conversions
 - [ ] Nesting depth > 4 levels
 - [ ] Missing error handling
 - [ ] console.log statements
 - [ ] TODO/FIXME comments
-- [ ] Missing JSDoc for public APIs
+- [ ] Public contracts or important invariants are unclear; comments only restate the code
 
 ### Best Practices (MEDIUM)
 
 - [ ] Mutation patterns (use immutable instead)
 - [ ] Unnecessary complexity
-- [ ] Missing tests for new code
+- [ ] Changed observable behavior lacks regression coverage through the public interface
 - [ ] Accessibility issues (a11y)
 - [ ] Performance concerns
 
 ### Style (LOW)
 
 - [ ] Inconsistent naming
-- [ ] Missing type annotations
+- [ ] Unclear public types; use schema inference when a runtime contract already exists
 - [ ] Formatting issues
 
 ## Report Format

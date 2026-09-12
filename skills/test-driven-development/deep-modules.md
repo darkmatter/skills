@@ -2,7 +2,10 @@
 
 From "A Philosophy of Software Design":
 
-**Deep module** = small interface + lots of implementation
+Follow [codebase-design](../codebase-design/SKILL.md) for the shared rules.
+
+**Deep module** = small interface that hides substantial complexity. Depth is
+not a line count; a long file can still expose too much internal knowledge.
 
 ```
 ┌─────────────────────┐
@@ -31,3 +34,5 @@ When designing interfaces, ask:
 - Can I reduce the number of methods?
 - Can I simplify the parameters?
 - Can I hide more complexity inside?
+- Does the operation own completion, errors, and cleanup?
+- Does a split remove knowledge from the reader, or just add navigation?

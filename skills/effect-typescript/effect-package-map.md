@@ -1,158 +1,117 @@
-# Effect package layout — directory → export map
+# Effect package layout
 
-The canonical shape of a darkmatter Effect package, mapped file-by-file to the
-Effect exports that belong there. Use it when scaffolding a new package or
-reviewing where an import landed. Distilled from the `labs` exemplars
-(`web-core`, `hl-ladder`, `compounder`) and generalized.
+Follow [codebase-design](../codebase-design/SKILL.md) for the shared rules and
+examples, and [domain-organization](../domain-organization/SKILL.md) for naming.
+Keep a capability's models, services, and implementations under its domain
+owner. Role directories help readers find code; they are not mandatory layers
+that every operation must pass through.
 
-**Version note:** this targets the Effect v4 surface the darkmatter toolchain
-pins — `Context.Service`, `effect/unstable/http`, `effect/unstable/cli`,
-`effect/testing/TestClock`, `@effect/platform-bun`. On Effect v3, translate:
-`Context.Service` → `Context.Tag`, `effect/unstable/http` → `@effect/platform/Http*`,
-`effect/unstable/cli` → `@effect/cli`, `effect/testing/TestClock` → `effect/TestClock`.
+This map is conceptual. Check the repository's installed Effect version and
+pinned source before using service, schema, runtime, or testing APIs. Do not
+translate between Effect versions by guessing import paths or signatures.
 
-## The layout
+## Example: a billing package
 
-```
-my-package/
+```text
+billing/
+  index.ts                  # explicit public models and service exports
+  postgres.ts               # explicit public Postgres layer export
+  testing.ts                # public test support, when consumers need it
+  package.json              # lists supported package entry points
   src/
-    index.ts                 # public surface: services, layers, errors
-    domain/
-      error.ts                # one tagged error for the whole package
-      model.ts                # value objects / DTOs (Schema)
-      logic.ts                # pure decision functions
-      logic.test.ts           # unit test beside the file it covers
-    services/                 # ports — the only thing workflows may see
-      <name>.ts               # one Context.Service per external system
-      runtime-config.ts       # validated settings as a service
+    models/
+      Invoice.ts            # schema and inferred type together
+    services/
+      InvoiceStore.ts       # complete operations and typed failures
     adapters/
-      live.ts                 # composition root for all *Live layers
-      config.ts               # env -> typed config
-      <system>/
-        live.ts               # Context.Service implementation for one system
-    workflows/                # use cases: orchestrate services, no I/O refs
-      <use-case>.ts
-      <use-case>.test.ts      # test beside the file it covers
-    cli/                      # optional boundary: CLI app
-      flags.ts
-      options.ts
-      commands/
-      app.ts
-      cli.ts
-    server/                   # optional boundary: HTTP app
-      routes.ts
-      server.ts
-  alchemy.run.ts              # optional boundary: deploy
-
-# repo root, not per package:
-tests/
-  <flow>.test.ts              # end-to-end only: spawns the real server/CLI or spans packages
+      Postgres.ts           # queries, bindings, decoding, private helpers
+      Postgres.test.ts      # exercise store behavior through public entries
+    workflows/
+      collect-payment.ts    # coordinates store and payment capabilities
 ```
 
-## `src/domain/` — pure. No layers, no env, no I/O.
+The package is already the `billing` owner; do not add `src/billing/` just to
+repeat its name. A package containing multiple domains uses
+`src/<owner>/{models,services,adapters,workflows}`. Add only roles that contain
+real responsibilities. Related groups of adapters can use subdirectories
+when those groups improve navigation.
 
-| File | Effect exports | Why |
-| --- | --- | --- |
-| `error.ts` | `Data.TaggedError` | One typed error per package; everything external fails into it |
-| `model.ts` | `Schema` (`Schema.Struct`, `Schema.decodeUnknownSync`) | Value objects and boundary DTOs; validation at the edge |
-| `logic.ts` | none, or `Effect` as a *type only* (`Effect.Effect<A, E>`) | Pure functions; dependency-free and trivially testable |
+Root source entries contain explicit re-exports from implementation modules
+under `src/`. Declare supported entries in `package.json`. Avoid a root barrel
+that re-exports another barrel or exposes every private helper. Separate
+optional database or testing entries so ordinary callers need not depend on
+them. A small package may need only one entry.
 
-## `src/services/` — ports
+## Models and services
 
-| File | Effect exports | Why |
-| --- | --- | --- |
-| `<name>.ts` | `Context.Service` | Declare the port + method shapes; never the implementation |
-| `runtime-config.ts` | `Context.Service`, `Redacted` (type `Redacted.Redacted<T>` for keys) | Validated settings via context, so nothing downstream reads env |
+A model owns its schema and inferred type. Reuse library or generated contracts
+when they already describe the value. A wire representation belongs to its
+adapter unless consumers also need it. Different representations may need
+separate schemas; repeating the same contract as a handwritten interface does
+not add a boundary.
 
-```ts
-// services/telemetry.ts — the port
-export class Telemetry extends Context.Service<Telemetry, {
-  readonly record: Effect.Effect<number>;
-  readonly snapshot: Effect.Effect<Snapshot>;
-}> {}
-```
+A service exposes operations meaningful to its caller, such as
+`saveInvoice(invoice)`. Its implementation owns validation, persistence, and
+required follow-up work. Callers should not have to remember an internal
+sequence of encode, insert, update-index, and decode calls.
 
-## `src/adapters/` — the only place I/O lives
+Use Effect services and Layers where an injected implementation or resource
+lifetime is useful. A pure calculation does not need a service tag. Define the
+errors callers need to handle; do not force unrelated failures into one
+package-wide error or repeat contracts in separate runtime and backend files.
 
-| File | Effect exports | Why |
-| --- | --- | --- |
-| `config.ts` | `Config` (`Config.string/integer/boolean`, `Config.withDefault`, `Config.optional`, `Config.redacted`), `ConfigProvider` (`fromUnknown`, `fromEnv`, `orElse`, `constantCase`, `layer`), `Schema` (validate), `Layer.effect` | Named config file + env/flag overrides → typed `RuntimeConfig` service ([ADR-0014](../../docs/adr/0014-named-config-files-over-flags-and-env.md)) |
-| `<system>/live.ts` | `Effect` (`Effect.tryPromise`, `Effect.gen`), `Layer.effect`, the domain `Data.TaggedError` | Wrap one external system (SDK, RPC, API) behind its port |
-| `live.ts` | `Layer.mergeAll`, `Layer.provide`, `Layer.provideMerge` | Single `*ServicesLive` bundle consumers compose |
+## Adapters
 
-## `src/workflows/` — use cases
+Keep SQL, parameter bindings, row conversion, and operation-local helpers close
+to the operation. `Postgres.ts` can implement several related store operations.
+Extract a shared decoder or client when it hides substantial details or has
+useful consumers; do not create forwarding files for every query. Keep the
+existing typed query tools when useful. Parameterized SQL with validated rows
+and behavior checks is also valid; a result generic alone is not validation.
+See [ADR-0015](../../docs/adr/0015-cohesive-modules.md).
 
-| File | Effect exports | Why |
-| --- | --- | --- |
-| `<use-case>.ts` | `Effect.gen`, `Effect.repeat` + `Schedule.spaced` (loop modes), `Option`, `Ref` (accumulation) | Reference **services only**, never adapters; scheduling lives here, not the CLI |
+Use Effect-native drivers directly. Wrap an actual Promise-based driver at the
+adapter edge and classify its failures there. Avoid internal
+`Effect → Promise → Effect` round trips. Decode unknown input as it enters the
+package, then keep the validated type inside it.
 
-## `src/cli/` — optional CLI boundary
+An operation completes only after its required work completes. Preserve errors,
+ordering, cancellation, and cleanup. If work must outlive the call, expose a
+handle or a documented handoff to an owner that supervises it.
 
-| File | Effect exports | Why |
-| --- | --- | --- |
-| `flags.ts` | `Flag.boolean/string/integer`, `Flag.optional`, `Flag.withDefault`, `Flag.withDescription` | Declarative flags; typed input is `Option.Option<T>` for optionals |
-| `options.ts` | `Option` (`Option.getOrUndefined`, `Option.isSome`) | Pure flags → domain options; no effects |
-| `commands/*.ts` | `Command.make`, `Command.withDescription` | One command per file, thin program over workflows |
-| `app.ts` | `Command.withSubcommands` | The routable tree — testable without layers or network |
-| `cli.ts` | `Command.run`, `Effect.provide(BunServices.layer)`, `Logger.layer` (`consolePretty`, `tracerLogger`), `BunRuntime.runMain` | The **only** place `runMain` appears |
+Keep configured line limits. Split a coherent responsibility when that makes
+code easier to understand; use a documented file-specific increase when a
+forced split would scatter one implementation.
 
-```ts
-// cli/cli.ts — the whole entrypoint
-Command.run(app, { version: VERSION }).pipe(
-  Effect.provide(BunServices.layer),
-  Effect.provide(Logger.layer([Logger.consolePretty(), Logger.tracerLogger])),
-  BunRuntime.runMain,
-);
-```
+## Workflows and application boundaries
 
-Routing is tested with `Command.runWith` + a `Ref` recorder + `NodeServices.layer`
-(`@effect/platform-node`) — no layers, no network.
+Workflows coordinate complete capabilities through their public contracts;
+they do not reach into an adapter's private SQL or decoder. Keep private
+workflow helpers local. Do not add a workflow layer around a single forwarding
+call.
 
-## `src/server/` — optional HTTP boundary
+CLI and HTTP handlers parse requests, call the capability, and present its
+result. Group related commands when they form one readable module; one command
+does not automatically require one file. Application entry points compose
+Layers and run the program. `runPromise` belongs at a host callback or caller
+boundary that requires a Promise, not between internal Effect modules.
 
-| File | Effect exports | Why |
-| --- | --- | --- |
-| `routes.ts` | `HttpRouter.use` + `Effect.fn`, `HttpServerResponse.json/.text` | Handlers stay thin: record, call service, serialize |
-| `server.ts` | `HttpRouter.serve` (`Layer.mergeAll(routes, static)`), `HttpStaticServer.layer`, `BunHttpServer.layer`, `Layer.unwrap` (config-dependent layers), `Layer.provide`, `Layer.launch`, `BunRuntime.runMain` | Composition root only |
+Read configuration through the project's configured provider, validate it, and
+pass typed settings inward. Keep deployment assembly in `alchemy.run.ts` or
+the repository's established deploy entry. Neither runtime nor deployment
+composition belongs in a reusable domain model.
 
-```ts
-// server.ts — launch shape
-const MainLive = HttpRouter.serve(Layer.mergeAll(Routes, StaticFiles)).pipe(
-  Layer.provide(/* service layers */),
-  Layer.provide(BunHttpServer.layer({ hostname, port })),
-);
-BunRuntime.runMain(
-  Layer.launch(MainLive).pipe(
-    // v4's runMain installs no pretty logger; provide one or logs render plain
-    Effect.provide(Logger.layer([Logger.consolePretty(), Logger.tracerLogger])),
-  ),
-);
-```
+## Tests
 
-## Tests and `alchemy.run.ts`
+Follow [when-to-write-tests](../when-to-write-tests/SKILL.md). Exercise behavior
+through the public package or adapter entry: save an invoice, list invoices,
+and verify the result; repeat a delivery and verify idempotency. Check ordering,
+errors, and cleanup when those are part of the public contract. Use real test
+storage where practical, or inject an external driver/service at its boundary.
 
-Tests sit beside the source they cover: `logic.test.ts` next to `logic.ts`. A
-package has no `test/` or `tests/` directory. The only separate test directory
-is the repo-root `tests/`, reserved for end-to-end tests that spawn the real
-server or CLI or span packages.
-
-| File | Effect exports | Why |
-| --- | --- | --- |
-| `<file>.test.ts` (beside `<file>.ts`) | `@effect/vitest` (`it.effect`, `assert`, `describe`), `Layer.provideMerge`, `Layer.succeed` (test services), `ConfigProvider.fromUnknown` (fake env), `TestClock` + `Fiber` + `Exit` (loop tests), `NodeServices.layer`, `Command.runWith` + `Ref` (CLI routing) | Deterministic: virtual time, injected config, no network |
-| `alchemy.run.ts` | `Alchemy.Stack`, `Cloudflare.providers`/`Cloudflare.state`, `Config` + `Effect` for env, `Cloudflare.DurableObject` + `DurableObjectState` (with `Effect.gen` inside) if it is a worker | Deploy boundary; reuses the package's `*ServicesLive` layers |
-
-## Rules of thumb that make the map work
-
-- **Dependencies point inward:** `cli`/`server` → `workflows` → `services` ←
-  `adapters`. Domain imports nothing.
-- **`runMain` / `BunServices` appear exactly once**, in a boundary file — never
-  inside `src/` of a reusable package.
-- **Config is read once**, in `adapters/config.ts`, from the named config file
-  plus env/flag overrides (ADR-0014); everything after sees typed config or
-  `Redacted` via context.
-- **Every promise-based SDK gets one wrapper** (`Effect.tryPromise` → the
-  package's tagged error), not scattered try/catch.
-- **Loops are `Effect.repeat` + `Schedule`**, which is what makes `TestClock`
-  tests possible.
-- **Tests sit next to their source** (`foo.test.ts` beside `foo.ts`). The only
-  separate test directory is the repo-root `tests/`, for end-to-end tests.
+Keep tests beside the capability they exercise according to repository
+conventions. Repository-wide tests may span packages or launch the real app.
+Do not create a test for every internal helper or export internals for tests.
+A public pure function can have focused input/output tests without starting a
+server or wrapping the calculation in Effect. Use the installed version's
+Effect test helpers for Effects, virtual time, and resource scopes.

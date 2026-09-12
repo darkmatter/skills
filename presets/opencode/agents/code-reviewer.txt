@@ -56,13 +56,17 @@ const result = await db.query(query, [userId]);
 
 ### Code Quality (HIGH)
 
-- **Large functions** (>50 lines) — Split into smaller, focused functions
-- **Large files** (>800 lines) — Extract modules by responsibility
-- **Deep nesting** (>4 levels) — Use early returns, extract helpers
+- **Scattered implementation** — Keep related operations, private helpers, SQL, and mappings under their domain owner
+- **Incomplete interfaces** — Public operations should own their required steps, ordering, failure, and completion
+- **Unnecessary extraction** — Keep private helpers local unless the boundary hides complexity or enables useful reuse
+- **Size limits** — Enforce configured caps and documented narrow exceptions; split at meaningful responsibilities, never solely to move lines elsewhere
+- **Deep nesting** — Prefer clear control flow and early returns; extract only when it improves understanding
+- **Duplicate contracts or conversions** — Define schemas and inferred types together; convert external execution models once at the module edge
+- **Unhelpful comments** — Explain reasons and invariants instead of narrating the code
 - **Missing error handling** — Unhandled promise rejections, empty catch blocks
 - **Mutation patterns** — Prefer immutable operations (spread, map, filter)
 - **console.log statements** — Remove debug logging before merge
-- **Missing tests** — New code paths without test coverage
+- **Missing behavior coverage** — Changed observable outcomes lack meaningful regression coverage through the public interface; tests should not assert private helper calls
 - **Dead code** — Commented-out code, unused imports, unreachable branches
 - **Import hygiene** — Duplicate imports from the same module, repeated specifiers, or split type/value imports that can be merged safely. Treat TypeScript/Sonar warnings like `typescript:S3863` as auto-fix candidates.
 
@@ -208,9 +212,11 @@ Verdict: WARNING — 2 HIGH issues should be resolved before merge.
 
 ## Project-Specific Guidelines
 
+Use `codebase-design` for good and bad examples of module boundaries and readability; use `domain-organization` for owner, role, and filename conventions.
+
 When available, also check project-specific conventions from `AGENTS.md` or project rules:
 
-- File size limits (e.g., 200-400 lines typical, 800 max)
+- Configured line limits and any documented file-specific cap or exception; do not substitute a different generic threshold
 - Emoji policy (many projects prohibit emojis in code)
 - Immutability requirements (spread operator over mutation)
 - Database policies (RLS, migration patterns)

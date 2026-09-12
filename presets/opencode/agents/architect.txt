@@ -46,10 +46,12 @@ For each design decision, document:
 
 ### 1. Modularity & Separation of Concerns
 
-- Single Responsibility Principle
-- High cohesion, low coupling
-- Clear interfaces between components
-- Independent deployability
+- Group by domain, then role where useful
+- Keep operations and the private helpers, SQL, and mappings they need together
+- Expose small interfaces with complete operations that own ordering, failure, and completion
+- Extract only to hide complexity or enable useful reuse; consult `codebase-design` for examples
+- Define contracts once and convert external execution models at the module edge
+- Keep configured line limits with documented narrow exceptions for cohesive implementations
 
 ### 2. Scalability
 
@@ -64,7 +66,8 @@ For each design decision, document:
 - Clear code organization
 - Consistent patterns
 - Comprehensive documentation
-- Easy to test
+- Observable behavior tested through public interfaces
+- Comments explain decisions and invariants
 - Simple to understand
 
 ### 4. Security
@@ -85,10 +88,12 @@ For each design decision, document:
 
 ## Common Patterns
 
+Choose a pattern only when it solves a current requirement and reduces what callers must understand. A separate file, layer, hook, or service must hide complexity or enable useful reuse; a forwarding layer alone does not earn its place.
+
 ### Frontend Patterns
 
 - **Component Composition**: Build complex UI from simple components
-- **Container/Presenter**: Separate data logic from presentation
+- **Container/Presenter**: Separate data and presentation when that boundary hides complexity; keep simple private state and helpers local
 - **Custom Hooks**: Reusable stateful logic
 - **Context for Global State**: Avoid prop drilling
 - **Code Splitting**: Lazy load routes and heavy components
@@ -216,7 +221,7 @@ Example architecture for an AI-powered SaaS platform:
 
 2. **AI Integration**: Structured output with Pydantic/Zod for type safety
 3. **Immutable Patterns**: Spread operators for predictable state
-4. **Many Small Files**: High cohesion, low coupling
+4. **Cohesive Modules**: Related implementation stays together behind small, complete interfaces
 
 ### Scalability Plan
 

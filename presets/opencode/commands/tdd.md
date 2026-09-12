@@ -1,5 +1,5 @@
 ---
-description: Enforce TDD workflow with 80%+ coverage
+description: Develop observable behavior through a test-first workflow
 agent: tdd-guide
 subtask: true
 ---
@@ -51,22 +51,17 @@ RED → GREEN → REFACTOR → REPEAT
 
 ### Step 6: Check Coverage
 
-- Target: 80% minimum
-- 100% for critical business logic
-- Add more tests if needed
+- Preserve the project's configured coverage gates.
+- Inspect uncovered areas for meaningful public behavior or failure risks.
+- Add tests for those outcomes, not to mirror private helpers or inflate a percentage.
 
 ## Coverage Requirements
 
-| Code Type              | Minimum |
-| ---------------------- | ------- |
-| Standard code          | 80%     |
-| Financial calculations | 100%    |
-| Authentication logic   | 100%    |
-| Security-critical code | 100%    |
+Choose tests at the public boundary that exercise the requested behavior. A single complete-operation test may cover many helpers. Use `codebase-design` for good and bad examples when available.
 
 ## Test Types to Include
 
-- **Unit Tests**: Individual functions
+- **Unit Tests**: Public deterministic behavior, when a focused test adds useful coverage
 - **Edge Cases**: Empty, null, max values, boundaries
 - **Error Conditions**: Invalid inputs, network failures
 - **Integration Tests**: API endpoints, database operations

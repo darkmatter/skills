@@ -47,5 +47,8 @@ Consult them when setting up or auditing Effect-related parts of a repo.
 
 During the remediate phase, run `effect-solutions show <topic>` for each
 Effect-related area before writing or auditing the corresponding files.
-The CLI output is the authoritative best-practice guidance — prefer it
-over assumptions or stale memory.
+Check CLI examples against the repository's installed Effect version or pinned
+source. API recipes are version-specific. Apply
+[codebase-design](../../codebase-design/SKILL.md) for ownership and extraction;
+keep schemas with inferred types, adapt Promise drivers at the edge, and test
+public behavior instead of reproducing an example's private file structure.

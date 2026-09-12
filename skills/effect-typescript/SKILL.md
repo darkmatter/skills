@@ -5,14 +5,16 @@ description: Effect is a hard default unless the codebase explicitly states it. 
 
 # Effect TypeScript
 
-Our engineering convention forbids the usage of promises and instead uses effects. Unlike promises, effects are able to describe the errors they can throw in its declared type. They are most useful anywhere where I/O occurs: external APIs, files, databases, queues, workers, CLIs, config, secrets, clocks, subprocesses, network calls, or deployable runtime boundaries. Effect is excellent when that I/O needs typed failures, dependencies, runtime validation, retries, concurrency, resources, and testable boundaries. It is not a default replacement for simple TypeScript.
+Use Effect for application I/O so failures, dependencies, and resource lifetimes are explicit. Adapt a Promise-based driver or SDK once at its boundary; keep internal operations in Effect. Run Effects at the caller or runtime boundary that requires a Promise or starts the program. Pure transformations remain plain TypeScript.
+
+Follow [codebase-design](../codebase-design/SKILL.md) for the shared readability rules and examples. Keep related queries, bindings, decoding, and private helpers with their adapter; extract only when it hides complexity or enables useful reuse. Operations own completion, errors, and cleanup, or explicitly hand that responsibility to their caller.
 
 
 This skill adapts Effect guidance to darkmatter conventions: use Bun commands instead of pnpm for darkmatter projects, and prefer Alchemy for deployable infrastructure. 
 
 ## Bootstrap
 
-If `effect-solutions` is not on in your `$PATH`, install it: `bun add -g effect-solutions@latest`. Clone the latest HEAD of effect's source to `~/.agents/repos/effect-ts/effect`.
+If `effect-solutions` is not on in your `$PATH`, install it: `bun add -g effect-solutions@latest`. Prefer the repository's pinned Effect source or installed package for API details; use a version-matching checkout when neither is available.
 
 ## Guidelines
 
@@ -31,7 +33,7 @@ If `effect-solutions` is not on in your `$PATH`, install it: `bun add -g effect-
 
 ## When NOT to use
 
-- A small one-off script can be obvious plain TypeScript: read one file, transform pure data, write one file, no retries, no injected dependencies, no long-lived resources. Keep this exception genuinely small; if the file starts accumulating schemas, clients, orchestration, retries, or reusable helpers, split it around those boundaries instead of growing a monolith.
+- A small one-off script can be obvious plain TypeScript: read one file, transform pure data, write one file, no retries, no injected dependencies, no long-lived resources. As requirements grow, adopt Effect where I/O needs it and extract coherent responsibilities. A line count alone does not justify scattering the implementation; retain configured limits with documented, targeted exceptions where needed.
 - Pure functions, simple data mappers, UI-local state, or tiny glue code do not need Effect wrappers.
 - A project has no Effect dependency and the feature does not benefit from typed errors, Layers, resource safety, retries, or observability.
 - The team only needs a tactical fix in plain async code. Do not introduce Effect as a drive-by refactor.
@@ -47,7 +49,7 @@ If `effect-solutions` is not on in your `$PATH`, install it: `bun add -g effect-
 
 ## Package layout reference
 
-For the canonical Effect package shape - which directory/file owns which Effect export (domain, services, adapters, workflows, CLI/HTTP boundaries, tests, Alchemy deploy) - see the effect-package-map.md file next to this SKILL.md. Use it when scaffolding a new package or reviewing where an Effect import landed.
+See [effect-package-map.md](effect-package-map.md) for domain ownership, public package entries, adapters, workflows, tests, and runtime boundaries. It describes responsibilities rather than prescribing a file for each function or Effect export.
 
 ## Upstream Reference
 

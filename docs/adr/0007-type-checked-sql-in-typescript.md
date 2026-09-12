@@ -1,6 +1,6 @@
 # 0007 — Type-checked SQL in TypeScript
 
-- **Status:** accepted
+- **Status:** superseded by [ADR-0015](0015-cohesive-modules.md)
 - **Date:** 2026-06-16
 - **Deciders:** cm
 

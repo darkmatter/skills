@@ -13,17 +13,11 @@ Analyze test coverage and identify gaps: $ARGUMENTS
 1. **Check for existing coverage report** — if none found, run `npm test -- --coverage` first
 2. **Analyze results** - Identify low coverage areas
 3. **Prioritize gaps** - Critical code first
-4. **Generate missing tests** - For uncovered code
+4. **Add meaningful tests** - For unverified observable behavior or material failure risks
 
 ## Coverage Targets
 
-| Code Type       | Target |
-| --------------- | ------ |
-| Standard code   | 80%    |
-| Financial logic | 100%   |
-| Auth/security   | 100%   |
-| Utilities       | 90%    |
-| UI components   | 70%    |
+Read and preserve the project's configured coverage gates. A percentage identifies areas to inspect; it does not require a test for every uncovered line or function. Prioritize meaningful public behavior and material failure risks. Test complete operations rather than private call sequences; use `when-to-write-tests` and `codebase-design` for examples when available.
 
 ## Coverage Report Analysis
 
@@ -37,21 +31,23 @@ All files      |   XX    |    XX    |   XX    |   XX
 
 ### Low Coverage Files
 
-[Files below target, prioritized by criticality]
+[Files below a configured target, prioritized by meaningful behavior at risk]
 
 ### Uncovered Lines
 
-[Specific lines that need tests]
+[Uncovered areas and the observable outcome, if any, that needs verification]
 
 ## Test Generation
 
-For each uncovered area:
+For each uncovered area with a meaningful behavior gap:
 
-### [Function/Component Name]
+### [Observable Behavior]
 
 **Location**: `src/path/file.ts:123`
 
-**Coverage Gap**: [description]
+**Behavior Gap**: [outcome or failure case not yet verified]
+
+**Public Entry Point**: [interface used by callers]
 
 **Suggested Tests**:
 

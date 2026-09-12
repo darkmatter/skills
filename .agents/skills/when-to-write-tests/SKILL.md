@@ -1,11 +1,13 @@
 ---
 name: when-to-write-tests
-description: Decide whether to add a test. Use before writing or requesting tests. Default is no new test. Prefer a few end-to-end happy-path tests of the public contract over unit tests of internals.
+description: Decide whether a new test is needed. Use before writing or requesting tests. Prefer a few tests of observable public behavior over tests of private helpers; preserve required lifecycle and regression coverage.
 ---
 
 # When to write tests
 
-Do not unit-test every little thing. Prefer a few end-to-end happy-path tests of the public contract.
+Test observable behavior through the capability's interface. Follow
+[codebase-design](../codebase-design/SKILL.md) for the shared rules and examples.
+Prefer a few tests that cover real behavior over a test for every private helper.
 
 ## Default
 
@@ -16,34 +18,31 @@ Smoke the changed path (run the thing). That is verification.
 ## Write a test only when
 
 - The user asked for one, or
-- A **public observable contract** changed and nothing already covers the happy path (store API, HTTP route, migration backfill of live rows).
+- A **public observable contract** is new, changed, or has a reproduced bug that existing tests do not cover (store API, HTTP route, migration backfill, public calculation).
 
-If you write one, make it end-to-end on that happy path. Do not add a unit-test layer underneath.
+Choose the smallest test that exercises that contract through its interface.
+For a store, use the real persistence path where practical. For a public pure
+function, assert its input/output behavior directly. Test failure, ordering,
+and cleanup when they are part of the contract; do not add a layer of tests
+for private helpers or assertions about internal calls.
 
 Put it next to the source as `<file>.test.ts`, not in a separate `test/` or `tests/` directory. Only a test that spawns the real server or CLI, or spans packages, goes in the repo-root `tests/`.
 
 ## Do not write a test for
 
 - Comment / docs-only edits
-- Internal helpers, encoders, bind-list rewrites
+- Internal helpers, encoders, or bind-list rewrites already covered by behavior tests
 - "Every new function/method"
 - Edges an advisory invented that are not the contract
 - Refactors that keep the same public behavior (existing tests are the regression net)
 
-## Instruction-stack trap
+## Apply repository requirements
 
-These used to fire too often. Treat them as opt-in; this preference wins:
-
-- Bundled `test-driven-development` — "any feature or bugfix", "every new function has a test"
-- `using-superpowers` 1% match — does **not** mean invoke TDD on every implement
-- `AGENTS.md` "regression tests for behavior changes" — means public contract, not every internal change
-- `diagnose` Phase 5 — verify with the repro loop; do not add a test unless this skill says so
-- `definition-of-done` — no coverage quota; verification is smoke plus this skill
-- Session advisories asking for another unit test of plumbing
-
-`verification` is end-to-end smoke, not a vitest file.
-
-User instructions beat skills. This preference is a user instruction.
+Current user instructions and repository requirements take precedence over this
+skill. Check existing coverage before adding tests; a required regression test
+should reproduce the observable bug, not freeze its current implementation.
+Do not invoke TDD merely because a helper was added or moved. A successful smoke
+check is useful verification, but does not replace a required automated test.
 
 ## Fair example
 
@@ -51,4 +50,5 @@ Seed old inbound tables, apply the migration, list events, assert facts and meta
 
 ## Unfair example
 
-A test per helper or per comment rewrite.
+A test per helper or per comment rewrite. Asserting that `saveInvoice` called
+private `insertRow` rather than that the invoice was saved.

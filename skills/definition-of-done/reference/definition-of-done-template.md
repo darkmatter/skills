@@ -3,7 +3,8 @@
 ## Functional criteria
 
 - All user-visible features work as specified.
-- Edge cases and error handling are implemented.
+- Required failure, ordering, and cleanup behavior is implemented. Operations
+  finish their work or explicitly hand responsibility to a caller.
 
 ## Non-functional criteria
 
@@ -13,20 +14,20 @@
 
 ## Verification
 
-Default is no new test. Smoke the changed path (run the thing). See
-`when-to-write-tests`.
+Follow [when-to-write-tests](../../when-to-write-tests/SKILL.md) and the
+repository's test requirements. Run the changed path and existing relevant checks.
 
-- Write a test only if the user asked, or a public observable contract
-  changed and nothing covers the happy path.
-- If you write one, make it an end-to-end happy-path test of that
-  contract. Do not add a unit-test layer underneath. No coverage quota.
-- `test-driven-development` is opt-in: only when the user asked for TDD
-  or that uncovered public-contract happy path.
+- Add tests for uncovered public behavior when required, including reproduced
+  failures and lifecycle guarantees.
+- Verify through the public interface; do not add tests for every private helper.
+  A public pure function can be tested directly. No coverage quota.
+- Apply [codebase-design](../../codebase-design/SKILL.md): retain file limits,
+  document targeted exceptions, and keep related implementation together.
 
 ## Documentation
 
 - Public-facing documentation is updated.
-- Code comments explain non-trivial sections.
+- Code comments explain decisions and invariants that names alone cannot convey.
 - Release notes include a summary of changes.
 
 ## Sign-off

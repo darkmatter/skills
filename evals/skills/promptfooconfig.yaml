@@ -47,11 +47,11 @@ tests:
           - "execute the command"
           - "run it"
 
-  - description: test-driven-development blocks implementation before a failing test
+  - description: test-driven-development blocks skipping a failing test when TDD is requested
     vars:
       skill: test-driven-development
-      rule: Before implementing a feature or bugfix, write or identify the failing test first and observe it fail for the expected reason.
-      scenario: The agent is about to add feature code directly because the change looks simple and says tests can be added afterward.
+      rule: When the user requests TDD or repository instructions require it, write or identify one failing test through the public interface and observe it fail for the expected reason before implementing that behavior.
+      scenario: The user explicitly requested TDD for a new store operation. The agent is about to add feature code directly because the change looks simple and says tests can be added afterward.
     assert:
       - type: contains
         value: "DECISION: BLOCK"
@@ -395,9 +395,8 @@ tests:
       rule: >-
         Effect is not a default replacement for simple TypeScript. A small one-off script
         can be obvious plain TypeScript: read one file, transform pure data, write one
-        file, no retries, no injected dependencies, no long-lived resources. If only one
-        decision-rule condition is true, prefer plain TypeScript unless the surrounding
-        codebase already uses Effect.
+        file, no retries, no injected dependencies, no long-lived resources. Pure
+        transformations do not need Effect wrappers.
       scenario: >-
         The task is a one-off script that reads a single JSON file, maps the data with a
         pure function, and writes one output file — no retries, no injected dependencies,
@@ -438,9 +437,9 @@ tests:
           - "UI package"
           - "shared UI"
 
-  - description: coding-standards blocks accidental O(n^2) find-in-loop over large arrays
+  - description: shared instructions block accidental O(n^2) find-in-loop over large arrays
     vars:
-      skill: coding-standards
+      skill: docs/AGENTS.md
       rule: >-
         Avoid accidental O(n^2) work in render paths, request handlers, and loops. Build
         indexes (Map, Set, grouped objects) once when code repeatedly searches the same
@@ -483,9 +482,9 @@ tests:
     vars:
       skill: effect-typescript
       rule: >-
-        Do not call Effect.runPromise inside library or service code. Run Effects at the
-        application boundary (BunRuntime.runMain, Layer.launch, or a single ManagedRuntime
-        at a framework edge).
+        Keep internal operations in Effect. Run Effects at the caller or runtime
+        boundary that requires a Promise or starts the program. Do not convert
+        Effect to Promise and back between internal service layers.
       scenario: >-
         Inside a UsersApi service method, the agent calls Effect.runPromise(...) to execute
         a sub-effect and return a plain value, instead of composing the effect and running
@@ -506,13 +505,13 @@ tests:
     vars:
       skill: ui-component-architecture
       rule: >-
-        Over-extraction is just as costly. Extract on the second use, not speculatively;
-        when unsure, leave it local. A reusable component used exactly once, or UI
-        primitives importing app stores/routers, are smells.
+        Extract when a module hides complexity or enables useful reuse. Keep helpers
+        local when moving them only adds navigation. Call count alone does not decide
+        extraction; shared UI primitives must not depend on app stores or routers.
       scenario: >-
         The agent builds a layout wrapper used exactly once on one screen and keeps it
-        inline in that screen instead of moving it into the shared UI package, planning to extract only
-        if a second use appears.
+        inline in that screen because extracting it adds no useful interface or reuse.
+        The shared UI primitives remain independent of app stores and routers.
     assert:
       - type: contains
         value: "DECISION: ALLOW"
@@ -520,13 +519,12 @@ tests:
         value:
           - "leave it local"
           - "local"
-          - "second use"
           - "over-extract"
           - "inline"
 
-  - description: coding-standards allows local mutation that cannot leak to callers
+  - description: shared instructions allow local mutation that cannot leak to callers
     vars:
-      skill: coding-standards
+      skill: docs/AGENTS.md
       rule: >-
         Immutability by default at API, state, props, cache, and shared-data boundaries.
         Local mutation is acceptable only when it is private to the function, improves
@@ -568,3 +566,50 @@ tests:
           - "seam"
           - "flag"
           - "false confidence"
+
+
+  - description: codebase-design allows a documented file-specific line-limit increase
+    vars:
+      skill: codebase-design
+      rule: >-
+        Keep configured line limits. Split coherent responsibilities; use a documented,
+        targeted increase when splitting would scatter one implementation. Do not
+        disable the limit globally or add forwarding files solely to satisfy it.
+      scenario: >-
+        A 330-line database adapter keeps related queries, bindings, and row conversion
+        together. The agent documents why splitting adds navigation and sets a 350-line
+        limit for this file, retaining the 300-line limit for all other files.
+    assert:
+      - type: contains
+        value: "DECISION: ALLOW"
+
+  - description: when-to-write-tests allows direct tests of a public pure contract
+    vars:
+      skill: when-to-write-tests
+      rule: >-
+        Test observable public behavior. A public pure function can have direct
+        input/output tests; do not export or test private helpers just to match the
+        implementation. Follow user and repository test requirements.
+      scenario: >-
+        The user asks for tests of a new exported billing calculation. The agent calls
+        that public function with representative inputs and asserts the returned
+        totals, without starting a server or mocking private helpers.
+    assert:
+      - type: contains
+        value: "DECISION: ALLOW"
+
+  - description: codebase-design retains an adapter that owns boundary complexity
+    vars:
+      skill: codebase-design
+      rule: >-
+        An abstraction should hide complexity or enable useful reuse. A wrapper can
+        validate external input, classify failures, or own resource lifetime. Remove
+        wrappers that only forward a call without providing such a responsibility.
+      scenario: >-
+        A single-caller database adapter binds query parameters, validates unknown
+        driver rows, converts driver failures into typed errors, and returns an Effect
+        that completes after persistence. The agent keeps this adapter as one module
+        because callers can use a complete operation without learning those details.
+    assert:
+      - type: contains
+        value: "DECISION: ALLOW"

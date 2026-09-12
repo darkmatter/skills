@@ -66,10 +66,14 @@ npx ts-prune
 
 ### Consolidation Strategies
 
-1. **Extract utility function** - for repeated logic
-2. **Create base class** - for similar classes
-3. **Use higher-order functions** - for repeated patterns
-4. **Create shared constants** - for magic values
+1. **Identify the common responsibility** — similar code from separate domains may need to change independently
+2. **Keep helpers local** — extract only when a boundary hides complexity or enables useful reuse
+3. **Prefer straightforward composition** — a wrapper or shared abstraction must reduce what callers need to understand
+4. **Define contracts once** — colocate runtime schemas and inferred types; keep mappings with their owner
+5. **Preserve complete operations** — retain ordering, error propagation, and completion through the public interface
+6. **Keep configured line limits** — use documented narrow exceptions instead of scattering cohesive code to fit a cap
+
+Use `codebase-design` for good and bad examples; verify observable behavior after consolidation.
 
 ## Verification
 

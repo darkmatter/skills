@@ -20,6 +20,10 @@ allowed-tools: Bash(cargo:*) Bash(rustc:*) Bash(rustfmt:*) Bash(clippy:*) Read W
 
 Apply these guidelines when writing or reviewing Rust code. Based on Apollo GraphQL's [Rust Best Practices Handbook](https://github.com/apollographql/rust-best-practices).
 
+## Shared module design
+
+Use [codebase-design](../codebase-design/SKILL.md) for language-independent conventions: group by domain then role where useful, keep related implementation together, and expose complete operations. Extract only for hidden complexity or useful reuse; define each contract once, convert execution models at external boundaries, and own required work through completion. Keep configured line limits with documented narrow exceptions. Comments explain reasons and invariants; tests verify public behavior with as many assertions as that behavior needs. Apply the upstream chapters below within these conventions; private visibility is not a reason to test implementation details.
+
 ## Best Practices Reference
 
 Before reviewing, familiarize yourself with Apollo's Rust best practices. Read ALL relevant chapters in the same turn in parallel. Reference these files when providing feedback:
@@ -28,7 +32,7 @@ Before reviewing, familiarize yourself with Apollo's Rust best practices. Read A
 - [Chapter 2 - Clippy and Linting](references/chapter_02.md): Clippy configuration, important lints, workspace lint setup
 - [Chapter 3 - Performance Mindset](references/chapter_03.md): Profiling, avoiding redundant clones, stack vs heap, zero-cost abstractions
 - [Chapter 4 - Error Handling](references/chapter_04.md): Result vs panic, thiserror vs anyhow, error hierarchies
-- [Chapter 5 - Automated Testing](references/chapter_05.md): Test naming, one assertion per test, snapshot testing
+- [Chapter 5 - Automated Testing](references/chapter_05.md): Test naming, behavioral assertions, snapshot testing
 - [Chapter 6 - Generics and Dispatch](references/chapter_06.md): Static vs dynamic dispatch, trait objects
 - [Chapter 7 - Type State Pattern](references/chapter_07.md): Compile-time state safety, when to use it
 - [Chapter 8 - Comments vs Documentation](references/chapter_08.md): When to comment, doc comments, rustdoc
@@ -66,7 +70,7 @@ Use `#[expect(clippy::lint)]` over `#[allow(...)]` with justification comment.
 
 ### Testing
 - Name tests descriptively: `process_should_return_error_when_input_empty()`
-- One assertion per test when possible
+- Verify one observable behavior per test; use all assertions needed to establish it
 - Use doc tests (`///`) for public API examples
 - Consider `cargo insta` for snapshot testing generated output
 
