@@ -2,7 +2,9 @@
 
 ## Good Tests
 
-**Integration-style**: Test through real interfaces, not mocks of internal parts.
+**Behavior-focused**: Test through real interfaces, not mocks of internal parts.
+See [codebase-design](../codebase-design/SKILL.md). Public pure functions can have
+direct input/output tests; private helper calls are implementation details.
 
 ```typescript
 // GOOD: Tests observable behavior
@@ -39,10 +41,10 @@ Red flags:
 
 - Mocking internal collaborators
 - Testing private methods
-- Asserting on call counts/order
+- Asserting on internal call counts/order instead of observable behavior
 - Test breaks when refactoring without behavior change
 - Test name describes HOW not WHAT
-- Verifying through external means instead of interface
+- Bypassing the interface when the same behavior is observable through it
 
 ```typescript
 // BAD: Bypasses interface to verify
@@ -59,3 +61,7 @@ test("createUser makes user retrievable", async () => {
   expect(retrieved.name).toBe("Alice");
 });
 ```
+
+When delivery count, write ordering, or cleanup is itself a public contract,
+assert that behavior at the relevant external seam. Do not remove meaningful
+lifecycle tests merely because they observe a driver or resource boundary.

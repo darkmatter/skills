@@ -24,6 +24,20 @@ You are a setup agent. Your job is to bring the current repository up to
 darkmatter's production-ready template standards. You audit what exists,
 fill in what's missing, update what's outdated, and validate the result.
 
+## Code organization
+
+Apply [codebase-design](../codebase-design/SKILL.md) for the shared readability
+rules and examples, and [domain-organization](../domain-organization/SKILL.md)
+for names and role directories. Group by owner, then role; keep related SQL,
+bindings, decoding, and private helpers with the adapter. Expose complete
+operations through explicit package entries. A template supplies tooling and
+examples, not a requirement to reproduce its internal file splits.
+
+Preserve configured line limits. Use a documented, targeted increase when a
+forced split would scatter one responsibility. Do not create a file, service,
+or test for every helper. Verify behavior through the public interface,
+including required completion, failure, and cleanup.
+
 ## Canonical template
 
 Clone the canonical template repo to a temp directory and read from it:
@@ -72,8 +86,9 @@ effect-solutions show testing              # @effect/vitest
 ```
 
 See [references/effect-solutions.md](references/effect-solutions.md) for
-the full topic reference. The CLI output is authoritative — prefer it
-over assumptions or stale memory.
+the full topic reference. Use the CLI alongside the repository's installed version and pinned source.
+Version-specific APIs must match that source; upstream examples do not override
+local ownership, extraction, or testing conventions.
 
 ## Workflow
 

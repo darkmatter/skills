@@ -138,19 +138,36 @@ The load-bearing pieces are:
 
 ## Effect-native provider module layout
 
-When authoring or refactoring an Alchemy provider in a Darkmatter app/repo, mirror the canonical `alchemy-run/alchemy-effect/packages/alchemy/src/Cloudflare` organization instead of putting resource contracts, HTTP clients, schemas, helpers, and provider lifecycle in one large file. Before writing provider code, inspect the relevant upstream provider directory (for example `Cloudflare/Providers.ts`, `Cloudflare/KV/KVNamespace.ts`, and adjacent `*Binding.ts`/`index.ts` files) and keep the same separation of concerns.
+Follow [codebase-design](../codebase-design/SKILL.md) for shared readability
+rules. A provider owns the operations that converge a resource and the cleanup
+needed when those operations fail or finish. Inspect the installed Alchemy
+version and pinned upstream provider before choosing API names or registration
+shapes. Upstream contributions follow that repository's own layout.
 
-Canonical shape for a provider namespace such as `src/Verda/`:
+For a provider implemented in a Darkmatter app or package:
 
-- `ResourceName.ts` contains only the public `Resource` type, props, attributes, JSDoc/examples, and `Resource<ResourceName>("Namespace.ResourceName")`. It should not contain the HTTP client or reconcile helpers.
-- `ResourceNameProvider.ts` contains `Provider.effect(ResourceName, Effect.gen(...))` and the lifecycle methods (`read`, `diff`, `reconcile`, `delete`). Keep provider-local adoption/reconcile logic readable and delegate API calls/selection/status helpers to sibling modules.
-- `Providers.ts` defines `class Providers extends Provider.ProviderCollection<Providers>()("Namespace") {}`, `ProviderRequirements`, and `providers()`. The `Provider.collection([...])` list contains resource tokens/policies (for example `GpuInstance`), while implementation layers are supplied with `.pipe(Layer.provide(...))`, matching Cloudflare's `Providers.ts`. Do not put already-provided provider layers inside `Provider.collection`.
-- `Client.ts` / provider SDK modules expose Effect `Context.Service` clients and `Layer.effect` live implementations. Decode all unknown provider responses with `Schema` at this boundary and return typed domain objects.
-- `Config.ts` / `Credentials.ts` centralize `Config.string`, `Config.redacted`, defaults, and auth/profile resolution. Secrets stay redacted and are provided through layers, not resource props or physical names.
-- `Errors.ts`, `Types.ts`, `Wire.ts`, `Mapping.ts`, `Status.ts`, `Selection.ts`, and other focused helpers are preferred over multi-hundred-line resource files when they isolate typed errors, wire schemas, pure selection logic, and domain mapping.
-- `index.ts` re-exports the namespace's public surface so app code imports `./ProviderNamespace/index.ts` rather than a monolithic resource file.
+- Group by the resource or provider domain, then use `models/`, `services/`,
+  `adapters/`, and `workflows/` where those roles have real responsibilities.
+  A single-domain package already supplies the owner.
+- Keep resource schemas and inferred types together. Expose the resource
+  contract and supported provider layer through explicit package entries.
+- Keep adoption, comparison, mapping, and status helpers with the lifecycle
+  implementation that needs them. Extract when it hides complexity or enables
+  useful reuse; avoid a file per helper or separate `Types` and `Schemas` copies.
+- A shared client can own API requests, response decoding, and typed failures.
+  Use an Effect-native SDK directly; wrap a Promise SDK only at that edge.
+  Keep configuration and credentials in the existing config/provider layers.
+- Preserve Alchemy's resource/provider collection and binding contracts. Public
+  composition may register several resource layers without re-exporting every
+  internal helper through a chain of barrels.
+- Keep configured file limits. Document a targeted increase when a forced split
+  would scatter one coherent reconciler.
 
-Testing convention for provider refactors: extract pure helpers where possible (selection, name normalization, status classification, mapping) and write focused Vitest tests for them (beside the source: `Selection.test.ts` next to `Selection.ts`) before moving production code. For Effect-dependent provider lifecycle, test through Layers/fakes where practical; otherwise typecheck with `bun tsc -b` and avoid changing behavior during layout-only refactors.
+Test refactors through the resource or provider interface. Retain lifecycle
+coverage for create, repeated deploy, adoption, update, and destroy as applicable.
+Use real provider clients or substitute an external service through a Layer.
+Do not extract or export private selection/mapping helpers just to test them;
+a public pure helper with its own contract can retain focused tests.
 
 ## Local development
 
@@ -256,12 +273,11 @@ Alchemy stacks and Worker/Function bodies run as Effect programs. Do not reach f
 | `new Promise((res) => setTimeout(res, ms))` | `yield* Effect.sleep(Duration.millis(ms))`           |
 | `Effect.promise(() => listSqlFiles(dir))`   | Make the helper itself return an `Effect`            |
 
-Sync, CPU-only Node APIs (`crypto.createHash`, `process.cwd`, `Buffer`, `TextEncoder`) must still be wrapped in `Effect.sync(() => …)` (or `Effect.try` if they can throw) so the call participates in the Effect runtime — tracing, interruption, and the error channel all depend on it.
-
-```ts
-const hash = yield * Effect.sync(() => crypto.createHash("sha256").update(input).digest("hex"));
-const cwd = yield * Effect.sync(() => process.cwd());
-```
+Pure transformations do not need Effect wrappers. Suspend environment reads
+and side effects in Effect; classify expected thrown failures when crossing an
+external boundary. Wrapping a CPU calculation does not make that calculation
+interruptible. Keep internal operations in Effect once a driver has been adapted,
+and run them only at the host or runtime boundary that requires it.
 
 This applies to **stack bodies, custom resource helpers, and tests**. Tests must use `FileSystem.FileSystem` / `Path.Path` for any file/path access.
 
@@ -340,7 +356,9 @@ Provider test rules:
 - Use the scratch stack handed to the test; do not write to `.alchemy/` or shared state from provider tests.
 - Provider implementations should close over services at provider construction (`const client = yield* Client` before returning lifecycle methods), matching Cloudflare providers. Do not leave `yield* Client` requirements inside `read`/`diff`/`reconcile`/`delete` unless the effect is explicitly provided there; `test.provider` should catch this with a “Service not found” failure.
 - For live provider tests that need credentials, resolve them through the same AuthProvider/config path as `alchemy deploy` (for example env-method credentials or an `alchemy login` test profile). Skip or gate the test when credentials are absent; do not commit secrets.
-- Keep pure helper tests too. Use unit tests for selection/name/status/mapping logic, and provider tests for Alchemy lifecycle semantics.
+- Preserve useful public-contract tests, including pure calculations. Do not
+  require unit tests for every private selection/name/status/mapping helper;
+  provider tests should continue to verify real lifecycle semantics.
 
 ## Build and type checking
 
@@ -433,7 +451,10 @@ For Effect-native workers/functions, prefer a deployed fixture or smoke route ov
 - Secrets are not committed, echoed in logs, or encoded into stack outputs.
 - CI deploys are non-interactive and verify stack outputs or live endpoints.
 - Preview deploys have a destroy path.
-- Effect code uses typed errors, Layers, and `Schedule` for retries instead of raw promises, bare SDK calls inside business logic, or `Date.now()` polling.
+- Effect code uses typed errors, Layers, and `Schedule` for retries; Promise SDKs
+  are adapted at their edge, and pure transformations stay plain TypeScript.
+- Provider operations own completion, errors, and cleanup. File splits hide real
+  complexity and retain configured limits with documented, targeted exceptions.
 
 ## Contributing back to `alchemy-effect`
 

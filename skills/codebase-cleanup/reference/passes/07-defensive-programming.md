@@ -4,7 +4,9 @@ You are pass 7 of 8. Read `../protocol.md` first.
 
 ## Goal
 
-Remove try/catch, null-guards, fallback returns, and other defensive scaffolding that doesn't serve a real purpose. Keep defensiveness only at genuine input boundaries (user input, external APIs, untrusted data, IPC) — not as a general anxiety pattern sprinkled through internal code.
+Remove try/catch, null-guards, fallback returns, and other defensive scaffolding that doesn't serve a real purpose. Keep validation at genuine input boundaries and retain handling for reachable
+failures, ordering, and resource cleanup inside the operation that owns them.
+Internal code can have real failure and lifecycle responsibilities.
 
 ## What counts as a hit
 
@@ -24,12 +26,17 @@ Remove try/catch, null-guards, fallback returns, and other defensive scaffolding
 - **Boundary catches**: anything that wraps `fetch`, `JSON.parse`, file I/O, child-process invocation, network calls, FFI, parsing user input
 - **Catches that classify and re-route**: `catch (e) { if (e instanceof RetryableError) retry(); else throw }` — that's real handling
 - **Catches with logging that propagates the error**: `catch (e) { logger.error(e); throw }` — observability + propagation, both real
-- **Resource cleanup**: `try { ... } finally { close() }` — finally is the point, catch is incidental or absent
+- **Resource cleanup**: `try { ... } finally { close() }` or Effect scopes and
+  finalizers — preserve cleanup on success, failure, and interruption
+- **Completion and ordering**: waiting for writes, supervising owned tasks, and
+  reporting delivery failures — do not replace these with detached work
 - **Catches that handle a documented, reachable failure mode** — even if the handling is just emitting a metric and returning a sentinel — _if_ the contract documents the sentinel
 - **Null-guards at API boundaries** where the type system can't reach (untyped callers, dynamic input)
 - **Defensive checks in code that has been bitten by the failure mode before** — git blame / commit message will mention the incident
 
-If you can't tell whether a catch is real handling or anxiety, read the commit that introduced it. If the commit message mentions a specific bug or incident, it's real. If the commit message is generic ("add error handling"), it's anxiety.
+Trace the failure and completion paths. Git history can explain an invariant,
+but a generic commit message does not prove that handling is unnecessary.
+Retain meaningful handling when the code or its contract demonstrates the need.
 
 ## Process per finding
 

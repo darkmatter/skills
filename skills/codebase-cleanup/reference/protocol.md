@@ -2,6 +2,17 @@
 
 Every pass in this skill follows this exact protocol. The pass-specific files at `passes/*.md` only specify the domain-specific bits — what to look for, which tools to run, what counts as a "hit". The phasing and confidence rules below are universal.
 
+## Shared design rules
+
+Use [codebase-design](../../codebase-design/SKILL.md) when evaluating every pass.
+Keep related operations and private helpers with their owner. Preserve public
+contracts, error propagation, completion, and cleanup. Test those behaviors
+through the interface; do not add a test per moved helper.
+
+Retain configured line limits. Split coherent responsibilities, or document a
+targeted increase when splitting would scatter one implementation. A smaller
+file or shorter diff alone does not prove a readability improvement.
+
 ## Phase 1 — research (read-only)
 
 Goal: build a complete, evidence-backed picture of the problem in this codebase. No edits.
@@ -65,7 +76,8 @@ End with:
 - Applied: <count> high-confidence changes
 - Reverted: <count> (with reason)
 - Test status: <pass|fail|n/a>
-- Net LoC delta: <+X/-Y>
+- Readability effect: <knowledge hidden, navigation removed, or ownership clarified>
+- Net LoC delta: <+X/-Y, descriptive only>
 ```
 
 ## Stop conditions

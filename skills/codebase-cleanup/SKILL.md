@@ -9,6 +9,11 @@ Eight independent specialist passes over a codebase, each scoped to one quality 
 
 Every pass follows the same three-phase protocol — see `reference/protocol.md`. The recommended pass ordering and why is in `reference/pass-ordering.md`.
 
+Apply [codebase-design](../codebase-design/SKILL.md) throughout: keep each
+capability together, expose complete operations, and extract only when the split
+hides complexity or enables useful reuse. Preserve configured line limits with
+documented, targeted exceptions. File count and net deleted lines are not goals.
+
 ## When to use
 
 - "Clean up the codebase" / "do a tech-debt pass"

@@ -19,7 +19,9 @@ Consolidate duplicated logic _only_ where the consolidation reduces complexity. 
 ## What to skip — and this is most of the apparent duplication
 
 - **Code that looks similar but means different things**. Two functions that both do `total += item.price` aren't duplicates if one is summing line items and the other is summing taxes — even if the code is identical, they'll evolve in different directions.
-- **Premature abstraction candidates**. Three callsites is rarely enough to abstract. Wait for the fourth where the duplication causes pain.
+- **Premature abstraction candidates**. Call count alone does not justify an
+  abstraction. It should hide complexity or enable useful reuse, without making
+  callers understand a generic mechanism.
 - **Test code**. Test repetition is often _the point_ — explicit, self-contained tests are easier to read than a DRY test framework. Don't DRY tests unless the duplication is mechanical setup that's clearly orthogonal to what's being tested.
 - **Configuration values**. Two configs with the same fields are not duplicates; configs are data, not logic.
 - **Boilerplate that the language requires**. Constructor argument lists, getter/setter pairs, etc. — language-imposed, not real duplication.
@@ -51,7 +53,8 @@ Consolidate only when:
 1. The duplication is semantic (not just textual).
 2. The abstraction has an obvious, honest name.
 3. The unified callsite is at least as readable as the duplicated version.
-4. There are at least 3 callsites, or 2 callsites with strong evidence they'll need to evolve together.
+4. The callsites share a responsibility and benefit from maintaining it together;
+   there is no minimum call count that substitutes for this judgment.
 5. No callsite needs a special-case parameter or flag to fit the abstraction (if it does, your abstraction is wrong — back out).
 6. Tests pass after consolidation.
 
@@ -64,6 +67,8 @@ Per the protocol. In your assessment, include a "considered but rejected" sectio
 ## Out-of-scope
 
 - Don't introduce inheritance hierarchies, mixins, or higher-order helpers to chase 2-line wins.
-- Don't unify code across package boundaries unless the unified function has a clear home in a shared package.
+- Do not create a shared grab-bag package. Cross-package reuse needs a clear
+  domain owner and a public interface; a local helper may remain with one caller
+  when its name hides meaningful complexity.
 - Don't deduplicate types — that was pass 6.
 - Don't deduplicate identical-looking error messages — they're usually fine duplicated; centralizing them tends to drift from what each callsite actually wants to say.

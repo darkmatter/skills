@@ -22,7 +22,8 @@ Replace weak / escape-hatch types with strong, accurate ones. The goal is correc
 - **Type-erased generics in language designs that require it** (e.g. some reflection-heavy frameworks)
 - **Library escape hatches** intentionally typed as `any` for ergonomics on the caller side
 - **`unknown` after a parsing step** where the next operation is the validation — leave it for the validator to narrow
-- **Test mocks** where `any` is a quick scaffold for a stub that doesn't need to be accurate
+- **External library types** that cannot be changed locally — keep the external
+  type honest, and validate unknown values before they enter the domain
 
 If you can't prove the value's actual shape from the code, the type was right to be weak. Don't fabricate a strong type.
 
@@ -33,7 +34,8 @@ For each weak type:
 1. Read where the value comes from. Trace it back to its source.
 2. Read where the value goes. What operations are done on it? Those operations imply structure.
 3. If the value crosses a boundary (API, DB, file, IPC), read the schema / SDK / wire format. The strong type lives there.
-4. If a similar value is typed strongly elsewhere in the codebase, reuse that type.
+4. Reuse the owning schema's inferred type or an accurate library contract. A
+   handwritten interface or query generic alone does not validate external data.
 5. Look at related packages / SDKs — they often export the right type.
 
 ## Tools

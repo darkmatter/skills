@@ -29,6 +29,13 @@ User: Let's define the definition of done for the new checkout flow.
 Agent: ... (uses this skill to ask clarifying questions and produce a DoD checklist)
 ```
 
+## Implementation criteria
+
+For code work, use [codebase-design](../codebase-design/SKILL.md): complete
+operations, clear ownership, retained line limits, and verification through the
+public interface. A helper count, file count, or coverage percentage does not
+prove a capability is complete.
+
 ## Reference
 
 - `reference/definition-of-done-template.md` — a markdown template for a Definition of Done checklist with sections for functional criteria, non-functional criteria, verification, documentation, and sign-off.
