@@ -10,8 +10,9 @@ contribute.
 
 - `effect-typescript` — Effect for anything with meaningful I/O: services,
   Layers, Config, Schema, typed errors, retries, resources, tests.
-- `coding-standards` — universal TS/JS/React/Node readability and
-  maintainability standards.
+- `codebase-design` — cohesive capabilities, complete operations, useful
+  extraction, line limits with narrow exceptions, and behavioral tests.
+- `domain-organization` — domain ownership, role directories, and filenames.
 - `ui-component-architecture` — thin screens; reusable UI in its own package
   (name is per-repo).
 - `vercel-react-best-practices` — React/Next.js performance patterns.
@@ -22,9 +23,10 @@ contribute.
 
 | Topic              | What it should demonstrate                                            | Exemplar |
 | ------------------ | ---------------------------------------------------------------------- | -------- |
-| Project layout     | Bun + Turborepo monorepo shape, package boundaries, UI in its own package | _todo_   |
-| Effect services    | Service / Layer / Config wiring for an I/O-heavy module                | _todo_   |
+| Project layout     | Domain then role, cohesive packages, small public interfaces | _todo_   |
+| Contracts          | Schema and inferred type together; decode at external boundaries | _todo_   |
+| Effect services    | Complete operations, one Promise-to-Effect conversion at the adapter, owned completion | _todo_   |
 | Error handling     | Typed errors with Schema, expected failure vs defect                   | _todo_   |
-| Testing            | Effect test layers; `*.test.ts` beside the source, root `tests/` only for end-to-end | _todo_   |
+| Testing            | Observable behavior through package interfaces; Effect test layers where useful | _todo_   |
 | Tooling            | `tsconfig` baseline, lint/format choice, CI wiring                     | _todo_   |
 | Preferred packages | Blessed picks for common needs (validation, HTTP, dates, CLI)          | _todo_   |

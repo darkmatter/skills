@@ -28,7 +28,8 @@ Briefly describe what changed and why.
 
 - [ ] I read `AGENTS.md` and relevant `.agent/context/*` files
 - [ ] I checked `.agent/policy/project-exceptions.md` for applicable exceptions
-- [ ] For feature/behavior change: failing test was observed before implementation
+- [ ] Changed behavior has meaningful regression coverage through the public interface
+- [ ] When TDD was requested or required: failing test was observed before implementation
 - [ ] For bugfix: reproduction/root cause is documented
 - [ ] For refactor: baseline behavior was verified before editing
 - [ ] For release/deploy: rollback path is documented
@@ -52,6 +53,15 @@ Required checks:
 - [ ] Build, if applicable
 - [ ] Secret scan, if applicable
 - [ ] Smoke test, if applicable
+
+## Readability
+
+- [ ] Related implementation stays together under its domain owner
+- [ ] Public operations own their steps, ordering, failure, and completion
+- [ ] Every extraction hides complexity or enables useful reuse
+- [ ] Contracts have one source, and execution-model conversion stays at the edge
+- [ ] Configured line limits are met or have a documented narrow exception
+- [ ] Comments explain reasons; tests verify observable behavior
 
 ## Review
 

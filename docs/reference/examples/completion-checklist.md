@@ -39,6 +39,8 @@ For each claim, provide fresh evidence from this session.
 - [ ] I did not rely on stale output from a previous session
 - [ ] I did not rely only on a subagent success report
 - [ ] I checked for known gaps or skipped checks
+- [ ] Changed behavior is verified through the public interface; new tests have a meaningful purpose
+- [ ] Related code stays together, and any line-limit exception is narrow and documented
 - [ ] I can cite file paths, commands, or artifact IDs in the final response
 
 ## Final response format

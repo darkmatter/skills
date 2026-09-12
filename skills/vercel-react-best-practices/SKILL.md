@@ -7,11 +7,15 @@ metadata:
   version: "1.0.0"
 ---
 
-> **Precedence:** Use this skill when the primary goal is _React/Next.js performance_. For visual design, use `frontend-design` or `ui-ux-pro-max`. For universal coding standards, use `coding-standards`.
+> **Precedence:** Use this skill when the primary goal is _React/Next.js performance_. For visual design, use `frontend-design` or `ui-ux-pro-max`. For module boundaries and readability, use `codebase-design`: keep cohesive implementations and extract only when it hides complexity or enables useful reuse.
 
 # Vercel React Best Practices
 
 Comprehensive performance optimization guide for React and Next.js applications, maintained by Vercel. Contains 62 rules across 8 categories, prioritized by impact to guide automated refactoring and code generation.
+
+## Shared conventions
+
+Apply performance advice within the shared module design rules. Private helpers and components may stay in the same file as their owner; stable component identity does not require a separate file. Use supported package entry points instead of importing private internals to bypass a barrel. Preserve configured line limits with documented narrow exceptions. Keep required persistence and cleanup part of completion; use `after()` only for work explicitly handed to a supervising host, never as evidence that the work already succeeded. Adapt Promise-based framework APIs at the boundary when the application's internal model is Effect.
 
 ## When to Apply
 

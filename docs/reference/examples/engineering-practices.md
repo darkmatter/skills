@@ -28,9 +28,10 @@ If two instructions conflict, stop and report the conflict instead of silently c
    - Do not claim work is done, fixed, passing, deployed, or reviewed without fresh verification evidence from this session.
    - Cite the exact command, exit code, artifact, URL, diff, or file path that proves the claim.
 
-2. Tests before behavior changes.
-   - Features, bug fixes, refactors with behavior risk, and public API changes require a failing test before implementation.
-   - If TDD is skipped, cite an approved exception.
+2. Verify observable behavior.
+   - Run existing public-interface tests and add meaningful regression coverage for changed behavior.
+   - Use test-first development when explicitly requested or required by project policy.
+   - Documentation edits and behavior-preserving refactors covered by existing tests need no new tests or exception ID.
 
 3. Reproduce before fixing.
    - Bug fixes require a reproduction step, failing test, log trace, or minimal repro before patching.
@@ -55,6 +56,10 @@ If two instructions conflict, stop and report the conflict instead of silently c
 8. Make side effects explicit.
    - Before deploys, sends, transfers, destructive DB changes, or external writes, state target, command/action, expected effect, and rollback or abort plan.
    - Cron/read-only sessions must not perform side effects unless a workflow explicitly authorizes them.
+
+## Module design
+
+Apply the readability rules in the shared `AGENTS.md`; use the `codebase-design` skill for examples when available. Organize by domain then role, keep related implementation together, and expose complete operations. Extract only when it hides complexity or enables useful reuse. Define contracts once, convert external execution models at the edge, and own work through completion. Keep configured line limits with documented narrow exceptions, explain reasons in comments, and test public behavior.
 
 ## Required final evidence for code changes
 

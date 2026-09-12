@@ -26,14 +26,18 @@ project, skim `references/<language>/README.md` and the exemplars it indexes.
 
 Precedence when conventions conflict:
 
-1. The project's own `.agent/` context and policy — project rules win.
-2. Exemplars here — they beat generic training-data habits.
-3. General language idiom.
+1. Current user instructions and the project's own context and policy.
+2. Shared `AGENTS.md` and current team skills, including `codebase-design`.
+3. Exemplars here, when consistent with those rules.
+4. General language idiom.
+
+For organization and readability, use the `codebase-design` skill: keep a capability together, expose complete operations, and extract only when it hides complexity or enables useful reuse. Keep configured line limits with documented narrow exceptions. Language idioms change the syntax and folder names, not these design goals.
 
 ## Adding an exemplar
 
-1. One convention per exemplar. A file that demonstrates five things teaches
-   none of them.
+1. Give each exemplar one clear teaching goal; a complete package may span
+   several related conventions and files. Teaching scope is not a rule to split
+   production files.
 2. Code must compile / typecheck as written, or carry an explicit "excerpt"
    marker in a header comment.
 3. Keep prose in skills, code here. If an exemplar needs more than a short

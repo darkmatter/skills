@@ -36,9 +36,9 @@ If baseline is failing, either fix baseline first or record the known failure in
 
 ## Gate 3 — Characterization tests
 
-If coverage is weak, add characterization tests before refactoring.
+Run existing tests through the public interface. Add characterization tests only for meaningful behavior at risk that those tests do not cover.
 
-A characterization test documents current behavior, even if imperfect.
+A characterization test documents observable current behavior, even if imperfect; it does not freeze private calls or require a test for each helper.
 
 ## Gate 4 — Small mechanical steps
 
@@ -50,6 +50,8 @@ Prefer small steps:
 4. Inline
 5. Delete dead code
 6. Simplify after tests are green
+
+Extract only when a new boundary hides complexity or enables useful reuse; inline forwarding layers that add no value. Keep related implementation under its domain owner and preserve configured line limits with documented narrow exceptions. Use the `codebase-design` skill for examples when available.
 
 Run targeted tests between risky steps.
 

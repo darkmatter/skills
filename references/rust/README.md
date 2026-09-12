@@ -8,6 +8,9 @@ contribute.
 
 ## Related skills
 
+- `codebase-design` — language-independent guidance for cohesive capabilities,
+  small complete interfaces, useful extraction, line limits, and behavioral tests.
+
 - `rust-best-practices` — prose guidance based on Apollo GraphQL's handbook:
   borrowing vs cloning, `Result` error handling, performance, tests and docs.
 

@@ -20,11 +20,12 @@ model:
 
 skills:
   required:
-    - darkmatter/test-driven-development
+    - darkmatter/codebase-design
     - darkmatter/systematic-debugging
     - darkmatter/verification-before-completion
     - darkmatter/end-of-turn-review
   optional:
+    - darkmatter/test-driven-development
     - darkmatter/codebase-cleanup
 
 tools:
@@ -48,18 +49,17 @@ checks:
   secrets: "gitleaks detect --source . --redact"
 
 practices:
+  tests:
+    focus: public_observable_behavior
+    run_existing_relevant_tests: true
+    add_regressions_for_changed_behavior: true
+    new_tests_for_docs_or_covered_refactors: false
+
   tdd:
-    required_for:
-      - feature
-      - bugfix
-      - behavior_change
-      - public_api_change
-    exceptions:
-      - generated_code
-      - config_only
-      - docs_only
-    exception_file: ".agent/policy/project-exceptions.md"
-    requires_human_exception: true
+    required_when:
+      - explicitly_requested
+      - project_policy_requires
+    sequence: one_failing_test_then_one_implementation
 
   debugging:
     require_reproduction_first: true

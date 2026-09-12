@@ -15,7 +15,7 @@ These examples expand the proposed structure for enforcing engineering practices
 
 ## Workflow examples
 
-- `feature-development-workflow.md` — context → plan → RED → GREEN → refactor → verify → review → completion.
+- `feature-development-workflow.md` — context → plan → behavior coverage → implementation → refactor → verify → review → completion; use RED/GREEN when TDD is requested or required.
 - `bugfix-workflow.md` — symptom capture → reproduction → root cause → regression test → fix → verify.
 - `refactor-workflow.md` — baseline verification, characterization tests, mechanical refactor steps, final verification.
 - `release-workflow.md` — release intent, clean tree, full verification, risk check, approval, smoke test.

@@ -57,13 +57,11 @@ Root cause: `parseAmount` assumes `token.decimals` exists. The API omits decimal
 
 ## Gate 4 — Regression test
 
-Write or keep the failing test that captures the bug.
-
-Run it before the fix and confirm expected failure.
+Keep or add a meaningful regression test that captures the observable bug through the public interface. When TDD is requested or required, run it before the fix and confirm expected failure; otherwise the reproduction from Gate 2 supplies the before evidence.
 
 ## Gate 5 — Fix
 
-Implement the smallest fix that makes the regression test pass.
+Implement the smallest fix that resolves the reproduced behavior and passes the regression test.
 
 Avoid opportunistic refactors unless they directly reduce the bug risk.
 

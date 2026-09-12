@@ -13,7 +13,7 @@ Execute comprehensive verification (run each check and report results):
 
 1. **Type Check**: `npx tsc --noEmit`
 2. **Lint**: `npm run lint`
-3. **Unit Tests**: `npm test`
+3. **Behavior Tests**: run the project test command for relevant public outcomes
 4. **Integration Tests**: `npm run test:integration` (if available)
 5. **Build**: `npm run build`
 6. **Coverage Check**: Review coverage report (run with `--coverage` if needed)
@@ -25,13 +25,18 @@ Execute comprehensive verification (run each check and report results):
 - [ ] No TypeScript errors
 - [ ] No lint warnings
 - [ ] No console.log statements
-- [ ] Functions < 50 lines
-- [ ] Files < 800 lines
+- [ ] Related implementation stays together under its domain owner
+- [ ] Public operations own ordering, failure, and completion
+- [ ] Extractions hide complexity or enable useful reuse
+- [ ] Configured line limits are met or have documented narrow exceptions
+- [ ] Contracts have one source; execution-model conversion stays at the edge
+- [ ] Comments explain reasons and invariants
 
 ### Tests
 
 - [ ] All tests passing
-- [ ] Coverage >= 80%
+- [ ] Configured project coverage gates are met
+- [ ] Changed observable behavior is covered through the public interface; tests do not mirror private calls
 - [ ] Edge cases covered
 - [ ] Error conditions tested
 
@@ -62,7 +67,7 @@ Execute comprehensive verification (run each check and report results):
 | TypeScript | ✅/❌  | [details]         |
 | Lint       | ✅/❌  | [details]         |
 | Tests      | ✅/❌  | [details]         |
-| Coverage   | ✅/❌  | XX% (target: 80%) |
+| Coverage   | ✅/❌  | XX% (configured project target, if any) |
 | Build      | ✅/❌  | [details]         |
 
 ### Action Items

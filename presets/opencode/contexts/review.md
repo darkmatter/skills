@@ -17,8 +17,12 @@ Focus: Quality, security, maintainability
 - [ ] Error handling
 - [ ] Security (injection, auth, secrets)
 - [ ] Performance
-- [ ] Readability
-- [ ] Test coverage
+- [ ] Cohesive domain ownership and complete public operations
+- [ ] Useful extractions, one contract source, edge conversions, and owned completion
+- [ ] Configured line limits with documented narrow exceptions
+- [ ] Comments explain reasons; tests verify observable behavior
+
+Use `codebase-design` for good and bad examples when reviewing these boundaries.
 
 ## Output Format
 

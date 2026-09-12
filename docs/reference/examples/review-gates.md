@@ -40,6 +40,10 @@ Review is optional for:
 - Formatting-only changes with no logic changes
 - Mechanical generated output already validated by a generator
 
+## Readability review
+
+Apply the shared `AGENTS.md` module design rules and the `codebase-design` examples when available. Review ownership, cohesive implementation, complete operations, meaningful extraction, one contract source, edge conversions, completion, explanatory comments, and behavioral tests. Check configured line limits and documented narrow exceptions; size alone does not justify scattering one operation across files.
+
 ## Review evidence
 
 The review request must include:

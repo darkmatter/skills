@@ -42,10 +42,13 @@ For each item to remove:
 
 ### 4. Consolidate Duplicates
 
-- Find duplicate components/utilities
-- Choose the best implementation (most complete, best tested)
-- Update all imports, delete duplicates
-- Verify tests pass
+- Establish a shared responsibility before merging similar code; separate domains may change independently
+- Extract only when it hides complexity or enables useful reuse; keep simple private helpers local
+- Keep operations, mappings, queries, and contracts with their domain owner
+- Remove forwarding layers that add no behavior or useful boundary
+- Preserve complete operations, one contract source, edge conversions, and owned completion
+- Keep configured line limits with documented narrow exceptions for cohesive implementations
+- Verify observable behavior through the public interface; use `codebase-design` for examples
 
 ## Safety Checklist
 

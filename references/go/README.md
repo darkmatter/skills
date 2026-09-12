@@ -8,8 +8,10 @@ contribute.
 
 ## Related skills
 
-None yet — when Go prose guidance exists it should become a skill and be
-linked here.
+- `codebase-design` — language-independent guidance for cohesive capabilities,
+  small complete interfaces, useful extraction, line limits, and behavioral tests.
+
+Go-specific guidance should become a skill and be linked here when available.
 
 ## Index
 
