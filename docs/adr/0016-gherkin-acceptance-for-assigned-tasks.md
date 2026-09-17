@@ -1,4 +1,4 @@
-# 0015 — Assigned tasks include Gherkin acceptance scenarios
+# 0016 — Assigned tasks include Gherkin acceptance scenarios
 
 - **Status:** accepted
 - **Date:** 2026-09-17
