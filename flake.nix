@@ -25,12 +25,12 @@
 
       imports = [
         inputs.treefmt-nix.flakeModule
-        ./flake/modules/flake-parts/sops-nix.nix
+        ./nix/flake/modules/flake-parts/sops-nix.nix
       ];
 
       flake = {
-        homeManagerModules.default = import ./home-manager.nix { inherit agent-skills; };
-        homeManagerModules.shared = import ./home-manager.nix { inherit agent-skills; };
+        homeManagerModules.default = import ./nix/home-manager.nix { inherit agent-skills; };
+        homeManagerModules.shared = import ./nix/home-manager.nix { inherit agent-skills; };
       };
 
       perSystem =
