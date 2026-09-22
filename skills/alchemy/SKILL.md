@@ -15,7 +15,7 @@ Alchemy v2 and `alchemy-effect` move quickly. Verify upstream docs before changi
 
 - The user asks to set up or review an `alchemy.run.ts` file.
 - The user asks to develop with `alchemy dev`, local Workers, public preview URLs, hot reload, or webhook testing.
-- The user asks to configure an Alchemy deploy for Cloudflare Workers, Vite apps, R2, D1, Queues, Durable Objects, AWS Lambda, S3, DynamoDB, ECS, EC2, static sites, or related resources.
+- The user asks to configure an Alchemy deploy for Cloudflare Workers, Vite apps, R2, Queues, Durable Objects, D1, AWS Lambda, S3, DynamoDB, ECS, EC2, static sites, or related resources.
 - The user asks how to use Alchemy stages, profiles, state stores, bindings, stack outputs, cross-stack references, or CI/CD.
 - The user asks to migrate deploy plumbing toward Alchemy v2 or away from ad hoc provider scripts.
 - The user asks for examples from `alchemy-run/alchemy-effect/examples`.
@@ -98,7 +98,9 @@ Use plain `bun alchemy deploy` only in tiny repos where `alchemy.run.ts` at the 
 
 For Darkmatter TypeScript/Effect projects, prefer Alchemy for deployable infrastructure:
 
-- New Cloudflare Workers, Vite/frontends, queues, D1/R2/KV, workflows, AI Gateway, tunnels, and GitHub deploy automation should start with Alchemy.
+- New Cloudflare Workers, Vite/frontends, queues, R2/KV, workflows, AI Gateway, tunnels, and GitHub deploy automation should start with Alchemy.
+- Application data is Postgres-first. Use Kysely + `pg` for query-heavy TypeScript adapters, or Effect SQL Postgres for Effect-native database services. Let Alchemy own the deploy wiring, bindings, secrets, and network resources around that database where the provider supports it.
+- Use D1/sqlite only for narrow edge-local state, demos, or an explicit project decision. Do not pick D1 because the app is on Cloudflare if the data model belongs in Postgres.
 - New AWS Lambda, S3, DynamoDB, API Gateway, ECS/EC2/EKS/RDS, and static-site deploys should consider Alchemy first.
 - Shared preview environments should use Alchemy stages instead of bespoke name mangling.
 - Local webhook testing should use `alchemy dev` or an Alchemy-managed tunnel/preview flow instead of separate ngrok/Cloudflare Tunnel scripts when Alchemy can provide the route.
@@ -225,20 +227,22 @@ Never use `Date.now()` or random timestamps in physical names. Let Alchemy gener
 
 Prefer bindings over manually threading deployed identifiers through environment variables. A binding is deploy-time data attached to a runtime resource so the function/worker receives exactly the infrastructure dependency it needs.
 
-For Cloudflare, bind resources directly into a Worker or Vite app:
+For Cloudflare, bind platform resources directly into a Worker or Vite app:
 
 ```ts
-export const DB = Cloudflare.D1Database("DB");
 export const Bucket = Cloudflare.R2Bucket("Bucket");
 
 export const Worker = Cloudflare.Worker("Worker", {
   main: "./src/worker.ts",
   bindings: {
-    DB,
     Bucket,
   },
 });
 ```
+
+Keep Postgres connection details in the app's config/secrets layer and expose
+the runtime client through a service Layer. Only bind a database-like Cloudflare
+resource when the repo has an explicit reason not to use Postgres for that data.
 
 For Effect-native runtimes, keep runtime services and deploy wiring separate. Alchemy owns cloud resources and bindings; Effect services own runtime behavior. Use Layers at the stack boundary when the resource requires a runtime implementation.
 

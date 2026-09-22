@@ -1,13 +1,14 @@
 ---
 name: darkmatter-ts-toolchain
-description: 'The darkmatter TypeScript toolchain contract: Bun, tsgo, Vitest, oxlint/biome, changesets, Effect I/O, Alchemy deploys, and required checks. Use when writing, fixing, building, or shipping TypeScript in a darkmatter repo. Use codebase-design for module boundaries and effect-typescript for deep Effect patterns.'
+description: 'The darkmatter TypeScript toolchain contract: Bun catalogs, Effect 4, effect-orpc, Postgres-first data, tsgo, Vitest, oxlint/oxfmt, changesets, Alchemy deploys, and required checks. Use when writing, fixing, building, or shipping TypeScript in a darkmatter repo. Use codebase-design for module boundaries and effect-typescript for deep Effect patterns.'
 ---
 
 # Darkmatter TypeScript toolchain
 
-Org-wide contract for TS repos (platform, nixmac-web, and friends). The stack
-is deliberate; substituting familiar defaults (npm, jest, wrangler) creates a
-second convention and breaks CI.
+Org-wide contract for TS repos (platform, nixmac-web, and friends). Align new
+repos with the `darkmatter/template` catalog as the reference monorepo. The
+stack is deliberate; substituting familiar defaults (npm, jest, wrangler, D1 as
+the default database) creates a second convention and breaks CI.
 
 Apply [codebase-design](../codebase-design/SKILL.md) for readability and module
 boundaries. Toolchain checks support cohesive implementations and small public
@@ -28,13 +29,31 @@ If the repo is TypeScript-only, utility and CI scripts are TypeScript
 - Run scripts with `bun run <script>`; execute tools with `bun x <tool>`.
 - Monorepos use Turbo + workspaces (`@repo/*` packages). Add shared code to a
   workspace package, not a relative `../../` import across apps.
+- Shared dependency versions live in the root `workspaces.catalog`; package
+  manifests use `catalog:` or `workspace:*` instead of repeating versions.
+
+## Preferred stack defaults
+
+Use these defaults unless the target repo has a documented exception:
+
+| Area | Default |
+| --- | --- |
+| Runtime/package manager | Bun, workspace catalogs, Node >= 24 when Node is needed |
+| Effect | Effect 4, `effect-solutions`, `@effect/tsgo`, `@effect/vitest`, `@effect/platform-bun` |
+| Agents | `effect/unstable/ai` / effect-agent APIs before hand-rolled agent loops or duplicated contracts |
+| Typed RPC | `effect-orpc@1.0.0-effect-v4.8` plus `@orpc/server`, `@orpc/client`, `@orpc/contract`, and `@orpc/shared` at `>=1.13`; load `effect-typescript` for usage rules |
+| Data | Postgres first. Prefer Kysely + `pg` for query-heavy TypeScript, or Effect SQL Postgres for Effect-native database services. Do not pick D1 or sqlite as the default persistence layer. |
+| Deploy | Alchemy-managed infrastructure, commonly Cloudflare Workers or AWS depending on the app |
+| Web/UI | Vite or vite-plus, Vitest, React 19, Tailwind v4, shadcn/Radix, and the repo's shared UI package |
+| Lint/format | oxlint with Effect/tsgo rules, oxfmt for formatting |
 
 ## Verify in this order
 
 ```bash
 bun run typecheck   # tsgo -p tsconfig.json (NOT tsc)
 bun run test        # vitest
-bun run lint        # oxlint / biome per repo
+bun run lint        # oxlint
+bun run fmt:check   # oxfmt
 ```
 
 Run the narrowest target that covers your change first (single test file,
@@ -59,9 +78,14 @@ Convert a Promise-based driver to Effect at its adapter boundary and keep
 internal operations in Effect. Own persistence, failure, and cleanup through
 completion instead of returning success while work is still unobserved.
 
-Keep database queries and decoding with the owning adapter. Use existing typed
-query tools when useful; parameterized SQL is also allowed with row validation
-and behavioral query verification. A row generic does not validate data, and a
+Keep database queries and decoding with the owning adapter. New app data starts
+on Postgres unless a project-specific decision says otherwise. Use Kysely with
+`pg` when the service is query-heavy; use Effect SQL Postgres when the repo is
+already organizing persistence as Effect services and Layers. D1/sqlite are
+valid only for narrow platform-local state, demos, or explicit edge constraints,
+not as the default because they are easy to provision. Use existing typed query
+tools when useful; parameterized SQL is also allowed with row validation and
+behavioral query verification. A row generic does not validate data, and a
 readability change does not require an ORM migration. See
 [ADR-0015](../../docs/adr/0015-cohesive-modules.md).
 

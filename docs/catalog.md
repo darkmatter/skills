@@ -9,17 +9,18 @@ a catalogued skill includes it in future installations.
 | Skill | Purpose |
 | --- | --- |
 | `agent-browser` | Browser automation guidance. |
-| `alchemy` | Darkmatter's Alchemy v2 infrastructure and deployment workflow. |
+| `alchemy` | Darkmatter's Alchemy v2 infrastructure and deployment workflow, with Postgres-first app data guidance. |
 | `choose-dev-entrypoints` | Choose the correct Nix, Bun, Turbo, Just, or script entrypoint. TypeScript-only repos implement ops scripts in TypeScript ([ADR-0012](adr/0012-ops-scripts-in-typescript.md)). |
 | `codebase-cleanup` | Safely clean up and simplify an existing codebase. |
 | `codebase-design` | Canonical module conventions with good/bad examples: cohesive capabilities, small public interfaces, meaningful extraction, and retained line limits ([ADR-0015](adr/0015-cohesive-modules.md)). |
 | `darkmatter-design-system` | Darkmatter visual language and tokens. Reusable UI lives in the repo's own package ([ADR-0013](adr/0013-shared-ui-is-its-own-package.md)). |
 | `darkmatter-gitops-conventions` | Safe GitOps changes, validation, rollout, and rollback. SOPS payloads are JSON ([ADR-0011](adr/0011-sops-files-as-json.md)). |
-| `darkmatter-ts-toolchain` | Darkmatter TypeScript/Bun toolchain and CI contract. Ops scripts in TS-only repos are TypeScript ([ADR-0012](adr/0012-ops-scripts-in-typescript.md)). |
+| `darkmatter-repo-setup` | Darkmatter repo setup and compliance checks against the template/toolchain standard, including Bun catalogs, Effect 4, effect-agent, effect-orpc, Postgres-first data, and React 19/shadcn UI defaults. |
+| `darkmatter-ts-toolchain` | Darkmatter TypeScript/Bun preferred stack and CI contract: Bun catalogs, Effect 4, effect-orpc, Postgres-first data, tsgo, oxlint/oxfmt, Vitest, Alchemy, and UI defaults. Ops scripts in TS-only repos are TypeScript ([ADR-0012](adr/0012-ops-scripts-in-typescript.md)). |
 | `definition-of-done` | Define a clear, verifiable completion condition for agentic work. Verification follows `when-to-write-tests`. |
 | `diagnose` | Evidence-led diagnosis of bugs and performance regressions. |
 | `domain-organization` | Organize source by domain owner, role, and module; plan file moves, public boundaries, naming, and scoped enforcement. |
-| `effect-typescript` | Typed Effect patterns for meaningful TypeScript I/O. Configuration is named config files read through `Config`, picked from a list rather than a flag; env vars and flags only override ([ADR-0014](adr/0014-named-config-files-over-flags-and-env.md)). |
+| `effect-typescript` | Typed Effect patterns for meaningful TypeScript I/O, including effect-orpc typed RPC, Postgres adapters, and named config files read through `Config` ([ADR-0014](adr/0014-named-config-files-over-flags-and-env.md)). |
 | `find-skills` | Find available skills for a task. |
 | `flue` | Use when working with the Flue framework. |
 | `keep-codebase-maintainable` | Cleanup and maintainability passes, not feature work. |
