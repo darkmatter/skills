@@ -19,7 +19,9 @@ Record ✅ present, ⚠️ partial, or ❌ missing.
 
 - [ ] Documents the repo layout and purpose of each top-level path
 - [ ] Defines the `ops/` boundary — what goes in ops vs source-adjacent config
-- [ ] States the toolchain contract (Bun, tsgo, oxlint/oxfmt, Vitest)
+- [ ] States the toolchain contract (Bun catalog, Effect 4, effect-agent,
+  effect-orpc, Postgres-first data, tsgo, oxlint/oxfmt, Vitest, vite-plus,
+  React 19, shadcn)
 - [ ] States package conventions (catalog, workspace, # imports)
 - [ ] Applies [codebase-design](../../codebase-design/SKILL.md): domain ownership,
   explicit public entries, complete operations, and cohesive implementations
@@ -31,6 +33,9 @@ Record ✅ present, ⚠️ partial, or ❌ missing.
 
 - [ ] Bun workspace with `apps/*` and `packages/*`
 - [ ] Shared dependency versions in a catalog (not pinned per-package)
+- [ ] Catalog aligns with `darkmatter/template` for Effect 4, `@effect/tsgo`,
+  `@effect/vitest`, Effect agent APIs, Alchemy, oxlint/oxfmt, vite-plus,
+  React 19 + shadcn for UI, and effect-orpc when typed RPC is needed
 - [ ] `prepare` patches tsgo and oxlint via `effect-tsgo patch`
 - [ ] `generate:bun-nix` script for regenerating the Nix lock
 - [ ] Engine and package-manager constraints matching the org standard
@@ -59,6 +64,18 @@ Record ✅ present, ⚠️ partial, or ❌ missing.
   pure calculations can have direct tests without Effect wrappers
 - [ ] Private helpers are not exported or extracted solely to test them
 - [ ] Smoke tests spawn the real server end-to-end
+
+## 5a. Data and RPC
+
+- [ ] Application data uses Postgres by default; D1/sqlite are documented
+  exceptions for edge-local state, demos, or an explicit project decision
+- [ ] Query-heavy TypeScript uses Kysely + `pg`, or the repo uses Effect SQL
+  Postgres when persistence is organized as Effect services and Layers
+- [ ] Typed RPC routes use `effect-orpc@1.0.0-effect-v4.8` with
+  `@orpc/server`, `@orpc/client`, `@orpc/contract`, and `@orpc/shared` at
+  `>=1.13`
+- [ ] Simple HTTP, webhook, streaming, or static routes stay on Effect
+  `HttpRouter` or the framework adapter when RPC contracts would add ceremony
 
 ## 6. Zed editor config
 

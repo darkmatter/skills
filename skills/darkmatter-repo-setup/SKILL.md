@@ -4,9 +4,10 @@ description: >-
   Use when setting up a new repo, onboarding an existing repo to darkmatter
   standards, running a compliance check, or when the user says "set up this
   repo", "bring repo up to standards", "apply template", or "audit repo".
-  Checks and installs the org TypeScript toolchain (Bun, tsgo, oxlint/oxfmt,
-  Vitest), Nix flake-parts devshell, ops/ surface, CI pipeline, and AGENTS.md
-  conventions.
+  Checks and installs the org TypeScript toolchain (Bun catalog, Effect 4,
+  effect-agent, effect-orpc, Postgres-first data, tsgo, oxlint/oxfmt, Vitest,
+  vite-plus, React 19, shadcn), Nix flake-parts devshell, ops/ surface, CI
+  pipeline, and AGENTS.md conventions.
 license: Proprietary. See LICENSE at repo root.
 compatibility: >-
   Requires Bun 1.3.x, Nix with flake-parts, network access to clone
@@ -50,6 +51,13 @@ Read files from `/tmp/darkmatter-template` to understand the target state.
 Adapt content to the target repo — do not blindly copy project names,
 package names, or app logic. The structure and conventions are the
 standard; the specific app is the example.
+
+The template root `package.json` catalog is the preferred-libs home. Align new
+dependency choices with that catalog, then add only the app-specific libraries
+the target repo needs. When the current template demonstrates a narrower
+resource such as D1, keep the current Darkmatter preference in mind: new
+application data starts on Postgres unless the repo records a specific
+edge-local or demo reason.
 
 Clean up when done:
 
@@ -148,7 +156,9 @@ later sections may depend on earlier ones:
 10. **CI** — .github/workflows/ci.yaml
 11. **.gitignore**
 12. **Docs** — architecture.md, getting-started.md, README.md
-13. **Effect source code** — services, data models, errors, config
+13. **Effect source code** — services, data models, errors, config,
+    effect-orpc routes when the repo needs typed RPC, and Postgres adapters
+    for application data unless the repo documents a different database choice
     (consult `effect-solutions show` for each area)
 14. **AGENTS.md** — last, because it documents everything else. First run
     `nix run github:darkmatter/skills#install` in the repo root: it writes the
