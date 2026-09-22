@@ -6,7 +6,7 @@ a shared tooling repository owns reusable presets, not another project's state.
 
 Use [codebase-design](../../codebase-design/SKILL.md) to judge the proposed
 boundaries. Show what each extraction hides or makes reusable, and keep related
-implementation together. A shorter file tree or more role directories is not an
+implementation together. A shorter file tree or more directories is not an
 improvement by itself.
 
 ## Establish the inventory
@@ -21,7 +21,7 @@ Record the inspected revision or working-tree state. Keep three kinds of claim
 distinct throughout the plan:
 
 - **Current:** observed files, owners, public imports, and dependencies.
-- **Proposed:** desired paths, role splits, and enforcement scopes.
+- **Proposed:** desired paths, module splits, and enforcement scopes.
 - **Verified:** changes or checks actually completed, with evidence.
 
 An old execution banner does not prove today's layout or complete adoption.
@@ -37,7 +37,7 @@ a focused package plan needs only its affected scope.
 | ----------------------- | -------------------------------------------------------------------------------------------------------------------------------------------- |
 | Outcome and scope       | What developers should find from paths, authorized changes, and contracts that remain stable.                                                |
 | Current evidence        | Actual owners, entry files, mixed responsibilities, import graph, and gaps in the baseline.                                                  |
-| Target contract         | Owner/role/module rules, filename defaults, public interface policy, and justified local exceptions.                                         |
+| Target contract         | Owner/capability/module rules, filename defaults, public interface policy, and justified local exceptions.                                         |
 | Before/after inventory  | Every package and app mapped to a concrete target or intentional unchanged outcome with its reason. Include other affected source roots.     |
 | Worked mappings         | Representative real files mapped to proposed paths, including mixed modules that need a responsibility split.                                |
 | Integration changes     | Callers, exports/imports, aliases, build roots, tests, fixtures, runtime assets, documentation, and generated-input paths affected by moves. |
@@ -54,9 +54,9 @@ Illustrative mappings below show the required precision, not a project inventory
 
 | Before                     | Proposed after                                                                              | Reason                                                                          |
 | -------------------------- | ------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------- |
-| `src/billing/types.ts`     | `src/billing/models/Invoice.ts` and retained owned aliases as needed                        | Split substantial named concepts after inspecting exports.                      |
-| `src/billing/store.ts`     | `src/billing/services/InvoiceStore.ts` plus `src/billing/adapters/InvoiceStore.postgres.ts` | Separate the contract from a concrete client without changing service identity. |
-| `src/billing/parse-row.ts` | Keep private conversion in `src/billing/adapters/Postgres.ts`, or use `mappers/parse-row.ts` when independently useful | Ownership and callers determine whether the conversion needs a separate module. |
+| `src/billing/types.ts`     | Fold each type into the capability module that owns it, e.g. `src/billing/invoices.ts` | A type belongs with the schema and operations that use it, after inspecting exports. |
+| `src/billing/store.ts`     | `src/billing/invoices.ts` (contract) plus `src/billing/invoices.postgres.ts` (client) | Separate the concrete client from the contract without changing service identity. |
+| `src/billing/parse-row.ts` | Keep private conversion in `src/billing/invoices.postgres.ts`; a separate module only when other callers need it | Ownership and callers determine whether the conversion needs a separate module. |
 | `src/pages/invoices.tsx`   | Keep framework route; delegate to an app-owned screen                                       | Preserve the route convention and keep reusable primitives in the UI package.   |
 
 For renamed public imports, list old and new specifiers and affected consumers.

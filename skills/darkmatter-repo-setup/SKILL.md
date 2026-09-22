@@ -29,8 +29,8 @@ fill in what's missing, update what's outdated, and validate the result.
 
 Apply [codebase-design](../codebase-design/SKILL.md) for the shared readability
 rules and examples, and [domain-organization](../domain-organization/SKILL.md)
-for names and role directories. Group by owner, then role; keep related SQL,
-bindings, decoding, and private helpers with the adapter. Expose complete
+for names. Group by owner, then capability; keep related SQL, bindings,
+decoding, and private helpers with the operation they serve. Expose complete
 operations through explicit package entries. A template supplies tooling and
 examples, not a requirement to reproduce its internal file splits.
 
