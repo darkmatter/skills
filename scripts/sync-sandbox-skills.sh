@@ -14,7 +14,7 @@
 #
 # The manifest lists one skill name per line (# comments and blank lines
 # ignored). Each name is resolved from skills/<name> first, then
-# inactive/<name>. Never edit .agents/skills/ by hand — edit the source
+# _archive/<name>. Never edit .agents/skills/ by hand — edit the source
 # or the manifest and rerun this script.
 
 set -euo pipefail
@@ -46,10 +46,10 @@ while IFS= read -r name; do
 
   src="$CATALOG/$name"
   if [[ ! -f "$src/SKILL.md" ]]; then
-    src="$REPO_ROOT/inactive/$name"
+    src="$REPO_ROOT/_archive/$name"
   fi
   if [[ ! -f "$src/SKILL.md" ]]; then
-    echo "FAIL: manifest lists '$name' but neither skills/$name nor inactive/$name has SKILL.md" >&2
+    echo "FAIL: manifest lists '$name' but neither skills/$name nor _archive/$name has SKILL.md" >&2
     fail=1
     continue
   fi
