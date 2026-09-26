@@ -118,6 +118,7 @@ Determine the repo's current state:
 - Check for `.zed/`, `ops/`, `.github/`, `docs/`, `justfile`.
 
 Classify the repo:
+
 - **New repo**: no `package.json` or no `flake.nix`. Start from the
   template and adapt.
 - **Existing repo**: has some structure already. Audit against the
@@ -160,15 +161,44 @@ later sections may depend on earlier ones:
     effect-orpc routes when the repo needs typed RPC, and Postgres adapters
     for application data unless the repo documents a different database choice
     (consult `effect-solutions show` for each area)
-14. **AGENTS.md** — last, because it documents everything else. First run
-    `nix run github:darkmatter/skills#install` in the repo root: it writes the
-    org-wide shared instructions into `AGENTS.md` between
-    `<!-- BEGIN docs/AGENTS.md -->` / `<!-- END docs/AGENTS.md -->` markers
-    and creates `CLAUDE.md` as `@AGENTS.md` if missing. Never edit inside
-    the markers; put repo-specific text below them. Add
-    `nix run github:darkmatter/skills#install -- --check` to CI.
+14. **AGENTS.md** — last, because it documents everything else. Keep
+    repo-specific instructions in `docs/AGENTS.repo.md`; never edit the
+    generated `AGENTS.md` directly. Add `darkmatter-skills`
+    (`github:darkmatter/skills`) as a flake input and concatenate the
+    shared topics the repo adopts with its own text:
+
+    ```nix
+    let agents = inputs.darkmatter-skills.agentsMd; in
+    packages.agents-md = pkgs.writeText "AGENTS.md" (lib.concatStringsSep "\n" [
+      (builtins.readFile agents.preamble)
+      (builtins.readFile agents.defaults)
+      (builtins.readFile agents.showing-code)
+      (builtins.readFile agents.must-always)
+      (builtins.readFile agents.must-never)
+      (builtins.readFile agents.readability)
+      (builtins.readFile agents.should)
+      (builtins.readFile agents.authority-order)
+      (builtins.readFile agents.completion-evidence)
+      (builtins.readFile ./docs/AGENTS.repo.md)
+    ]);
+    ```
+
+    Refresh the committed file with:
+
+    ```sh
+    cp "$(nix build --no-link --print-out-paths .#agents-md)" AGENTS.md
+    ```
+
+    If `CLAUDE.md` is missing, create it containing `@AGENTS.md` (an existing
+    one is never touched). Add a CI step so a stale `AGENTS.md` fails the
+    build:
+
+    ```sh
+    diff -u AGENTS.md "$(nix build --no-link --print-out-paths .#agents-md)"
+    ```
 
 Adaptation rules:
+
 - Replace `ops-monorepo-demo` / `@ops-demo/web` with the target repo's
   actual name and package names.
 - Replace `Ops monorepo demo` in user-facing strings with the repo's
