@@ -16,5 +16,5 @@ jobs:
       - name: Check sandbox skill subset is in sync
         run: scripts/sync-sandbox-skills.sh --check
       - uses: cachix/install-nix-action@v31
-      - name: Check AGENTS.md and docs/AGENTS.md are generated from the docs/agents/ topics
-        run: nix build .#checks.x86_64-linux.agents-md
+      - name: Check generated instructions and Home Manager module
+        run: nix build .#checks.x86_64-linux.agents-md .#checks.x86_64-linux.home-manager

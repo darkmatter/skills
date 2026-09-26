@@ -8,9 +8,9 @@
   ...
 }:
 let
-  skillsWithSubmodules = import ./lib/skills-source.nix {
+  skillsWithSubmodules = import ../lib/skills-source.nix {
     inherit lib pkgs;
-    skillsDir = ./skills;
+    skillsDir = ../skills;
   };
 
   darkmatterSkillId =
@@ -33,7 +33,7 @@ let
   personalSkills =
     if personalAgentSkillsPath != null then readSkills personalAgentSkillsPath else { };
 
-  baseOpencodeSettings = import ./presets/opencode/opencode.nix;
+  baseOpencodeSettings = import ../presets/opencode/opencode.nix;
   opencodeSettings = lib.foldl' (
     previous: overlay: lib.recursiveUpdate previous (overlay previous)
   ) baseOpencodeSettings opencodeConfigOverlays;
@@ -92,10 +92,10 @@ in
     #   theme = "aura";
     # };
 
-    context = ./docs/AGENTS.md;
-    commands = ./presets/opencode/commands;
-    agents = ./presets/opencode/agents;
-    themes = ./presets/opencode/themes;
+    context = ../docs/AGENTS.md;
+    commands = ../presets/opencode/commands;
+    agents = ../presets/opencode/agents;
+    themes = ../presets/opencode/themes;
 
     # Per-skill entries merge team + personal sources into a single
     # opencode/skills directory, which fixes the prior limitation
@@ -106,8 +106,8 @@ in
   # Shared instructions (docs/AGENTS.md) installed as each client's global
   # AGENTS.md. Symlinked via home.file so they stay in sync with this repo;
   # the copy for ~/.claude uses an activation below.
-  home.file.".codex/AGENTS.md".source = ./docs/AGENTS.md;
-  home.file.".omp/agent/AGENTS.md".source = ./docs/AGENTS.md;
+  home.file.".codex/AGENTS.md".source = ../docs/AGENTS.md;
+  home.file.".omp/agent/AGENTS.md".source = ../docs/AGENTS.md;
   # Claude Code base instructions (~/.claude/darkmatter/). Copied as real
   # files rather than symlinked: Claude Code treats ~/.claude as
   # user-writable and a home.file symlink there can conflict with
@@ -116,7 +116,7 @@ in
   # itself because Claude Code treats it as personal user config — add
   # `@~/.claude/darkmatter/AGENTS.md` to it once to import this.
   home.activation.claudeBaseInstructions = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
-    _cb_src="${toString ./docs}"
+    _cb_src="${toString ../docs}"
     _cb_dst="$HOME/.claude/darkmatter"
     mkdir -p "$_cb_dst"
     _f="$_cb_src"/AGENTS.md
@@ -165,7 +165,7 @@ in
     fi
   '';
 
-  # tools = ./presets/opencode/tools is intentionally NOT set here.
+  # tools = ../presets/opencode/tools is intentionally NOT set here.
   #
   # programs.opencode.tools installs files as Nix-store symlinks, but Bun
   # (opencode's runtime) resolves `node_modules` from the *canonical* path of
@@ -176,7 +176,7 @@ in
   # Fix: copy the source files as real (non-symlinked) files via activation so
   # Bun resolves node_modules from ~/.config/opencode/ instead.
   home.activation.opencodeTools = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
-    _oc_src="${toString ./presets/opencode/tools}"
+    _oc_src="${toString ../presets/opencode/tools}"
     _oc_dst="$HOME/.config/opencode/tools"
     mkdir -p "$_oc_dst"
     for _f in "$_oc_src"/*.ts; do
@@ -187,7 +187,7 @@ in
   '';
 
   home.activation.opencodePlugins = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
-    _oc_src="${toString ./presets/opencode/plugins}"
+    _oc_src="${toString ../presets/opencode/plugins}"
     _oc_dst="$HOME/.config/opencode/plugins"
     mkdir -p "$_oc_dst"
     for _entry in "$_oc_src"/*; do
@@ -211,7 +211,7 @@ in
   # unmanaged copies where a home.file symlink would fail activation.
   # Team themes are reset from the preset on every rebuild.
   home.activation.claudeThemes = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
-    _ct_src="${toString ./presets/claude/themes}"
+    _ct_src="${toString ../presets/claude/themes}"
     _ct_dst="$HOME/.claude/themes"
     mkdir -p "$_ct_dst"
     for _f in "$_ct_src"/*.json; do
@@ -225,7 +225,7 @@ in
   # the curated preset on every activation. This lets the plugin mutate it at
   # runtime without preserving drift across rebuilds.
   home.activation.ohMyOpenagentJson = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
-    _oma_src="${toString ./presets/opencode/oh-my-openagent.jsonc}"
+    _oma_src="${toString ../presets/opencode/oh-my-openagent.jsonc}"
     _oma_dst="$HOME/.config/opencode/oh-my-openagent.json"
 
     mkdir -p "$(dirname "$_oma_dst")"

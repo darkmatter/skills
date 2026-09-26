@@ -126,6 +126,31 @@
               touch $out
             '';
 
+            checks.home-manager =
+              let
+                home = agent-skills.inputs.home-manager.lib.homeManagerConfiguration {
+                  inherit pkgs;
+                  extraSpecialArgs = {
+                    personalAgentSkillsPath = null;
+                    opencodeConfigOverlays = [ ];
+                  };
+                  modules = [
+                    inputs.self.homeManagerModules.default
+                    {
+                      home.username = "skills-check";
+                      home.homeDirectory =
+                        if pkgs.stdenv.hostPlatform.isDarwin then "/Users/skills-check" else "/home/skills-check";
+                      home.stateVersion = "25.11";
+                    }
+                  ];
+                };
+              in
+              builtins.seq home.activationPackage.drvPath (
+                pkgs.runCommand "check-home-manager-evaluation" { } ''
+                  touch "$out"
+                ''
+              );
+
             treefmt = {
               projectRootFile = "flake.nix";
               settings = {
