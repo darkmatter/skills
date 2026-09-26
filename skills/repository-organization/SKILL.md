@@ -10,7 +10,7 @@ Keep each repository easy for humans and agents to navigate by putting durable c
 For source conventions, apply [codebase-design](../codebase-design/SKILL.md):
 keep each capability together, expose complete operations, and extract only
 when the split improves understanding. Use
-[domain-organization](../domain-organization/SKILL.md) for domain/role paths.
+[domain-organization](../domain-organization/SKILL.md) for domain paths.
 Keep the governing rule short in always-on instructions and link the full
 examples; maintain one canonical definition instead of competing style lists.
 

@@ -1,18 +1,21 @@
 ---
 name: domain-organization
-description: Organize source code by domain owner, keeping models/types with services, defining role and filename conventions, and producing project-wide before/after plans. Use for source packaging and structural moves; use repository-organization for docs/context placement and nix-flake-organization for Nix layout.
+description: Organize source code by domain owner and capability, keeping a schema with the operations that use it, defining filename conventions, and producing project-wide before/after plans. Use for source packaging and structural moves; use repository-organization for docs/context placement and nix-flake-organization for Nix layout.
 ---
 
 # Domain organization
 
-Organize source by **owner → role → module**. A path should identify who owns
-the behavior, what responsibility it serves, and which concept or operation it
-contains. Models and services share an owner; they need not share a file.
+Organize source by **owner → capability → module**. A path should identify who
+owns the behavior and which concept or operation it contains. A capability's
+schema, its service contract and the operations against it live together; a
+concrete implementation such as a database client sits beside them.
 
 Apply [codebase-design](../codebase-design/SKILL.md) when choosing boundaries:
 keep each capability together and split only when the split improves
-understanding. Role directories organize useful modules; they do not require a
-separate file for every helper, query, type, or step.
+understanding. Do not sort code into architectural layer directories such as
+`models/`, `services/`, `adapters/`, `workflows/` or `policies/`. A layer
+directory spreads one operation over several files that each forward to the
+next, and it tells a reader nothing about what the code is for.
 
 Apply this to the requested scope. A planning request produces a plan; an
 implementation request authorizes the relevant structural changes. This skill
@@ -37,47 +40,51 @@ the requested outcome materially.
 
 ## Choose the owner
 
-- A focused package can be the owner: `src/models/Invoice.ts` and
-  `src/services/InvoiceStore.ts` belong together.
+- A focused package can be the owner: `src/invoices.ts` holds the invoice
+  schema, store contract and operations; `src/invoices.postgres.ts` holds its
+  SQL.
 - A package with substantial domains groups by domain first:
-  `src/billing/models/Invoice.ts`, `src/billing/services/InvoiceStore.ts`.
+  `src/billing/invoices.ts`, `src/billing/invoices.postgres.ts`.
 - Keep an app's screens, routes, and feature-specific behavior in the app.
   Reusable UI belongs in its own package; discover that package's name and alias
   from the workspace. Keep app routes, stores, and API clients out of it.
 - Give shared infrastructure a home based on real owners and callers. Similar
   names alone do not justify merging capabilities or creating another package.
-- Distinguish domain `models/` from AI model-provider capabilities. Use the
-  latter's actual responsibility, such as `inference/` or `providers/`, without
-  silently changing its public contract.
+- Name AI model-provider capabilities for what they do, such as `inference/`
+  or `providers/`, without silently changing their public contract.
 
 Keep packages as deep modules with small public interfaces. Avoid one package
-per type or service. Create role directories only when useful code belongs in
-them; preserve precise established roles instead of creating empty scaffolds.
+per type or service. Create a subdirectory only when useful code belongs in
+it; do not create empty scaffolds.
 
-## Assign roles by responsibility
+## Group by capability
 
-| Role         | Contents and boundary                                                                                                         |
-| ------------ | ----------------------------------------------------------------------------------------------------------------------------- |
-| `models/`    | Schemas, derived types, IDs, value objects, and closely related pure operations. Keep a schema and its derived type together. |
-| `services/`  | Named capabilities and operations against required interfaces. Receive concrete implementations through composition.          |
-| `adapters/`  | Database, HTTP, SDK, filesystem, host, and framework implementations, including provider-specific decoding.                   |
-| `workflows/` | Processes coordinating services; the composition root selects concrete adapters.                                              |
-| `policies/`  | Business decisions and validation rules that depend on domain concepts.                                                       |
-| `mappers/`   | Independently useful conversions between established representations. Keep adapter-private row conversion with its operation. |
-| `utils/`     | Small supporting functions independent of domain contracts. Domain-aware helpers belong with their model, policy, or mapper.  |
+One module per capability: the schema and its derived type, the identifiers,
+the service contract with its typed failures, and the operations against that
+contract. The module depends on the contracts it needs and nothing else; the
+composition root supplies concrete implementations.
 
-Use additional roles when they explain the code: `config/`, `tools/`, `prompts/`,
-`components/`, `hooks/`, `state/`, `routes/`, or `runtime/`. Configuration shapes
-and defaults remain separate from credentials and live resource construction.
-Keep app entrypoints thin and put live assembly in the composition root.
+A concrete implementation is its own module beside the capability, named for
+what it implements and how: `invoices.postgres.ts`, `notifications.slack.ts`.
+It keeps its queries, bindings, decoding and private helpers local. A process
+that coordinates several capabilities is a module named for the process:
+`collect-payment.ts`.
+
+Split a capability module only when a split helps a reader or the file
+outgrows the configured line budget, and name the pieces for what they do.
+Directories that describe content rather than layer are fine when they help
+navigation: `config/`, `tools/`, `prompts/`, `components/`, `hooks/`,
+`routes/`, `testing/`. Configuration shapes and defaults remain separate from
+credentials and live resource construction. Keep app entrypoints thin and put
+live assembly in the composition root.
 
 Read mixed modules before moving them. A filename does not make a function pure
-or separate a service contract from its concrete implementation. Split coherent
-responsibilities while preserving behavior; design any necessary semantic change
-as a separate change.
+or separate a service contract from its concrete implementation. Split
+responsibilities only where a reader gains from it, preserving behavior; design
+any necessary semantic change as a separate change.
 
 Keep an operation's private helpers, queries, bindings, and decoding local when
-they must be understood together. Share a mapper or helper when it hides a
+they must be understood together. Share a conversion or helper when it hides a
 meaningful decision or serves real callers, not to shorten another file. Retain
 configured line limits and document narrow exceptions for cohesive modules.
 
@@ -85,25 +92,28 @@ configured line limits and document narrow exceptions for cohesive modules.
 
 These defaults yield to explicit user choices and established repository or
 framework constraints. Keep owner directory casing consistent with the repo;
-role directories are lowercase and plural.
+content directories are lowercase and plural.
 
 | Kind                                        | Default                                                   | Example                                            |
 | ------------------------------------------- | --------------------------------------------------------- | -------------------------------------------------- |
-| Named model, schema, service, or toolkit    | PascalCase                                                | `Invoice.ts`, `InvoiceStore.ts`, `BillingTools.ts` |
-| Named adapter                               | PascalCase stem, optional lowercase implementation suffix | `InvoiceStore.postgres.ts`                         |
-| Component or JSX module                     | PascalCase                                                | `InvoiceTable.tsx`                                 |
-| Function, workflow, policy, mapper, handler | kebab-case                                                | `issue-invoice.ts`, `parse-row.ts`                 |
+| Capability module                           | Lowercase plural noun                                     | `invoices.ts`, `runners.ts`                        |
+| Concrete implementation                     | Capability stem, lowercase implementation suffix          | `invoices.postgres.ts`, `runners.memory.ts`        |
+| Named toolkit, agent definition, or component | PascalCase                                              | `BillingTools.ts`, `ReviewerAgent.ts`, `InvoiceTable.tsx` |
+| Process, handler, or standalone function    | kebab-case                                                | `collect-payment.ts`, `parse-row.ts`               |
 | React hook                                  | camelCase                                                 | `useInvoice.ts`                                    |
-| Companion test or fixture                   | Source stem, lowercase suffix                             | `InvoiceStore.test.ts`, `parse-row.fixture.ts`     |
+| Companion test or fixture                   | Source stem, lowercase suffix                             | `invoices.test.ts`, `parse-row.fixture.ts`         |
 
 Conventional files stay recognizable and lowercase: `index`, `app`, `main`,
 `agent`, `cli`, `config`, `errors`, `constants`, `types`, `schemas`, `fixtures`,
 `testing`, `setup`, and `runtime`. Their directory should supply a narrow meaning.
 Split a broad `types.ts` by owned concepts when useful, not by every alias.
 
-PascalCase identifies a named module; it implies neither a class nor a single
-export. Keep related schema/type pairs and useful associated exports together.
-Retain established exported spellings and service identities during file moves.
+PascalCase identifies a named toolkit, agent or component; it implies neither
+a class nor a single export. Keep related schema/type pairs and useful
+associated exports together. Retain established exported spellings and service
+identities during file moves; where a lint rule derives a service key from its
+file path, moving the file changes the key, so treat such moves as contract
+changes.
 
 Lowercase dotted suffixes distinguish implementation and test roles. Preserve
 framework routes, configuration files, declaration files, migration numbering,
@@ -120,8 +130,8 @@ composer-images.ts     → composer/images.ts
 composer-text.ts       → composer/text.ts
 ```
 
-Keep the grouping within its owner and role, such as `utils/composer/text.ts`,
-and apply the casing conventions above to the shorter names. Count distinct
+Keep the grouping within its owner, such as `composer/text.ts`, and apply the
+casing conventions above to the shorter names. Count distinct
 implementation modules; companion tests and fixtures follow their source.
 Retain descriptive operation names such as `parse-row.ts` when their words
 describe the operation itself.

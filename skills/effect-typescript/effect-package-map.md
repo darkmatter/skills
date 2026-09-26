@@ -2,9 +2,9 @@
 
 Follow [codebase-design](../codebase-design/SKILL.md) for the shared rules and
 examples, and [domain-organization](../domain-organization/SKILL.md) for naming.
-Keep a capability's models, services, and implementations under its domain
-owner. Role directories help readers find code; they are not mandatory layers
-that every operation must pass through.
+Keep a capability's schema, service contract and implementation under its
+domain owner, in one module until a split helps a reader. Do not sort code into
+layer directories (`models/`, `services/`, `adapters/`, `policies/`).
 
 This map is conceptual. Check the repository's installed Effect version and
 pinned source before using service, schema, runtime, or testing APIs. Do not
@@ -19,22 +19,17 @@ billing/
   testing.ts                # public test support, when consumers need it
   package.json              # lists supported package entry points
   src/
-    models/
-      Invoice.ts            # schema and inferred type together
-    services/
-      InvoiceStore.ts       # complete operations and typed failures
-    adapters/
-      Postgres.ts           # queries, bindings, decoding, private helpers
-      Postgres.test.ts      # exercise store behavior through public entries
-    workflows/
-      collect-payment.ts    # coordinates store and payment capabilities
+    invoices.ts             # schema, inferred type, store contract, typed failures
+    invoices.postgres.ts    # queries, bindings, decoding, private helpers
+    invoices.test.ts        # exercise store behavior through public entries
+    collect-payment.ts      # coordinates the store and payment capabilities
 ```
 
 The package is already the `billing` owner; do not add `src/billing/` just to
-repeat its name. A package containing multiple domains uses
-`src/<owner>/{models,services,adapters,workflows}`. Add only roles that contain
-real responsibilities. Related groups of adapters can use subdirectories
-when those groups improve navigation.
+repeat its name. A package containing multiple domains uses one directory per
+domain, `src/<owner>/`, with the same capability modules inside. Split a
+module only when a split helps a reader or the file outgrows the configured
+line budget; then name the pieces for what they do, not for a layer.
 
 Root source entries contain explicit re-exports from implementation modules
 under `src/`. Declare supported entries in `package.json`. Avoid a root barrel
