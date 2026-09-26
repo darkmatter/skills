@@ -1,3 +1,4 @@
+<!-- Generated file — do not edit. nix build .#agents-md-shared renders it from the docs/agents/ topics. -->
 # Instructions
 
 Classify prompt difficulty as easy `+--`, medium `-+-`, or difficult `--+`.
