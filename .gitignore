@@ -15,6 +15,18 @@ evals/results/*
 !evals/results/.gitkeep
 evals/prompt-tests/.cache/
 __pycache__/
+CLAUDE.md
 .omo
 .beads
 .agents
+
+# Devenv
+.devenv*
+devenv.local.nix
+devenv.local.yaml
+
+# direnv
+.direnv
+
+# pre-commit
+.pre-commit-config.yaml

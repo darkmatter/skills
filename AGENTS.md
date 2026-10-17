@@ -124,6 +124,7 @@ What lives here:
 
 - `skills/` — team-wide shared skills, distributed via the Nix Home Manager module exported by `flake.nix`; Centaur sandboxes consume this same directory directly, with no manifest or generated subset
 - `docs/agents/` — shared instruction topics, one file per topic named `<order>-<topic>.md` (the number sets bundle order), discovered from the directory at build time and exported as the flake output `agentsMd`; downstream repos concatenate a chosen subset with their own text to generate their `AGENTS.md`, and this repo does the same
+- `references/` — per-language reference codebases (`rust/`, `go/`, `typescript/`) showing preferred conventions as exemplar code
 - `docs/AGENTS.md` — GENERATED bundle of every topic (`packages.agents-md-shared`); the Home Manager module installs it as every LLM client's global `AGENTS.md`. The root `AGENTS.md` is generated too: every topic plus `docs/AGENTS.repo.md`, via `packages.agents-md`
 - `scripts/install-base.sh` — manually install `docs/AGENTS.md` as `AGENTS.md` into a client config dir
 - `scripts/validate-skill.sh` — sanity-check the skills catalog

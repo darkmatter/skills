@@ -24,41 +24,31 @@
       ...
     }:
     let
-      # Shared instruction topics, discovered from docs/agents/ so the
-      # registry cannot drift from the directory. Each file is one topic,
-      # named <order>-<topic>.md: the numeric prefix sets the bundle order
-      # (attrNames and attrValues sort alphabetically, so the order must
-      # live in the filename), and the suffix is the topic name downstream
-      # repos import via inputs.darkmatter-skills.agentsMd.<topic>. A new
-      # file is importable and bundled automatically; a misnamed file or a
-      # duplicate topic name fails evaluation.
+      # attrNames sorts filenames, so zero-padded prefixes define bundle order.
       agentsMdTopics =
         let
           dir = ./docs/agents;
-          fileNames = builtins.filter (name: builtins.substring 0 1 name != ".") (
-            builtins.attrNames (builtins.readDir dir)
-          );
-          parsed = map (fileName: {
-            parts = builtins.match "([0-9]+)-([a-z0-9-]+)\\.md" fileName;
-            inherit fileName;
-          }) fileNames;
-          invalid = map (p: p.fileName) (builtins.filter (p: p.parts == null) parsed);
-          topics = map (p: {
-            order = nixpkgs.lib.toInt (builtins.head p.parts);
-            name = builtins.elemAt p.parts 1;
-            path = dir + ("/" + p.fileName);
-          }) parsed;
-          names = map (t: t.name) topics;
-          duplicates = builtins.filter (
-            name: builtins.length (builtins.filter (n: n == name) names) > 1
-          ) names;
+          entries = builtins.readDir dir;
+          files = builtins.filter (name: entries.${name} == "regular") (builtins.attrNames entries);
+          parse =
+            file:
+            let
+              parts = builtins.match "[0-9]+-([a-z0-9-]+)\\.md" file;
+            in
+            if parts == null then
+              throw "docs/agents: topic files must be named <number>-<topic>.md, got: ${file}"
+            else
+              {
+                name = builtins.head parts;
+                path = dir + "/${file}";
+              };
+          topics = map parse files;
+          names = map (topic: topic.name) topics;
         in
-        if invalid != [ ] then
-          throw "docs/agents: topic files must be named <number>-<topic>.md, got: ${toString invalid}"
-        else if duplicates != [ ] then
-          throw "docs/agents: duplicate topic names: ${toString (nixpkgs.lib.unique duplicates)}"
+        if builtins.length names != builtins.length (nixpkgs.lib.unique names) then
+          throw "docs/agents: topic names must be unique"
         else
-          nixpkgs.lib.sort (a: b: a.order < b.order || (a.order == b.order && a.name < b.name)) topics;
+          topics;
       topicTexts = map (topic: builtins.readFile topic.path) agentsMdTopics;
 
       flake = flake-parts.lib.mkFlake { inputs = inputs; } {

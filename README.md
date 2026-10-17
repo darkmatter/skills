@@ -46,7 +46,7 @@ darkmatter/skills/
 │   ├── skills/              ← Promptfoo behavior evals (LLM decision checks, CI)
 │   └── prompt-tests/        ← real-repo opencode evals (local/manual only)
 └── docs/
-    ├── agents/              ← shared instruction topics, <order>-<topic>.md
+    ├── agents/              ← shared instruction topics, <NN>-<topic>.md
     ├── AGENTS.md            ← GENERATED topic bundle — nix build .#agents-md-shared
     ├── AGENTS.repo.md       ← this repo's own agent instructions
     ├── adr/                 ← architecture decision records
@@ -89,7 +89,7 @@ Use this table before adding a new instruction, skill, command, hook, or tool. T
 
 | Need                                                         | Put it here                                                             | Loaded when                           | Examples / notes                                                                                    |
 | ------------------------------------------------------------ | ----------------------------------------------------------------------- | ------------------------------------- | --------------------------------------------------------------------------------------------------- |
-| Org-wide rules that must apply in every session              | `docs/agents/<order>-<topic>.md`                                        | Always, as global agent instructions  | Keep short: safety, verification, preserving user changes, secret handling, evidence-before-claims. |
+| Org-wide rules that must apply in every session              | `docs/agents/<NN>-<topic>.md`                                           | Always, as global agent instructions  | Keep short: safety, verification, preserving user changes, secret handling, evidence-before-claims. |
 | Project-specific rules and decisions                         | Target project's own `AGENTS.md`, `.agent/context/*`, `.agent/policy/*` | Always inside that project            | Stack choices, local conventions, approved exceptions, project state. Owned by each project repo.   |
 | Reusable task guidance the model should choose when relevant | `skills/<name>/SKILL.md`                                                | On demand via skill discovery         | Effect, Nix, UI, codebase cleanup, test decisions. Add a row in `docs/catalog.md`.                  |
 | Long skill detail, examples, fixtures, or lookup data        | `skills/<name>/reference/`                                              | Only after the skill points there     | Use for large docs so `SKILL.md` stays concise.                                                     |
@@ -112,7 +112,9 @@ Placement rules:
 
 ## Shared instructions
 
-The shared instructions live as topics in `docs/agents/`, one file per topic named `<order>-<topic>.md` (`10-preamble.md`, `20-defaults.md`, …): the number sets the bundle order, the suffix is the topic you import. The flake reads the directory, so adding a file is all it takes — the file becomes importable and bundled automatically, while a misnamed or duplicate-topic file fails the build. Topics: `preamble`, `defaults`, `showing-code`, `must-always`, `must-never`, `readability`, `should`, `authority-order`, `completion-evidence`. The flake exports them as the `agentsMd` attrset (topic name → path), so a repo adopts exactly the topics it wants. Only Claude Code expands `@file` references; Codex, OpenCode, and OMP read `AGENTS.md` verbatim, so the shared text is always delivered as a real `AGENTS.md`, never as an import.
+Shared topics are files in `docs/agents/` named `<NN>-<topic>.md`. The zero-padded number sets bundle order; the suffix becomes the import name. The flake discovers every file automatically and rejects invalid or duplicate names.
+
+Topics are exported as `agentsMd` (topic name → path), so each repo imports only what it needs. Codex, OpenCode, and OMP require the selected text to be built into a real `AGENTS.md`; only Claude Code expands `@file` references.
 
 **Into a repo (canonical).** Pick the topics you adopt and concatenate them with repo-specific instructions at build time. With `darkmatter-skills` added as a flake input:
 
