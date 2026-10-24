@@ -1,6 +1,6 @@
 ---
 name: record-rule
-description: Only when explicitly asked to record a rule, reconcile a note with org-wide or project-local guidance and publish, activate, and verify it across configured agents.
+description: Only when explicitly asked to record a rule, interview to clarify the note, reconcile org-wide or project-local guidance, and publish, activate, and verify it across configured agents.
 disable-model-invocation: true
 argument-hint: "<note, e.g. 'never use paid CI runners; always self-hosted'>"
 ---
@@ -20,20 +20,23 @@ checkout, org adhere rules in `darkmatter/standards`, project rules in the
 invoking project's own repo. Installed copies (e.g. under `~/.omp`) are build
 output — always edit the source checkout, never the install.
 
-## 1. Capture the note and its scope
+## 1. Capture scope and interview
 
-Record the user's exact wording and the intent behind it (the behaviour it
-should change, and where that behaviour happens). Record the invoking
-project's identity now — repo root, remote, name — and keep targeting that
-project even if the working directory moves later.
+Record the note verbatim, its intended behaviour, and the invoking project's
+identity (root, remote, name). Keep targeting that project if the cwd moves.
 
-If the note or invocation does not explicitly state scope, ask one question:
-**Org-wide** (every darkmatter repo/agent) or **Project-local** (this project
-only)? Universal-sounding wording ("never…", "always…") is not evidence of
-org scope. Ask nothing else at this stage.
+If scope is not explicit, ask only **Org-wide** (every darkmatter repo/agent)
+or **Project-local** (this project only), then wait for the answer.
+"Never"/"always" does not imply org scope.
 
-Done when: the exact note, its interpreted intent, the chosen scope, and (for
-project-local) the invoking project identity are recorded.
+Then interview if ambiguity or missing detail could change when the rule applies
+or does not, exceptions, terms, or requirements vs preferences; use examples and
+counterexamples. Resolve repository facts yourself. Batch related user decisions
+and follow up until material gaps are settled; skip extra questions for clear notes.
+Restate agreed intent and boundaries before editing; do not invent the user's intent.
+
+Done when: note, scope, project identity, and agreed intent and boundaries
+are recorded, with no unresolved material questions.
 
 ## 2. Inventory what already governs this
 
@@ -73,12 +76,12 @@ Reconciliation bounds:
 - Prefer editing a suitable existing skill over creating a new one.
 - Org-wide content stays project-neutral; project specifics stay in the
   project. Never record secrets or secret-derived values.
-- Where authority or a policy tradeoff is genuinely ambiguous (two live
-  sources conflict and the note doesn't settle which wins), stop and ask the
-  user that specific question. Everything else: decide and show the reason.
+- If inventory exposes a new ambiguity (including authority or policy
+  tradeoffs), return to step 1's interview before choosing or editing.
+  Otherwise decide from evidence and show the reason.
 
-Done when: the decision list covers the whole inventory from step 2 and any
-ambiguity question has an answer.
+Done when: decisions cover step 2's inventory and the interview has resolved
+all material ambiguities.
 
 ## 4. Route each piece to its home
 
