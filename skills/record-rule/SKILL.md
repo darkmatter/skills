@@ -33,10 +33,11 @@ Then interview if ambiguity or missing detail could change when the rule applies
 or does not, exceptions, terms, or requirements vs preferences; use examples and
 counterexamples. Resolve repository facts yourself. Batch related user decisions
 and follow up until material gaps are settled; skip extra questions for clear notes.
+When asking, wait for the user's actual reply; never simulate answers or approval.
+If interaction is unavailable, show the open questions and stop before edits.
 Restate agreed intent and boundaries before editing; do not invent the user's intent.
 
-Done when: note, scope, project identity, and agreed intent and boundaries
-are recorded, with no unresolved material questions.
+Done when: note, scope, project identity, intent and boundaries are recorded and settled.
 
 ## 2. Inventory what already governs this
 
@@ -80,8 +81,7 @@ Reconciliation bounds:
   tradeoffs), return to step 1's interview before choosing or editing.
   Otherwise decide from evidence and show the reason.
 
-Done when: decisions cover step 2's inventory and the interview has resolved
-all material ambiguities.
+Done when: decisions cover step 2's inventory and all material ambiguities are resolved.
 
 ## 4. Route each piece to its home
 
