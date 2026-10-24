@@ -25,7 +25,7 @@ a catalogued skill includes it in future installations.
 | `flue` | Use when working with the Flue framework. |
 | `keep-codebase-maintainable` | Cleanup and maintainability passes, not feature work. |
 | `nix-flake-organization` | Maintain the Darkmatter Nix flake/module layout. |
-| `record-rule` | Manually invoked: turn a plain-language note into a live org-wide or project-local rule — reconcile policies, skills, and adhere rules, land on `main`, activate, and verify in every configured agent. |
+| `record-rule` | Manually invoked: interview for intent and applicability, then reconcile a note with org-wide or project-local policies, skills, and adhere rules, land on `main`, activate, and verify in every configured agent. |
 | `repository-organization` | Organize durable repository context and assets. |
 | `run-ui-registry-variations` | Build and compare UI registry variations. |
 | `rust-best-practices` | Idiomatic Rust implementation and review guidance. |
