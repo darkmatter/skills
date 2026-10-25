@@ -29,7 +29,7 @@ If the task is narrow and time-sensitive, the agent may skim, but must say what 
 - Load team-wide or project-local skills when their trigger conditions match.
 - Prefer specific skills over broad skills.
 - If a skill conflicts with project policy, project policy wins.
-- If a skill is stale or wrong, patch it or file a follow-up instead of silently working around it.
+- If a skill is stale or wrong, patch it instead of silently working around it; ask the human before filing a follow-up you can't finish.
 
 ## Planning
 
@@ -75,7 +75,7 @@ For code-changing turns, the final response must include:
 - What changed
 - Verification run and results
 - Review status, if applicable
-- Known gaps / next steps
+- Known gaps or blockers, with what you tried
 
 For read-only turns, summarize sources read and confidence level.
 ```

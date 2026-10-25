@@ -122,7 +122,7 @@ Final response must include:
 - Files changed
 - Verification commands and results
 - Review status
-- Known gaps or follow-ups
+- Known gaps or blockers, with what you tried
 - Exception IDs for skipped gates
 
 ```

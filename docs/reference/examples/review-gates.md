@@ -58,7 +58,7 @@ The review request must include:
 
 - Critical/security issues: fix before proceeding.
 - Important correctness issues: fix before merge unless explicitly waived.
-- Minor issues: fix if cheap, otherwise note follow-up.
+- Minor issues: fix them in the same session; ask the human before deferring one to a follow-up issue.
 - False positives: respond with evidence, not vibes.
 
 ## Waivers
