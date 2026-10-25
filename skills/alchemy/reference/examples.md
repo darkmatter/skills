@@ -271,7 +271,7 @@ export default Alchemy.Stack(
 
 Use this for a Cloudflare Worker written in Rust with [workers-rs](https://github.com/cloudflare/workers-rs). Alchemy has no Rust support of its own: `worker-build --release` compiles the crate into `build/index.js` (the entry) and `build/index_bg.wasm`, and a Worker with `bundle: false` uploads that output unchanged. With `bundle: false`, Alchemy walks the entry's directory recursively and uploads every file matching the default module rules (`.js`/`.mjs`, `.wasm`, `.txt`/`.html`/`.sql`, `.bin`) as an additional module, so keep unrelated files out of `build/`. A `Command.Build` runs `worker-build` before the Worker, and deriving `main` from its `outdir` makes the Worker wait for it. The build reruns only when a file matched by `memo.include` changes. Bindings go in `env` and are read in Rust with `env.var("GREETING")` and `env.bucket("ARTIFACTS")`.
 
-Working reference: `crates/cloudflare-worker-example` and `packages/infra/src/rust-worker.ts` in `darkmatter/template`. It is verified with deploy, redeploy, R2 binding, `alchemy dev`, and destroy on alchemy `2.0.0-beta.81`.
+Working reference: `crates/cloudflare-worker-example` and `packages/infra/src/rust-cloudflare-worker.ts` in `darkmatter/template`. It is verified with deploy, redeploy, R2 binding, `alchemy dev`, and destroy on alchemy `2.0.0-beta.81`.
 
 ```ts
 import * as Cloudflare from "alchemy/Cloudflare";
@@ -282,11 +282,11 @@ import { Path } from "effect/Path";
 
 import { ArtifactStore } from "#storage.ts"; // the stack's R2 bucket
 
-export const RustWorker = Effect.gen(function* () {
+export const RustCloudflareWorker = Effect.gen(function* () {
   const path = yield* Path;
   const crateDir = path.resolve(import.meta.dirname, "../../../crates/cloudflare-worker-example");
 
-  const build = yield* Command.Build("RustWorkerBuild", {
+  const build = yield* Command.Build("RustCloudflareWorkerBuild", {
     command: "worker-build --release",
     cwd: crateDir,
     outdir: "build",
@@ -302,7 +302,7 @@ export const RustWorker = Effect.gen(function* () {
     },
   });
 
-  return yield* Cloudflare.Worker("RustWorker", {
+  return yield* Cloudflare.Worker("RustCloudflareWorker", {
     main: build.outdir.pipe(Output.map((outdir) => path.join(outdir, "index.js"))),
     bundle: false,
     env: { ARTIFACTS: ArtifactStore, GREETING: "Hello from Rust!" },
