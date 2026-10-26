@@ -42,25 +42,24 @@ Verify these behaviors against the installed version, including override order:
 
 | Concern                   | Shared mechanism and boundary to verify                                                                                                              |
 | ------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Filename casing           | Native `unicorn/filename-case` overrides for roles and JSX, with function-role and hook overrides. The stem before the first dot is checked.         |
+| Filename casing           | Native `unicorn/filename-case` overrides per module kind and JSX, with hook overrides. The stem before the first dot is checked.                     |
 | Dotted suffixes           | Stem checking alone does not enforce lowercase suffixes or a suffix allowlist.                                                                       |
 | `index` casing            | Native special handling can exempt `index` case-insensitively; do not claim it enforces exact lowercase spelling.                                    |
 | Named toolkits            | A named module under `tools/` may inherit the kebab-case default. Supply a narrow override for named toolkits; function tools keep operation names.  |
 | Filename/export agreement | Casing rules do not check export names, single exports, schema placement, hook `use` prefixes, or owner-directory names.                             |
 | Framework/generated names | Check preset exemptions and add only the consumer-specific exceptions actually needed. Keep ordinary helpers covered.                                |
-| Role independence         | Role rules inspect transitive imports so a public re-export cannot hide a prohibited dependency.                                                     |
+| Dependency direction      | Import rules inspect transitive imports so a public re-export cannot hide a prohibited dependency.                                                   |
 | Package privacy           | Public-entry rules inspect direct imports and allow a package entry to import its own implementation. Nested public assets need explicit treatment.  |
 | Purity                    | Directory rules miss direct SDK usage and a `runtime.ts` file when they match only `runtime/`. A pure-looking path does not establish pure behavior. |
 
-The intended role direction keeps models independent of execution, services
-independent of concrete adapters, workflows coordinating services, and utilities
-independent of domain contracts. Review files for responsibilities that path
+The intended direction keeps a capability module independent of any concrete
+implementation and keeps utilities independent of domain contracts. Review files for responsibilities that path
 rules cannot detect. Composition roots supply concrete implementations.
 
 Keep type-only imports in the dependency graph. A type reference can violate an
 architectural boundary even when erased at runtime. Preserve stronger existing
 cycle, test-entry, and test-folder privacy checks. Exempting tests as sources
-from role rules does not make their fixtures public or replace workspace rules.
+from import rules does not make their fixtures public or replace workspace rules.
 
 Check narrow public entries as well as mixed barrels: allowing an entry file to
 reach its own source must not allow a model consumer to transitively reach an

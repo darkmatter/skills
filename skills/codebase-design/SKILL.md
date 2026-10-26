@@ -15,7 +15,7 @@ measure either.
 
 | Rule | Good example | Bad example |
 | --- | --- | --- |
-| **Organize by domain, then role.** | `billing/models/Invoice.ts` and `billing/services/InvoiceStore.ts`; a focused billing package can start at `src/models/`. | Unrelated billing, chat, and authentication code mixed into global `models/` and `services/`. |
+| **Organize by domain, then capability.** | `billing/invoices.ts` holds the invoice schema, store contract and operations; `billing/invoices.postgres.ts` holds its SQL. | Code sorted into layer directories such as `models/`, `services/` and `adapters/`, so one operation is spread across three files that each forward to the next. |
 | **Keep related implementation together.** | `Postgres.ts` owns an operation's SQL or typed queries, parameter bindings, and row conversion. | Understanding one query requires following several files that mostly forward calls. |
 | **Expose complete operations.** | The caller uses `saveInvoice(invoice)`. | Every caller must encode the invoice, write rows, update the index, and interpret the result in the correct order. |
 | **Extract to hide complexity or enable useful reuse.** | A local helper explains a retry policy; two adapters share a decoder with consistent errors. | `runQuery(sql)` merely calls `query(sql)`, adding another name and file to follow. |
