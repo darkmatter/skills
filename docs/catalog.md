@@ -11,7 +11,7 @@ a catalogued skill includes it in future installations.
 | `agent-browser` | Browser automation guidance. |
 | `alchemy` | Darkmatter's Alchemy v2 infrastructure and deployment workflow, with Postgres-first app data guidance. |
 | `choose-dev-entrypoints` | Choose the correct Nix, Bun, Turbo, Just, or script entrypoint. TypeScript-only repos implement ops scripts in TypeScript ([ADR-0012](adr/0012-ops-scripts-in-typescript.md)). |
-| `codebase-cleanup` | Safely clean up and simplify an existing codebase. |
+| `codebase-cleanup` | Focused cleanup and optional eight-pass code-quality audits. |
 | `codebase-design` | Canonical module conventions with good/bad examples: cohesive capabilities, small public interfaces, meaningful extraction, and retained line limits ([ADR-0015](adr/0015-cohesive-modules.md)). |
 | `darkmatter-design-system` | Darkmatter visual language and tokens. Reusable UI lives in the repo's own package ([ADR-0013](adr/0013-shared-ui-is-its-own-package.md)). |
 | `darkmatter-gitops-conventions` | Safe GitOps changes, validation, rollout, and rollback. SOPS payloads are JSON ([ADR-0011](adr/0011-sops-files-as-json.md)). |
@@ -23,7 +23,6 @@ a catalogued skill includes it in future installations.
 | `effect-typescript` | Typed Effect patterns for meaningful TypeScript I/O, including effect-orpc typed RPC, Postgres adapters, and named config files read through `Config` ([ADR-0014](adr/0014-named-config-files-over-flags-and-env.md)). |
 | `find-skills` | Find available skills for a task. |
 | `flue` | Use when working with the Flue framework. |
-| `keep-codebase-maintainable` | Cleanup and maintainability passes, not feature work. |
 | `nix-flake-organization` | Maintain the Darkmatter Nix flake/module layout. |
 | `record-rule` | Manually invoked: interview for intent and applicability, then reconcile a note with org-wide or project-local policies, skills, and adhere rules, land on `main`, activate, and verify in every configured agent. |
 | `repository-organization` | Organize durable repository context and assets. |

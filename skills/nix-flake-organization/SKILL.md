@@ -1,24 +1,22 @@
 ---
 name: nix-flake-organization
-description: Use when reorganizing Nix flakes, flake-parts outputs, NixOS modules, nix-darwin modules, or Home Manager modules into a thin flake/ public surface with implementation under src/.
+description: Use when reorganizing Nix flakes, NixOS modules, nix-darwin modules, Home Manager modules, hosts, packages, or devshells into the blueprint-style folder convention nested under nix/, where file paths map 1:1 to flake outputs.
 ---
 
 # Nix flake organization
 
-Keep `flake/` as the public output layer and `src/` as the implementation layer. The flake tree names, routes, and re-exports outputs; feature behavior, module bodies, package derivations, app scripts, and helper logic live under `src/<name>/...`.
+Organize flakes with the [numtide/blueprint](https://github.com/numtide/blueprint) folder convention, nested under a top-level `nix/` directory (blueprint's `prefix = "nix/"`). `flake.nix` stays a minimal entrypoint; every other output lives in a file under `nix/` whose path determines its output attribute. There is no separate glue layer: the file at the mapped path *is* the implementation. Outputs the mapping cannot express (such as `apps` or compatibility aliases) may keep explicit wiring beside the blueprint invocation, but their implementations still live under `nix/`.
 
 Apply [codebase-design](../codebase-design/SKILL.md) within those boundaries:
-keep each feature's implementation together and extract only to hide complexity
-or enable useful reuse. Nix output adapters are meaningful public entrypoints;
-additional internal forwarding files need their own purpose. Preserve Nix's
-roles rather than imposing TypeScript `models/` and `services/` directories.
+keep each output's implementation together with its mapped file and extract
+only to hide complexity or enable useful reuse. Preserve Nix's roles rather
+than imposing TypeScript `models/` and `services/` directories.
 
 ## When to use
 
 - A user asks to reorganize or refactor a Nix flake layout.
-- Flake outputs are crowded into `flake.nix` or mixed with implementation code.
-- NixOS, nix-darwin, Home Manager, or flake-parts modules contain business logic directly in output wiring files.
-- A repo needs a clear split between public flake API and implementation internals.
+- Flake outputs are crowded into `flake.nix` or spread across ad-hoc directories.
+- A repo mixes packages, modules, hosts, and devshells without a predictable mapping from file path to output name.
 
 ## When NOT to use
 
@@ -30,70 +28,53 @@ roles rather than imposing TypeScript `models/` and `services/` directories.
 
 Use this improved prompt when turning the request into an implementation plan:
 
-> Reorganize this repo so its public flake surface lives in a top-level `flake/` directory: `flake/apps`, `flake/packages`, `flake/lib`, and `flake/modules/{flake-parts,home-manager,darwin,nixos}` where applicable. Keep `flake.nix` as a minimal entrypoint and keep every file under `flake/` thin: it may declare output names, import implementation files, compose flake-parts modules, and adapt public calling conventions, but it must not contain derivation logic, app scripts, option/config bodies, service behavior, or helper implementations. Keep those implementation details together in feature-oriented `src/<name>/...` paths. Preserve existing output attribute names during structural moves; follow the repository's compatibility policy when changing the public interface. Verify with `nix flake show`, `nix flake check`, and representative package/module evals or builds.
+> Reorganize this repo to the blueprint folder convention nested under `nix/`: `nix/packages/<pname>(.nix|/default.nix)`, `nix/devshells/<name>.nix` (or `nix/devshell.nix` for the default), `nix/checks/<pname>.nix`, `nix/formatter.nix`, `nix/lib/default.nix`, `nix/modules/{nixos,darwin,home}/<name>(.nix|/default.nix)`, `nix/hosts/<hostname>/configuration.nix`, and `nix/templates/<name>/` where applicable. Keep `flake.nix` as a minimal entrypoint that wires inputs and loads the `nix/` tree — prefer `inputs.blueprint { inherit inputs; prefix = "nix/"; }`, adding explicit wiring beside it only for outputs the mapping cannot express. Each per-system mapped file (packages, devshells, checks, formatter) takes the standard arguments (`pkgs`, `inputs`, `flake`, `system`, `perSystem`, and `pname` for packages/checks) and returns its implementation directly; module files are plain modules. Preserve existing output attribute names during structural moves; follow the repository's compatibility policy when changing the public interface. Verify with `nix flake show`, `nix flake check`, and representative package/module evals or builds.
 
-## Target shape
+## Folder-to-output mapping
 
-Prefer this structure, adapting names to the existing repo:
+Prefer this structure, adapting names to the existing repo. The path of a file determines its flake output:
 
-```text
-flake.nix
-flake/default.nix
-flake/apps/default.nix
-flake/packages/default.nix
-flake/lib/default.nix
-flake/checks/default.nix       # if checks exist
-flake/devShells/default.nix    # if devShells exist
-flake/overlays/default.nix     # if overlays exist
-flake/modules/flake-parts/default.nix
-flake/modules/home-manager/default.nix
-flake/modules/darwin/default.nix
-flake/modules/nixos/default.nix
-src/<name>/app.nix
-src/<name>/package.nix
-src/<name>/lib.nix
-src/<name>/modules/flake-parts.nix
-src/<name>/modules/home-manager.nix
-src/<name>/modules/darwin.nix
-src/<name>/modules/nixos.nix
-```
+| Path                                             | Flake output                                         |
+| ------------------------------------------------ | ---------------------------------------------------- |
+| `nix/package.nix`                                | `packages.<system>.default`                          |
+| `nix/packages/<pname>(.nix\|/default.nix)`       | `packages.<system>.<pname>`                          |
+| `nix/devshell.nix`                               | `devShells.<system>.default`                         |
+| `nix/devshells/<name>(.nix\|/default.nix)`       | `devShells.<system>.<name>`                          |
+| `nix/formatter.nix`                              | `formatter.<system>`                                 |
+| `nix/checks/<pname>(.nix\|/default.nix)`         | `checks.<system>.<pname>`                            |
+| `nix/lib/default.nix`                            | `lib`                                                |
+| `nix/modules/nixos/<name>(.nix\|/default.nix)`   | `nixosModules.<name>`                                |
+| `nix/modules/darwin/<name>(.nix\|/default.nix)`  | `darwinModules.<name>`                               |
+| `nix/modules/home/<name>(.nix\|/default.nix)`    | `homeModules.<name>`                                 |
+| `nix/modules/<type>/<name>`                      | `modules.<type>.<name>`                              |
+| `nix/hosts/<hostname>/configuration.nix`         | `nixosConfigurations.<hostname>`                     |
+| `nix/hosts/<hostname>/darwin-configuration.nix`  | `darwinConfigurations.<hostname>`                    |
+| `nix/templates/<name>/`                          | `templates.<name>`                                   |
 
-`flake/modules/flake-parts` belongs beside the platform module families when flake-parts modules exist, even if the user's shorthand example omits it.
+Packages also feed `checks.<system>.pkgs-<pname>` (plus their `passthru.tests`), and hosts feed `checks.<system>.nixos-<hostname>`, so `nix flake check` covers them automatically.
 
-Feature-oriented means grouping by domain concept, not by output type. If a concept `vpn` has a package, app, and NixOS module, keep them under `src/vpn/`. If a package has no associated modules, `src/<pkg-name>/package.nix` is fine. When a repo is already organized by platform, preserving that structure under `src/` is acceptable, but do not mechanically recreate the whole `flake/` tree under `src/`.
+## File contract
 
-## Thin layer rule
+Per-system files (packages, devshells, checks, formatter) are functions taking:
 
-| Location                    | Allowed                                     | Not allowed                                       |
-| --------------------------- | ------------------------------------------- | ------------------------------------------------- |
-| `flake.nix`                 | Inputs, minimal `outputs`, import `./flake` | Package/module implementation                     |
-| `flake/apps`                | App output names and imports                | Shell scripts, wrappers, runtime behavior         |
-| `flake/packages`            | Package output names and imports            | `mkDerivation`, overlays, build logic             |
-| `flake/lib`                 | Public helper re-exports                    | Helper implementations                            |
-| `flake/checks`              | Check output names and imports              | Test harness implementation                       |
-| `flake/devShells`           | Dev shell output names and imports          | Tool setup logic, shell hooks                     |
-| `flake/overlays`            | Overlay output names and imports            | Package overrides and build logic                 |
-| `flake/modules/flake-parts` | flake-parts imports and module composition  | `perSystem` build logic, derivations, app scripts |
-| `flake/modules/*`           | Public module exports and imports           | Options, `config`, assertions, services           |
-| `src/<name>/...`            | All implementation details                  | Public output schema decisions                    |
+- `pkgs`: the nixpkgs instance for the current system.
+- `inputs`: the flake inputs.
+- `flake`: shorthand for `inputs.self`.
+- `system`: the current system string.
+- `perSystem`: packages of all inputs filtered per system, e.g. `perSystem.devshell.mkShell`. Use `perSystem.self.<pname>` to consume sibling packages.
+- `pname` (packages and checks only): the package name derived from the file or folder name.
 
-Thin does not mean empty. A thin file can adapt calling conventions, pass `inputs`, `self`, or `pkgs`, and preserve public attribute names. It should be understandable without reading implementation details.
-
-Keep configured file limits. If a cohesive module exceeds one, first look for an
-independent responsibility; otherwise document a narrow increase or exception.
-Keep options, defaults, assertions, and configuration local when they explain
-one feature, even when that makes a module longer.
-
-For module outputs, thin means the `flake/modules/<platform>/default.nix` file is a re-export point. It imports the full module from `src/` and wires it into the public output attribute. It does not mean splitting options from config inside a single module; options and config stay together in `src/<name>/modules/<platform>.nix`.
+Each file returns its implementation directly — a derivation for packages and checks, a shell for devshells, a module for `nix/modules/*`:
 
 ```nix
-# flake/modules/nixos/default.nix
-{ ... }:
-{
-  flake.nixosModules.vpn = import ../../../src/vpn/modules/nixos.nix;
+# nix/packages/vpn/default.nix
+{ pkgs, perSystem, ... }:
+pkgs.buildGoModule {
+  pname = "vpn";
+  # ...
 }
 
-# src/vpn/modules/nixos.nix
+# nix/modules/nixos/vpn.nix
 { config, lib, pkgs, ... }:
 {
   options.services.vpn = { ... };
@@ -101,45 +82,69 @@ For module outputs, thin means the `flake/modules/<platform>/default.nix` file i
 }
 ```
 
-In flake-parts repos, `perSystem` often owns `packages`, `apps`, `checks`, and `devShells`. Keep `perSystem` composition thin in `flake/modules/flake-parts`; package derivations still belong in `src/<name>/package.nix`, app behavior in `src/<name>/app.nix`, and dev shell/check implementation in `src/<name>/...`. Do not define the same output through both direct `flake/packages` wiring and flake-parts `perSystem` wiring.
+Modules may be wrapped in an outer function taking `flake` or `inputs` when they need to reference the defining flake; blueprint calls that function before exposing the module.
+
+## Wiring the flake
+
+Prefer the blueprint library; it replaces the mapping glue entirely:
+
+```nix
+{
+  inputs = {
+    nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
+    blueprint.url = "github:numtide/blueprint";
+    blueprint.inputs.nixpkgs.follows = "nixpkgs";
+  };
+  outputs = inputs: inputs.blueprint {
+    inherit inputs;
+    prefix = "nix/";
+  };
+}
+```
+
+If the repo cannot take the blueprint dependency, or is committed to flake-parts, keep the same `nix/` folder convention and file contracts, and write the mapping explicitly in `flake.nix` or the flake-parts `perSystem` wiring. The wiring may only name outputs and import files from `nix/`; implementations stay in the mapped files. Do not define the same output through two wiring paths.
+
+## Colocation rules
+
+- Helpers, scripts, and data for one output live beside its mapped file: `nix/packages/vpn/{default.nix,vpn.sh}`.
+- A concept spanning output types splits along the mapping: package in `nix/packages/vpn/`, NixOS module in `nix/modules/nixos/vpn.nix`. Name the files identically so the concept is findable.
+- Shared helpers go in `nix/lib/` and are exposed as the `lib` output; do not create a parallel `src/` or `internal/` tree.
+- Keep options, defaults, assertions, and configuration local to the module that explains one feature, even when that makes a module longer. Keep configured file limits; if a cohesive module exceeds one, first look for an independent responsibility, otherwise document a narrow increase or exception.
 
 ## Migration workflow
 
-1. Inventory current public outputs: `packages`, `apps`, `lib`, `checks`, `devShells`, `overlays`, `nixosModules`, `darwinModules`, `homeManagerModules`, and flake-parts imports.
-2. Preserve the public output schema first. Move files without renaming output attributes unless the user requested a breaking change.
+1. Inventory current public outputs: `packages`, `apps`, `devShells`, `formatter`, `lib`, `checks`, `nixosModules`, `darwinModules`, `homeModules`, `nixosConfigurations`, `darwinConfigurations`, `templates`.
+2. Preserve the public output schema first. Blueprint derives output names from mapped paths, so choose file names whose derived output names match the existing attributes unless the user requested a breaking change.
 3. If current outputs are interleaved in one file, first separate each output family enough that it can move independently; avoid a big-bang rewrite.
-4. Create the `flake/` directories as output shims and move one output family at a time.
-5. Move implementation into feature-oriented `src/<name>/...`; avoid recreating the `flake/` tree under `src/` unless the repo is already platform-oriented.
-6. Keep shared implementation in `src/<name>/lib.nix` or `src/shared/<name>.nix`, not in `flake/lib`.
-7. Follow the repository's compatibility policy for renamed outputs. Keep aliases only when that policy requires them; otherwise update consumers and remove obsolete paths.
-8. Give outputs without an example directory, such as `formatter`, their own thin `flake/<output>/` shim or leave them in the nearest existing composition file; do not fold them into unrelated directories.
-9. Verify after each family move with `nix flake show`, `nix flake check`, and targeted builds/evals.
+4. Add the blueprint input and `prefix = "nix/"`, then move one output family at a time into its mapped path, adapting each file to the file contract above.
+5. Watch for renames blueprint forces: `homeManagerModules` becomes `homeModules`, and `apps` have no folder — convert app scripts into packages (`nix run` runs a package's main program) or keep explicit `apps` wiring beside blueprint's outputs.
+6. Follow the repository's compatibility policy for renamed outputs. Keep aliases only when that policy requires them; otherwise update consumers and remove obsolete paths.
+7. Verify after each family move with `nix flake show`, `nix flake check`, and targeted builds/evals.
 
 ## Common mistakes
 
-- Moving `flake.nix` into `flake/`; Nix expects `flake.nix` at the repo root.
-- Treating `flake/` as the new implementation home instead of a thin public layer.
-- Hiding implementation in `flake/lib` because it feels like a shared bucket.
-- Putting option declarations, `config`, assertions, or services in `flake/modules/*`.
-- Forgetting that `packages.${system}` and `apps.${system}` are system-specific while module outputs usually are not.
-- Putting `perSystem` build logic in `flake/modules/flake-parts` instead of importing implementations from `src/<name>/...`.
-- Creating both direct output wiring and flake-parts `perSystem` wiring for the same derivation without a deliberate compatibility reason.
-- Creating circular imports between `flake/lib`, `flake/modules`, and `src`.
+- Putting the folders at the repo root instead of under `nix/`; the convention here always sets `prefix = "nix/"`.
+- Keeping a thin re-export layer between the mapped files and the implementation; the mapped file is the implementation.
+- Hiding one output's helpers in `nix/lib/` when they belong beside the output's own file.
+- Using `nix/modules/home-manager/` or `nix/modules/hm/`; blueprint's folder name for Home Manager is `home`.
+- Forgetting that `packages.<system>` and `devShells.<system>` are system-specific while module outputs are not.
+- Defining the same output both through blueprint's folder mapping and through extra manual wiring.
+- Expecting `pkgs` to include overlays that were never passed; configure `nixpkgs.config` and `nixpkgs.overlays` in the blueprint invocation.
 - Changing public output names during a move-only refactor.
 - Skipping verification because the change looks like only path shuffling.
 
 ## Templated scripts
 
-When packaging shell scripts, keep reusable script logic in its own source file instead of embedding long scripts inline in Nix strings. Use Nix only to substitute package-specific defaults.
+When packaging shell scripts, keep reusable script logic in its own source file beside the package's `default.nix` instead of embedding long scripts inline in Nix strings. Use Nix only to substitute package-specific defaults.
 
 Prefer nixpkgs-style `@name@` placeholders with `replaceVars`:
 
 ```nix
-writeTextFile {
+pkgs.writeTextFile {
   name = "tool";
   destination = "/bin/tool";
   executable = true;
-  text = builtins.readFile (replaceVars ./tool.sh {
+  text = builtins.readFile (pkgs.replaceVars ./tool.sh {
     default_config = builtins.toJSON config;
   });
 }
@@ -169,10 +174,11 @@ This keeps scripts usable outside Nix, makes the Nix coupling easy to audit, avo
 
 ## Review checklist
 
-- `flake/` files are mostly imports, attr names, re-exports, and public calling-convention adapters.
-- `src/<name>/...` contains derivations, scripts, options, config, services, assertions, and helpers.
+- `flake.nix` contains only inputs and the blueprint (or equivalent minimal) invocation with `prefix = "nix/"`, plus at most explicit wiring for outputs the mapping cannot express.
+- Every output's file path matches the folder-to-output mapping table, and output names match the names the table derives from those paths.
+- Each mapped file follows the file contract and returns its implementation directly.
+- Helpers and scripts are colocated with their output's file; shared code lives in `nix/lib/`.
 - Existing public output names still work or have deliberate migration notes.
-- Module families are separated: `home-manager`, `darwin`, `nixos`, and `flake-parts` do not leak platform-specific logic into each other.
 - Verification commands cover both system-specific outputs and module evaluation paths.
 - Templated scripts live in standalone files, use `@name@` placeholders via `replaceVars`, and keep Nix-specific defaults grouped at the top with environment/argument overrides for reusable behavior.
 
@@ -182,4 +188,4 @@ None. This is a pure prompt and review skill. Use the repo's existing Nix comman
 
 ## Reference
 
-No separate reference files. Use the canonical prompt, thin layer rule, migration workflow, and review checklist above.
+Blueprint's folder structure and configuration docs: <https://numtide.github.io/blueprint/main/>. The mapping table above mirrors them; when they disagree, the upstream docs win.
