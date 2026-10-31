@@ -1,6 +1,14 @@
 {
   "private": true,
   "type": "module",
+  "skills": [
+    "vercel-labs/agent-browser@agent-browser",
+    "vercel-labs/skills@find-skills",
+    "vercel-labs/agent-skills@vercel-react-best-practices",
+    "apollographql/skills@rust-best-practices",
+    "nextlevelbuilder/ui-ux-pro-max-skill@ui-ux-pro-max",
+    "obra/superpowers@test-driven-development"
+  ],
   "scripts": {
     "eval:validate": "promptfoo validate config -c evals/skills/promptfooconfig.yaml -c evals/prompt-tests/promptfooconfig.yaml",
     "eval:ci": "promptfoo eval -c evals/skills/promptfooconfig.yaml --no-share --output evals/results/skills.json --output evals/results/skills.html",

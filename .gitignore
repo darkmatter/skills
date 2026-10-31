@@ -17,3 +17,4 @@ evals/prompt-tests/.cache/
 __pycache__/
 .omo
 .beads
+.agents
