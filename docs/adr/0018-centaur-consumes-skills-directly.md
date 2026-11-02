@@ -9,8 +9,8 @@
 Centaur sandboxes previously received a curated copy of the catalog under
 `.agents/skills/`, generated from `.agents/skills.manifest` by
 `scripts/sync-sandbox-skills.sh`, with a CI check that failed on drift. The
-copy existed because the overlay contract accepted one directory per source
-and the full catalog includes workstation-only skills.
+script used real copies because the sandbox skill merger preserved symlinks,
+which would dangle inside `~/workspace`.
 
 Centaur now reads `skills/` at the repository root directly. Keeping the
 manifest, generated tree, sync script, and drift check alongside the real
