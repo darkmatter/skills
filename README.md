@@ -27,8 +27,6 @@ records current policy ownership.
 ```
 darkmatter/skills/
 ├── AGENTS.md                ← GENERATED — nix build .#agents-md; do not edit
-├── .agents/
-│   └── skills/              ← GENERATED sandbox subset — never edit by hand
 ├── .claude-plugin/          ← Claude Code marketplace + plugin manifests
 ├── README.md                ← this file
 ├── flake.nix                ← Nix entry; exports the Home Manager module
@@ -43,7 +41,6 @@ darkmatter/skills/
 │   ├── install-opencode.sh  ← install the OpenCode preset into ~/.config/opencode
 │   ├── sync-omp.sh          ← sync docs/AGENTS.md + skills/ into OMP's config dir
 │   ├── sync-opencode.sh     ← sync docs/AGENTS.md + skills/ into ~/.config/opencode
-│   ├── sync-sandbox-skills.sh ← regenerate .agents/skills/ from the manifest
 │   └── validate-skill.sh    ← sanity-check skills/ catalog
 ├── evals/
 │   ├── skills/              ← Promptfoo behavior evals (LLM decision checks, CI)
@@ -221,30 +218,16 @@ The module enables every `darkmatter/*` skill and syncs them to Claude, Codex, a
 
 See the [skill catalog](docs/catalog.md) for existing capabilities and registration.
 
-If the skill should also reach Centaur sandboxes, add its name to
-`.agents/skills.manifest` and run `scripts/sync-sandbox-skills.sh` (see below).
-
-## Centaur sandbox subset (`.agents/`)
+## Centaur sandboxes
 
 This repo is wired into [Centaur](https://github.com/darkmatter/centaur)
 sandboxes as an overlay source (gitops `apps/centaur.yaml`,
-`overlays.sources`). The overlay contract points at one directory per source
-with no per-skill filtering, and the full catalog includes workstation-only
-skills (macOS setup, local secrets, Slack side effects) that don't belong in a
-sandbox — so sandboxes get a curated subset instead:
+`overlays.sources`). Centaur consumes `skills/` at the repo root directly, so
+sandboxes, Home Manager, and the Claude Code plugin all read the same catalog.
+Adding or editing a skill under `skills/` is the only step needed for sandboxes
+to see it; this repo keeps no manifest, generated copy, or secondary catalog to
+sync.
 
-- `.agents/skills.manifest` — the curation surface: one skill name per line.
-  It is required: a checkout without the manifest cannot generate or verify the
-  sandbox subset, and `scripts/sync-sandbox-skills.sh` fails instead of
-  guessing.
-- `.agents/skills/` — **generated** copies of the listed skills, at the
-  contract's default `skillsSubdir`. Never edit these by hand; edit
-  `skills/<name>/` or the manifest and run `scripts/sync-sandbox-skills.sh`.
-- CI runs `scripts/sync-sandbox-skills.sh --check` and fails on drift, so the
-  copies can't diverge from the catalog.
-
-Copies are real files, not symlinks: the sandbox skill merger preserves
-symlinks when copying into `~/workspace`, so symlinks would arrive dangling.
 Pushes to `main` reach sandboxes on the next repo-cache sync (~30s), no
 deploy needed.
 

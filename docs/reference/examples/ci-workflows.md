@@ -29,14 +29,10 @@ jobs:
         run: nix build .#checks.x86_64-linux.agents-md
       - name: Evaluate Home Manager module on the native platform
         run: nix eval --impure --raw --file scripts/check-home-manager.nix
-      - name: Check sandbox skill subset is in sync
-        run: scripts/sync-sandbox-skills.sh --check
 ```
 
-The sandbox drift check reads `.agents/skills.manifest` and compares the
-generated `.agents/skills/` tree against it. Both are required for the Centaur
-sandbox distribution: a checkout without the manifest fails the check instead
-of producing or validating an empty subset.
+Validation covers the skill structure and catalog plus generated instructions.
+There is no sandbox copy to drift-check: Centaur consumes `skills/` directly.
 
 ## Downstream project workflow
 

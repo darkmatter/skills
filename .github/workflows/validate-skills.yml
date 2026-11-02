@@ -18,5 +18,3 @@ jobs:
         run: nix build .#checks.x86_64-linux.agents-md
       - name: Evaluate Home Manager module on the native platform
         run: nix eval --impure --raw --file scripts/check-home-manager.nix
-      - name: Check sandbox skill subset is in sync
-        run: scripts/sync-sandbox-skills.sh --check
