@@ -5,20 +5,19 @@ This repo is **infrastructure for other agent projects**, not an agent project i
 What lives here:
 
 - `skills/` — team-wide shared skills, distributed via the Nix Home Manager module exported by `flake.nix`
-- `.agents/skills/` — GENERATED subset of `skills/` shipped to Centaur sandboxes, managed by flake-skills (the `mkSkillsFlake` export in `flake.nix`); never edited by hand
-- `references/` — per-language reference codebases (`rust/`, `go/`, `typescript/`) showing preferred conventions as exemplar code
+- `.agents/skills/` — GENERATED subset of `skills/` shipped to Centaur sandboxes, produced by `scripts/sync-sandbox-skills.sh` from `.agents/skills.manifest`; the flake-skills `mkSkillsFlake` export in `flake.nix` packages the full `skills/` catalog for Nix consumers, not this sandbox tree. Never edited by hand, and a missing manifest blocks the sync
 - `docs/agents/` — shared instruction topics, one file per topic named `<order>-<topic>.md` (the number sets bundle order), discovered from the directory at build time and exported as the flake output `agentsMd`; downstream repos concatenate a chosen subset with their own text to generate their `AGENTS.md`, and this repo does the same
 - `docs/AGENTS.md` — GENERATED bundle of every topic (`packages.agents-md-shared`); the Home Manager module installs it as every LLM client's global `AGENTS.md`. The root `AGENTS.md` is generated too: every topic plus `docs/AGENTS.repo.md`, via `packages.agents-md`
 - `scripts/install-base.sh` — manually install `docs/AGENTS.md` as `AGENTS.md` into a client config dir
 - `scripts/validate-skill.sh` — sanity-check the skills catalog
-- `docs/` — catalog overview and OpenCode layout notes
+- `docs/` — catalog, ADR history, OpenCode layout notes, and reference examples
 
 If you're an agent reading this because you were pointed at the darkmatter skills repo:
 
-- For "add a skill to the team catalog" → see `docs/catalog.md` and validate with `scripts/validate-skill.sh`
+- For "add a skill to the team catalog" → see `docs/catalog.md` and validate with `nix build .#checks.x86_64-linux.skills`, or `scripts/validate-skill.sh` when `lychee` is on `PATH`
 - For "bootstrap a new project" → use the `darkmatter-repo-setup` skill (`skills/darkmatter-repo-setup/SKILL.md`), which reads the separate `darkmatter/template` repo as the canonical template
-- For "what's already shared" → see `docs/catalog.md`
-- For "what are our preferred conventions in <language>" → see `references/<language>/`
+- For "what's already shared" → see `docs/catalog.md` for repo-owned skills and externally installed skills
+- For "what are our preferred conventions in a language" → load the owning language skill (for example `effect-typescript` or `alchemy`) and the material under its `reference/` directory
 
 If you're working inside a darkmatter **project repo** (not this one), look for that project's `AGENTS.md` and `.agent/` — they have the project-state and decisions you need.
 

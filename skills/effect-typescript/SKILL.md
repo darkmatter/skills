@@ -1,29 +1,35 @@
 ---
 name: effect-typescript
-description: Effect is a hard default unless the codebase explicitly states it. Use this skill when writing any Typescript code, typed Effect services, database adapters, HTTP handlers, effect-orpc routes, or Effect agent code.
+description: 'Implementation patterns for Effect 4 TypeScript: services and Layers, typed errors, Schema, Config, effect-orpc routes, adapters, and Effect tests. Use when writing or reviewing typed Effect code, database adapters, HTTP handlers, or Effect agent code. Stack and dependency versions are in darkmatter-ts-toolchain; the shared AGENTS.md "Readability and module design" section governs module layout.'
 ---
 
 # Effect TypeScript
 
 Use Effect for application I/O so failures, dependencies, and resource lifetimes are explicit. Adapt a Promise-based driver or SDK once at its boundary; keep internal operations in Effect. Run Effects at the caller or runtime boundary that requires a Promise or starts the program. Pure transformations remain plain TypeScript.
 
-Follow [codebase-design](../codebase-design/SKILL.md) for the shared readability rules and examples. Keep related queries, bindings, decoding, and private helpers with their adapter; extract only when it hides complexity or enables useful reuse. Operations own completion, errors, and cleanup, or explicitly hand that responsibility to their caller.
+Follow the "Readability and module design" section in the repository's
+AGENTS.md. Apply it at Effect boundaries: adapt an external API once and keep
+one execution model inside the module.
 
-
-This skill adapts Effect guidance to darkmatter conventions: use Bun commands instead of pnpm for darkmatter projects, and prefer Alchemy for deployable infrastructure. 
+This skill owns Effect implementation. Use the package manager and dependency
+choices from [darkmatter-ts-toolchain](../darkmatter-ts-toolchain/SKILL.md);
+upstream examples use pnpm, so translate their commands. Deploy procedure is
+in [alchemy](../alchemy/SKILL.md).
 
 ## Bootstrap
 
-If `effect-solutions` is not on in your `$PATH`, install it: `bun add -g effect-solutions@latest`. Prefer the repository's pinned Effect source or installed package for API details; use a version-matching checkout when neither is available.
+Consult the `effect-solutions` CLI for best-practice lookup and the
+repository's pinned Effect source (or `reference/effect`) for version-matched
+APIs. Install it from the repository's tooling docs, or run it without
+installing via `bun x effect-solutions <command>`.
 
-For new Darkmatter TypeScript repos, align dependencies with the
-`darkmatter/template` root catalog. Use Effect 4, `@effect/tsgo`,
-`@effect/vitest`, `@effect/platform-bun`, and `effect-solutions`; prefer the
-Effect agent APIs (`effect/unstable/ai`) before inventing agent loop contracts.
+Take dependency versions from the repository catalog and the defaults in
+[darkmatter-ts-toolchain](../darkmatter-ts-toolchain/SKILL.md); do not pin a
+second set here. Prefer the Effect agent APIs (`effect/unstable/ai`) before
+inventing an agent-loop contract.
 
 ## Guidelines
 
-- Refer to the best practices recommended by the `effect-solutions` CLI when writing effectful code.
 - If you need more specific information, there's a local checkout of the effect source in the reference directory.
 
 ## When to use
@@ -34,11 +40,12 @@ Effect agent APIs (`effect/unstable/ai`) before inventing agent loop contracts.
 - The task involves external APIs, databases, queues, workers, CLIs, schedules, retries, config, secrets, structured logging, runtime validation, resource cleanup, or concurrent workflows.
 - You need typed domain errors rather than unstructured thrown exceptions.
 - You need swappable live/test implementations through services and Layers.
-- You are deploying TypeScript infrastructure or workers and need Alchemy-aware conventions.
+- You are adding runtime services for deployable infrastructure; deploy
+  procedure is in [alchemy](../alchemy/SKILL.md).
 
 ## When NOT to use
 
-- A small one-off script can be obvious plain TypeScript: read one file, transform pure data, write one file, no retries, no injected dependencies, no long-lived resources. As requirements grow, adopt Effect where I/O needs it and extract coherent responsibilities. A line count alone does not justify scattering the implementation; retain configured limits with documented, targeted exceptions where needed.
+- A small one-off script can be obvious plain TypeScript: read one file, transform pure data, write one file, no retries, no injected dependencies, no long-lived resources.
 - Pure functions, simple data mappers, UI-local state, or tiny glue code do not need Effect wrappers.
 - A project has no Effect dependency and the feature does not benefit from typed errors, Layers, resource safety, retries, or observability.
 - The team only needs a tactical fix in plain async code. Do not introduce Effect as a drive-by refactor.
@@ -46,12 +53,33 @@ Effect agent APIs (`effect/unstable/ai`) before inventing agent loop contracts.
 
 ## Darkmatter Conventions
 
-- Use Bun commands: `bun install`, `bun test`, `bun run <script>`, `bunx <tool>`.
-- Translate upstream `pnpm` examples mechanically. Example: `pnpm test file.test.ts` becomes `bun test file.test.ts` when the project uses Bun test, or `bun run test file.test.ts` when test is a package script.
-- Prefer Bun runtime packages where relevant, such as `@effect/platform-bun` and `BunRuntime.runMain` for Bun entrypoints.
-- Prefer Alchemy for deployable infrastructure. Put infra in `alchemy.run.ts`, create resources with Alchemy, bind them to workers/services, and build up an `Alchemy.Stack`. Refer to the alchemy skill if writing alchemy code or adding new infra code.
-- Prefer Postgres for application data. Use Kysely + `pg` for query-heavy TypeScript adapters, or Effect SQL Postgres when persistence is exposed as Effect services and Layers. D1/sqlite are exceptions for narrow edge-local state, demos, or an explicit project decision.
-- Configuration comes from named config files (`config/<name>.json`) read through `Config`. There is no selector flag: an interactive run picks from a list (`Prompt.select`), a non-interactive run reads `APP_CONFIG` or fails listing the names. Env vars and flags are per-key overrides chained with `ConfigProvider.orElse`; secrets come from the `.sops.json` sibling via `effect-sops`. Do not design the setup of a program as a list of flags or env vars. See [ADR-0014](../../docs/adr/0014-named-config-files-over-flags-and-env.md).
+- Use the package manager commands from
+  [darkmatter-ts-toolchain](../darkmatter-ts-toolchain/SKILL.md). Translate
+  upstream `pnpm` examples mechanically: `pnpm test file.test.ts` becomes
+  `bun test file.test.ts`, or `bun run test file.test.ts` when `test` is a
+  package script.
+- Prefer Bun runtime packages where relevant, such as `@effect/platform-bun`
+  and `BunRuntime.runMain` for Bun entrypoints.
+- Persistence choices follow
+  [darkmatter-ts-toolchain](../darkmatter-ts-toolchain/SKILL.md). This skill
+  owns how the adapter is implemented in Effect.
+- Deployable infrastructure uses [alchemy](../alchemy/SKILL.md). Keep
+  `alchemy.run.ts` and runtime services separate.
+
+## Named configuration
+
+Configuration comes from named config files (`config/<name>.json`) in the repo,
+read through `effect/Config`. There is no selector flag: an interactive run
+picks from a list with `Prompt.select`; a non-interactive run reads `APP_CONFIG`
+or fails listing the available names. Environment variables and flags are
+per-key overrides chained with `ConfigProvider.orElse`; secrets come from the
+`.sops.json` sibling via `effect-sops`. Do not design a program's setup as a
+list of flags or environment variables.
+[ADR-0014](../../docs/adr/0014-named-config-files-over-flags-and-env.md)
+records the rationale.
+
+Implement the typed settings service and provider chain here. Worker bundling
+and deploy-time selector wiring are in [alchemy](../alchemy/SKILL.md).
 
 ## Typed RPC with effect-orpc
 
@@ -61,26 +89,8 @@ Use raw Effect `HttpRouter` or Hono when the route is simple HTTP, a webhook,
 static content, streaming/SSE, or a framework adapter where an RPC contract
 would add ceremony without a client-facing type contract.
 
-When adding `effect-orpc`, pin the Effect 4 build in the catalog:
-
-```json
-{
-  "workspaces": {
-    "catalog": {
-      "effect-orpc": "1.0.0-effect-v4.8",
-      "@orpc/server": "^1.13.0",
-      "@orpc/client": "^1.13.0",
-      "@orpc/contract": "^1.13.0",
-      "@orpc/shared": "^1.13.0"
-    }
-  }
-}
-```
-
-Do not install `effect-orpc@latest`; npm `latest` is the Effect 3 line
-(`0.5.0`). The `effect-v4` dist-tag currently resolves to
-`1.0.0-effect-v4.8`, whose peers require Effect 4
-(`effect >=4.0.0-beta.98`) and the oRPC packages above.
+Take the `effect-orpc` and `@orpc/*` versions and pinning rules from
+[darkmatter-ts-toolchain](../darkmatter-ts-toolchain/SKILL.md).
 
 Prefer these upstream shapes:
 

@@ -73,7 +73,7 @@ npx ts-prune
 5. **Preserve complete operations** — retain ordering, error propagation, and completion through the public interface
 6. **Keep configured line limits** — use documented narrow exceptions instead of scattering cohesive code to fit a cap
 
-Use `codebase-design` for good and bad examples; verify observable behavior after consolidation.
+Apply the **Readability and module design** rules from `AGENTS.md`; verify observable behavior after consolidation.
 
 ## Verification
 

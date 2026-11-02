@@ -21,8 +21,11 @@ repository's test requirements. Run the changed path and existing relevant check
   failures and lifecycle guarantees.
 - Verify through the public interface; do not add tests for every private helper.
   A public pure function can be tested directly. No coverage quota.
-- Apply [codebase-design](../../codebase-design/SKILL.md): retain file limits,
-  document targeted exceptions, and keep related implementation together.
+- When TDD was explicitly requested or required, record the observed failing
+  test and the passing result; otherwise no failing-test step is required.
+- Apply the **Readability and module design** rules from the shared agent
+  instructions: retain file limits, document targeted exceptions, and keep
+  related implementation together.
 
 ## Documentation
 

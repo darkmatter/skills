@@ -19,14 +19,15 @@ model:
     max_tokens: 8192
 
 skills:
+  # Repo-owned skills from docs/catalog.md; add project-specific language
+  # skills where the project uses that stack.
   required:
-    - darkmatter/codebase-design
-    - darkmatter/systematic-debugging
-    - darkmatter/verification-before-completion
-    - darkmatter/end-of-turn-review
+    - darkmatter/repository-organization
+    - darkmatter/definition-of-done
+    - darkmatter/when-to-write-tests
   optional:
-    - darkmatter/test-driven-development
     - darkmatter/codebase-cleanup
+    - darkmatter/darkmatter-ts-toolchain
 
 tools:
   allowed:

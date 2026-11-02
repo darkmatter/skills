@@ -51,7 +51,7 @@ Prefer small steps:
 5. Delete dead code
 6. Simplify after tests are green
 
-Extract only when a new boundary hides complexity or enables useful reuse; inline forwarding layers that add no value. Keep related implementation under its domain owner and preserve configured line limits with documented narrow exceptions. Use the `codebase-design` skill for examples when available.
+Apply the **Readability and module design** section of the shared `AGENTS.md`: extract only when a new boundary hides complexity or enables useful reuse, inline forwarding layers that add no value, and preserve configured line limits with documented narrow exceptions.
 
 Run targeted tests between risky steps.
 

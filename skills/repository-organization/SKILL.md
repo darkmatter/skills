@@ -7,12 +7,16 @@ description: Organize darkmatter repositories, READMEs, agent context, docs, scr
 
 Keep each repository easy for humans and agents to navigate by putting durable context, reusable guidance, automation, and decisions in the right layer. Prefer the smallest durable home that will be loaded at the time it matters.
 
-For source conventions, apply [codebase-design](../codebase-design/SKILL.md):
-keep each capability together, expose complete operations, and extract only
-when the split improves understanding. Use
-[domain-organization](../domain-organization/SKILL.md) for domain/role paths.
-Keep the governing rule short in always-on instructions and link the full
-examples; maintain one canonical definition instead of competing style lists.
+This skill owns **artifact placement, README and ADR process, and instruction
+ownership**. It does not own source module or language rules. The canonical
+source convention is the **Readability and module design** section in the
+shared agent instructions. Reference that section by name; do not restate or
+fork its rules here.
+
+Keep each governing rule short in the always-on layer that must load it, and
+maintain one canonical definition instead of competing style lists. When policy
+changes, update the owner and every active reference rather than creating a
+second copy.
 
 ## When to use
 
@@ -26,9 +30,79 @@ examples; maintain one canonical definition instead of competing style lists.
 ## When NOT to use
 
 - The task is specifically reorganizing Nix flakes, flake-parts outputs, NixOS modules, nix-darwin modules, or Home Manager modules. Use `nix-flake-organization`.
-- The user only asks to create or edit a team-wide skill. Use `dm-skill-creator`; layer this skill only for placement or ADR questions around that change.
+- The user only asks to create or edit a team-wide skill. Follow the repository's skill authoring and validation steps (`docs/catalog.md` and `scripts/validate-skill.sh` in this repo); layer this skill only for placement or ADR questions around that change.
 - The user is asking for one-off implementation notes that do not need to survive beyond the current task.
 - The repository already has a clear local convention that conflicts with this guidance and the user explicitly wants to preserve it. Follow the local convention and note the tradeoff.
+
+## Rule ownership
+
+Every durable rule has exactly one owner. Other artifacts reference that owner
+by name; they do not copy its policy.
+
+- An always-follow rule belongs in the smallest always-on layer that must load
+  it: a shared instruction topic (`docs/agents/<order>-<topic>.md`) or the
+  target project's `AGENTS.md`.
+- Detailed guidance belongs in a skill, `reference/` document, workflow, or
+  ADR. It may describe how to apply the rule but must not redefine it.
+- A rule change updates the owner and every active reference in one change.
+  Cross-cutting ownership changes need an ADR supersession rather than an
+  in-place rewrite of accepted history.
+- When two artifacts disagree, the always-on owner wins. Remove the duplicate
+  rather than adding a tie-breaker or a shim.
+- Prefer naming the owning skill, command, or shared-instruction section over
+  a fragile relative path for rules that are already loaded in context.
+
+Adjacent owners and their boundaries:
+
+| Concern | Owner | This skill's boundary |
+| --- | --- | --- |
+| Module, readability, and domain/role source layout | **Readability and module design** shared instruction section | Decide where artifacts live; do not define source architecture. |
+| Test necessity and coverage decisions | `when-to-write-tests` | Do not add a test requirement or coverage quota to placement work. |
+| Requested or project-required red/green TDD procedure | The explicitly invoked TDD command or project workflow | TDD is opt-in; placement work does not add a TDD requirement. |
+| TypeScript stack, dependencies, persistence, test placement, and check contract | `darkmatter-ts-toolchain` | Do not restate package manager, test path, or CI policy. |
+| TypeScript implementation patterns | `effect-typescript` | Do not add a second Effect or module-pattern policy. |
+| Dev/build/test entrypoints and ops-script language | `choose-dev-entrypoints` | Decide whether a script is durable repo tooling, not how entrypoints layer. |
+| Infrastructure and deploy workflow | `alchemy` | Decide where infrastructure code lives, not provider or deploy policy. |
+| Secret access procedure | `sops-secret-access` | Decide where encrypted configuration lives, not how to decrypt or use it. |
+| Nix flake and module layout | `nix-flake-organization` | Decide repo-level docs and ownership, not flake folder mapping. |
+| Completion condition and evidence | `definition-of-done` | Orchestrates the owners listed here instead of redefining their policies. |
+| UI tokens and visual language | `darkmatter-design-system` | Only applies when the project has no established design system. |
+| UI component and package responsibility | `ui-component-architecture` | Does not define the shared UI package contents or registry sourcing. |
+| Registry component sourcing | `shadcn-registry-first`; explicitly invoked variations use `run-ui-registry-variations` | Does not define visual tokens or component package boundaries. |
+
+### Explicit exceptions
+
+A project MAY narrow or override an inherited rule only through a written
+exception in its own policy file. This section is the sole exception format.
+
+Each exception records:
+
+- **ID** — stable identifier, for example `EX-001`.
+- **Rule relaxed and owner** — the rule being narrowed and its named owner
+  (shared instruction section, skill, command, or project policy).
+- **Scope** — exact paths, packages, operations, or change classes covered.
+- **Rationale** — why the inherited rule does not fit this project.
+- **Approver** — the person or role accountable for accepting the risk.
+- **Review or expiry date** — when the exception must be reconsidered.
+- **Replacement control** — the check or manual review that covers the risk
+  while the rule is relaxed, or `none` with a reason.
+
+Template:
+
+```md
+### EX-001 — <short title>
+
+- **Rule relaxed and owner:** <rule> (owner: <owner>)
+- **Scope:** <paths/packages/operations>
+- **Rationale:** <why the inherited rule does not fit>
+- **Approver:** <person or role>
+- **Review or expiry:** <YYYY-MM-DD>
+- **Replacement control:** <check or review, or `none` with reason>
+```
+
+Do not leave an undocumented exception in code, a skill, or a prompt. When an
+exception becomes permanent policy, move it to the owner and remove the
+exception entry.
 
 ## Reference repo
 
@@ -61,8 +135,9 @@ When adding or updating ADRs:
 2. Use the next zero-padded number and a kebab-case title.
 3. Keep the decision to one topic with context, decision, consequences, and alternatives considered.
 4. Use `proposed` while under review; mark `accepted` only when the decision is real.
-5. Treat accepted ADRs as append-mostly history. If the decision changes, create a new ADR and mark the old one `superseded by ADR-XXXX`.
-6. Link the ADR from the README, catalog, code comment, PR, or docs section where future readers will hit the governed behavior.
+5. Treat accepted ADRs as append-mostly history. If the decision changes, create a new ADR and mark the old one `superseded by ADR-XXXX`; for a partial change, say which decision is superseded and which technical decisions remain in force.
+6. Preserve the old ADR's decision text and links. Add the status-line notice and a short context pointer to the new ADR instead of rewriting history so it appears the former decision was never made.
+7. Link the ADR from the README, catalog, code comment, PR, or docs section where future readers will hit the governed behavior.
 
 ## Organization workflow
 
@@ -81,7 +156,7 @@ When adding or updating ADRs:
 - Storing project facts in global presets where they leak into unrelated repos.
 - Writing ADRs for unresolved debates instead of marking them `proposed` or keeping them in a planning doc.
 - Editing accepted ADR conclusions in place instead of superseding them.
-- Moving files without updating provider shims, catalog entries, README tables, or internal links.
+- Moving files without updating public entrypoints, catalog entries, README tables, or internal links.
 - Adding scripts under a skill when they are really repo maintenance helpers, or vice versa.
 
 ## Review checklist
@@ -93,8 +168,10 @@ When adding or updating ADRs:
 - Team-wide skills have `SKILL.md` frontmatter, a catalog row, and validation coverage.
 - ADR-worthy decisions are recorded or intentionally deferred with a clear reason.
 - Accepted ADRs are not silently rewritten; supersession chains are explicit.
-- Links, shims, catalog rows, and examples still point at the new paths.
-- Source conventions agree with codebase-design; size thresholds prompt a cohesive split or a documented narrow exception, not mechanical fragmentation.
+- Links, public entrypoints, catalog rows, and examples still point at the new paths.
+- Every durable rule has one owner; other artifacts reference it by name instead of copying it.
+- Explicit exceptions record the relaxed rule and its owner, scope, rationale, approver, review or expiry date, and replacement control.
+- Source conventions follow the **Readability and module design** section; size thresholds prompt a cohesive split or a documented narrow exception, not mechanical fragmentation.
 
 ## Tools
 

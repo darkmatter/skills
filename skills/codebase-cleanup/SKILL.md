@@ -11,8 +11,8 @@ description: >-
 
 A cleanup makes the requested scope smaller or truer; it is not a feature with
 extra polish. Keep the diff limited to the ask, preserve real contracts, and
-follow [codebase-design](../codebase-design/SKILL.md) for shared module
-conventions. File count and net deleted lines are evidence, not goals.
+apply the **Readability and module design** rules from the shared agent
+instructions. File count and net deleted lines are evidence, not goals.
 
 ## Choose the scope
 

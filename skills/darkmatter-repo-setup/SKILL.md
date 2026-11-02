@@ -4,10 +4,12 @@ description: >-
   Use when setting up a new repo, onboarding an existing repo to darkmatter
   standards, running a compliance check, or when the user says "set up this
   repo", "bring repo up to standards", "apply template", or "audit repo".
-  Checks and installs the org TypeScript toolchain (Bun catalog, Effect 4,
-  effect-agent, effect-orpc, Postgres-first data, tsgo, oxlint/oxfmt, Vitest,
-  vite-plus, React 19, shadcn), Nix flake-parts devshell, ops/ surface, CI
-  pipeline, and AGENTS.md conventions.
+  Orchestrates the owner skills: darkmatter-ts-toolchain for the stack,
+  persistence, and checks, effect-typescript for Effect code, alchemy for
+  deploy procedure, choose-dev-entrypoints for entrypoint layering,
+  repository-organization for durable docs and ADRs, and when-to-write-tests
+  for coverage. Audits the Nix flake-parts devshell, ops/ surface, CI
+  pipeline, and AGENTS.md generation.
 license: Proprietary. See LICENSE at repo root.
 compatibility: >-
   Requires Bun 1.3.x, Nix with flake-parts, network access to clone
@@ -27,17 +29,16 @@ fill in what's missing, update what's outdated, and validate the result.
 
 ## Code organization
 
-Apply [codebase-design](../codebase-design/SKILL.md) for the shared readability
-rules and examples, and [domain-organization](../domain-organization/SKILL.md)
-for names and role directories. Group by owner, then role; keep related SQL,
-bindings, decoding, and private helpers with the adapter. Expose complete
-operations through explicit package entries. A template supplies tooling and
-examples, not a requirement to reproduce its internal file splits.
+Follow the "Readability and module design" section in the repository's
+AGENTS.md when scaffolding or auditing source. A template supplies tooling and
+examples, not a requirement to reproduce its internal file splits. Do not
+create a file, service, or test for every helper.
 
-Preserve configured line limits. Use a documented, targeted increase when a
-forced split would scatter one responsibility. Do not create a file, service,
-or test for every helper. Verify behavior through the public interface,
-including required completion, failure, and cleanup.
+Source layout for Effect code is described in
+[effect-typescript](../effect-typescript/SKILL.md) and
+[effect-package-map.md](../effect-typescript/effect-package-map.md). Durable
+file and doc placement is in
+[repository-organization](../repository-organization/SKILL.md).
 
 ## Canonical template
 
@@ -55,9 +56,9 @@ standard; the specific app is the example.
 The template root `package.json` catalog is the preferred-libs home. Align new
 dependency choices with that catalog, then add only the app-specific libraries
 the target repo needs. When the current template demonstrates a narrower
-resource such as D1, keep the current Darkmatter preference in mind: new
-application data starts on Postgres unless the repo records a specific
-edge-local or demo reason.
+resource such as D1, treat it as an example, not the default: persistence
+policy follows
+[darkmatter-ts-toolchain](../darkmatter-ts-toolchain/SKILL.md).
 
 Clean up when done:
 
@@ -65,11 +66,13 @@ Clean up when done:
 rm -rf /tmp/darkmatter-template
 ```
 
-## Effect best practices
+## Effect setup
 
-All Effect-related setup and code must follow the
-[Effect Solutions quick-start](https://www.effect.solutions/quick-start) —
-the canonical field manual for idiomatic Effect.
+Effect implementation follows [effect-typescript](../effect-typescript/SKILL.md),
+including its
+[named-config procedure](../effect-typescript/SKILL.md#named-configuration).
+The [Effect Solutions quick-start](https://www.effect.solutions/quick-start)
+remains the version-matched field manual used for auditing.
 
 Install the `effect-solutions` CLI for agent-accessible best-practice
 lookup:
@@ -95,8 +98,9 @@ effect-solutions show testing              # @effect/vitest
 
 See [references/effect-solutions.md](references/effect-solutions.md) for
 the full topic reference. Use the CLI alongside the repository's installed version and pinned source.
-Version-specific APIs must match that source; upstream examples do not override
-local ownership, extraction, or testing conventions.
+Version-specific APIs must match that source. Upstream examples do not
+override the toolchain, the shared module rules, or the coverage policy in
+[when-to-write-tests](../when-to-write-tests/SKILL.md).
 
 ## Workflow
 
@@ -157,10 +161,12 @@ later sections may depend on earlier ones:
 10. **CI** — .github/workflows/ci.yaml
 11. **.gitignore**
 12. **Docs** — architecture.md, getting-started.md, README.md
-13. **Effect source code** — services, data models, errors, config,
-    effect-orpc routes when the repo needs typed RPC, and Postgres adapters
-    for application data unless the repo documents a different database choice
-    (consult `effect-solutions show` for each area)
+13. **Effect application code** — follow
+    [effect-typescript](../effect-typescript/SKILL.md) for services, data
+    models, errors, config, adapters, and effect-orpc routes when the repo
+    needs typed RPC. Persistence and dependency choices follow
+    [darkmatter-ts-toolchain](../darkmatter-ts-toolchain/SKILL.md). Consult
+    `effect-solutions show <topic>` for version-matched APIs.
 14. **AGENTS.md** — last, because it documents everything else. Keep
     repo-specific instructions in `docs/AGENTS.repo.md`; never edit the
     generated `AGENTS.md` directly. Add `darkmatter-skills`
@@ -213,21 +219,21 @@ Adaptation rules:
 
 ### 4. Validate
 
-After all changes, run the full validation suite from the repo root:
+After all changes, run the validation suite from the repo root. TypeScript
+checks (`typecheck`, `test`, `lint`, `fmt:check`) are defined by
+[darkmatter-ts-toolchain](../darkmatter-ts-toolchain/SKILL.md); setup adds
+dependency materialization and the Nix/compose gates:
 
 ```sh
 bun install
 bun run prepare
-bun run check
-bun run test
-bun run lint
-bun run fmt:check
 nix flake check
 docker compose -f ops/compose/local.yaml config
 ```
 
-If any step fails, attempt to fix it. If a step is not applicable (e.g.,
-no Docker), note it and skip. Report the final status of each step.
+Then run the toolchain checks. If any step fails, attempt to fix it. If a step
+is not applicable (e.g., no Docker), note it and skip. Report the final status
+of each step.
 
 ### 5. Report
 

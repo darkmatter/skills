@@ -19,12 +19,13 @@ Record ✅ present, ⚠️ partial, or ❌ missing.
 
 - [ ] Documents the repo layout and purpose of each top-level path
 - [ ] Defines the `ops/` boundary — what goes in ops vs source-adjacent config
-- [ ] States the toolchain contract (Bun catalog, Effect 4, effect-agent,
-  effect-orpc, Postgres-first data, tsgo, oxlint/oxfmt, Vitest, vite-plus,
-  React 19, shadcn)
+- [ ] States the toolchain contract by reference to
+  [darkmatter-ts-toolchain](../../darkmatter-ts-toolchain/SKILL.md) rather
+  than restating versions
 - [ ] States package conventions (catalog, workspace, # imports)
-- [ ] Applies [codebase-design](../../codebase-design/SKILL.md): domain ownership,
-  explicit public entries, complete operations, and cohesive implementations
+- [ ] Follows the shared "Readability and module design" section: domain
+  ownership, explicit public entries, complete operations, cohesive
+  implementations
 - [ ] Documents the Nix devshell and `x` / `justfile` commands
 - [ ] Documents testing, secrets, CI, and validation steps
 - [ ] Forbids adding any additional top-level directories (or ask permission)
@@ -33,9 +34,10 @@ Record ✅ present, ⚠️ partial, or ❌ missing.
 
 - [ ] Bun workspace with `apps/*` and `packages/*`
 - [ ] Shared dependency versions in a catalog (not pinned per-package)
-- [ ] Catalog aligns with `darkmatter/template` for Effect 4, `@effect/tsgo`,
-  `@effect/vitest`, Effect agent APIs, Alchemy, oxlint/oxfmt, vite-plus,
-  React 19 + shadcn for UI, and effect-orpc when typed RPC is needed
+- [ ] Catalog aligns with
+  [darkmatter-ts-toolchain](../../darkmatter-ts-toolchain/SKILL.md) stack
+  defaults for Effect 4, tsgo, Vitest, Alchemy, oxlint/oxfmt, and effect-orpc
+  when typed RPC is needed
 - [ ] `prepare` patches tsgo and oxlint via `effect-tsgo patch`
 - [ ] `generate:bun-nix` script for regenerating the Nix lock
 - [ ] Engine and package-manager constraints matching the org standard
@@ -50,8 +52,7 @@ Record ✅ present, ⚠️ partial, or ❌ missing.
 ## 4. Linting & formatting
 
 - [ ] oxlint config extends the tsgo preset
-- [ ] File-size limit enforced; splits follow responsibilities, with documented
-  file-specific increases where splitting would scatter a coherent implementation
+- [ ] File-size limit enforced by the configured lint/format tooling
 - [ ] SOPS files ignored by linter and formatter
 - [ ] oxfmt configured as the sole formatter (Prettier disabled in Zed)
 
@@ -59,21 +60,26 @@ Record ✅ present, ⚠️ partial, or ❌ missing.
 
 - [ ] Vitest configured at the root with node environment
 - [ ] Vitest excludes `.direnv/**`
-- [ ] Tests exercise public behavior, including required failure/completion/cleanup
-- [ ] Effect tests use the installed version's test helpers and Layers; public
-  pure calculations can have direct tests without Effect wrappers
-- [ ] Private helpers are not exported or extracted solely to test them
+- [ ] Test placement follows
+  [darkmatter-ts-toolchain](../../darkmatter-ts-toolchain/SKILL.md):
+  `<file>.test.ts` beside the source; root `tests/` only for end-to-end
+- [ ] Coverage decisions follow
+  [when-to-write-tests](../../when-to-write-tests/SKILL.md); tests exercise
+  public behavior including required failure, completion, and cleanup
+- [ ] Effect tests use the installed version's test helpers and Layers
+  ([effect-typescript](../../effect-typescript/SKILL.md)); public pure
+  calculations can have direct tests without Effect wrappers
 - [ ] Smoke tests spawn the real server end-to-end
 
 ## 5a. Data and RPC
 
-- [ ] Application data uses Postgres by default; D1/sqlite are documented
-  exceptions for edge-local state, demos, or an explicit project decision
-- [ ] Query-heavy TypeScript uses Kysely + `pg`, or the repo uses Effect SQL
-  Postgres when persistence is organized as Effect services and Layers
-- [ ] Typed RPC routes use `effect-orpc@1.0.0-effect-v4.8` with
-  `@orpc/server`, `@orpc/client`, `@orpc/contract`, and `@orpc/shared` at
-  `>=1.13`
+- [ ] Persistence follows
+  [darkmatter-ts-toolchain](../../darkmatter-ts-toolchain/SKILL.md): Postgres
+  by default; D1/sqlite only as a documented edge-local, demo, or explicit
+  project exception
+- [ ] Typed RPC route style and error shapes follow
+  [effect-typescript](../../effect-typescript/SKILL.md); versions come from
+  the toolchain catalog
 - [ ] Simple HTTP, webhook, streaming, or static routes stay on Effect
   `HttpRouter` or the framework adapter when RPC contracts would add ceremony
 
@@ -100,9 +106,8 @@ Record ✅ present, ⚠️ partial, or ❌ missing.
 - [ ] Guards all targets with devshell entry (`nixsh`)
 - [ ] Wraps the core commands: check, test, dev, fmt
 - [ ] Has container config validation and container-up targets
-- [ ] Do NOT overload this. For additional modes like `lint --fix`, use param
-- [ ] Params should be enumerated so that they are self-documenting
-- [ ] Complex tasks should get their own executable in `ops/bin`
+- [ ] Recipes stay thin aliases and repo chores; entrypoint layering follows
+  [choose-dev-entrypoints](../../choose-dev-entrypoints/SKILL.md)
 
 
 ## 9. ops/ directory
@@ -123,7 +128,8 @@ Record ✅ present, ⚠️ partial, or ❌ missing.
 
 - [ ] Triggers on PR and push to main
 - [ ] Installs with `--frozen-lockfile --ignore-scripts`
-- [ ] Runs prepare, check, test, lint, fmt:check
+- [ ] Runs prepare and the checks defined by
+  [darkmatter-ts-toolchain](../../darkmatter-ts-toolchain/SKILL.md)
 - [ ] Runs `nix flake check`
 - [ ] Validates the compose stack
 - [ ] Bun version pinned to match the repo's packageManager
@@ -149,15 +155,14 @@ Record ✅ present, ⚠️ partial, or ❌ missing.
 Cross-reference each item against `effect-solutions show <topic>` from the
 [Effect Solutions quick-start](https://www.effect.solutions/quick-start).
 See [effect-solutions.md](effect-solutions.md) for the topic list.
+Implementation follows [effect-typescript](../../effect-typescript/SKILL.md).
 
 - [ ] `effect-solutions` CLI available for best-practice lookup
 - [ ] Effect Language Service configured per `show project-setup`
 - [ ] TypeScript config follows `show tsconfig`
-- [ ] Source code follows `show basics` (Effect.gen, Effect.fn conventions)
-- [ ] Services use Context.Service + Layer per `show services-and-layers`
+- [ ] Source code follows `effect-typescript` and the consulted topic
+  (Effect.gen/Effect.fn, Context.Service + Layer, Schema.TaggedError, Config)
 - [ ] Schemas and inferred types live together under their domain owner
 - [ ] Adapters decode external data and adapt Promise drivers once; internal
   Effect code does not round-trip through `runPromise`
-- [ ] Errors use Schema.TaggedError per `show error-handling`
-- [ ] Config uses Effect.Config per `show config`
 - [ ] Tests use @effect/vitest with it.effect per `show testing`

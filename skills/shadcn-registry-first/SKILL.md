@@ -58,8 +58,9 @@ check whether the registry already carries it.
 
 Use the shadcn MCP `get_project_registries` tool (or read `components.json`). You
 want to see `@shadcnblocks` and/or `@shadcn` listed. If `@shadcnblocks` is
-present but the API key isn't resolving, see "Registry access" below — don't
-fall back to hand-rolling just because the key is missing; fix the key.
+present but the API key isn't resolving, resolve it with `sops-secret-access`
+(see "Registry access" below) — don't fall back to hand-rolling just because the
+key is missing.
 
 ### 2. Search and shortlist at least three candidates
 
@@ -95,10 +96,13 @@ For every shortlisted candidate, inspect what you're committing to:
 - `view_items_in_registries` — see the item's files, dependencies, and registry
   dependencies (other components it pulls in).
 
-Confirm each fits the project's design system (theme tokens, fonts, radius). Many
-blocks assume the default shadcn theme; if the project overrides tokens (e.g. a
-terminal theme with `--radius: 0`), the block will adapt to those tokens, but
-check for hardcoded colors or rounded corners you'll need to reconcile.
+Confirm each fits the project's design system (theme tokens, fonts, radius). An
+existing project design system wins: adapt the block to it rather than restyling
+the project to the block. Many blocks assume the default shadcn theme; if the
+project overrides tokens (e.g. a terminal theme with `--radius: 0`), the block
+will adapt to those tokens, but check for hardcoded colors or rounded corners
+you'll need to reconcile. When the project has no design system of its own, use
+`darkmatter-design-system` as the fallback visual language.
 
 ### 4. Install all the variations
 
@@ -151,24 +155,23 @@ the project's own checks (`lsp_diagnostics`, `check-types`, build).
 ## Registry access
 
 The `@shadcnblocks` registry requires an API key in the `Authorization` header
-of `components.json`. In darkmatter repos this is handled per-project:
-
-- `components.json` is gitignored and carries the resolved key (or the shadcn MCP
-  reads `${SHADCNBLOCKS_API_KEY}` from the environment).
-- `components.json.template` is committed with the `${SHADCNBLOCKS_API_KEY}`
-  placeholder.
-- The key lives in the secret store (himitsu: `himitsu read shadcnblocks-api-key`,
-  or a SOPS-encrypted secret). A small `scripts/setup-components-json.ts` renders
-  the template with the key.
+of `components.json` (or a `${SHADCNBLOCKS_API_KEY}` environment variable that
+the shadcn MCP reads). Keep credential handling in `sops-secret-access`: it owns
+the encrypted/secret-store lookup, the rendered or override config branch, and
+the no-print/no-commit rules. This skill does not define a second secret recipe.
 
 ### Before running any `bunx shadcn` command
 
-The rendered `components.json` must exist **and be fresh** — a stale one from a
-previous session may carry an expired key. Always do these two steps first:
+The effective registry config must exist **and be fresh** — a stale rendered
+file from a previous session may carry an expired key. Always do these steps
+first:
 
-1. **Build components.json**: run `bun scripts/setup-components-json.ts` from the repo
-   root. This reads the current key from himitsu and writes the gitignored
-   `components.json`. Skip this and you'll get 401 auth failures.
+1. **Resolve the key and make the registry config available** through the
+   repo's documented setup path (for example
+   `scripts/setup-components-json.ts`). Render the gitignored config when the
+   repo uses one; for a committed public `components.json`, use the tool's
+   override instead of overwriting it. Follow `sops-secret-access` for the
+   credential; never print or commit it. Skipping this yields 401 auth failures.
 2. **`cd` into the app directory** (e.g. `apps/web/`) before running
    `bunx shadcn@latest add ...`. The CLI resolves registries from `components.json`
    in the current working directory. Running from the monorepo root will fail.
@@ -185,19 +188,26 @@ cd apps/web
 bunx shadcn@latest add @shadcnblocks/hero253 --overwrite
 ```
 
-If a registry call fails with a missing-env-var or auth error, the fix is to
-populate the key from the secret store — not to abandon the registry and
-hand-roll the component. See the `sops-secret-access` skill for the encrypted-
-config side of this and the expected secret-handling pattern.
+If a registry call fails with a missing-env-var or auth error, fix the
+credential path through `sops-secret-access` — do not abandon the registry and
+hand-roll the component.
 
 Graduate stable pieces from the screen into the repo's shared UI package (name
 is per-repo; see [ADR-0013](../../docs/adr/0013-shared-ui-is-its-own-package.md)).
 
 ## Relationship to other skills
 
-- `sops-secret-access` — how to _access_ the encrypted registry config and keys.
-  This skill is about _preferring registry components_; that one is about the
-  plumbing to reach a private registry.
+- `sops-secret-access` — the single procedure for resolving encrypted config and
+  registry credentials. This skill is about _preferring registry components_.
+- `run-ui-registry-variations` — a manually invoked, source-restricted workflow
+  that composes this sourcing and comparison procedure. This skill's default is
+  at least three candidates; the manual workflow specializes to exactly three
+  approved sources and three built variations. The counts are compatible: one
+  shortlists candidates, the other schedules the review artifacts.
+- `darkmatter-design-system` — fallback visual language when the project has no
+  design system of its own. An existing project system wins.
+- `ui-component-architecture` — internal reuse and extraction after a block is
+  installed; graduate stable pieces into the shared UI package.
 - `ui-ux-pro-max` — design intelligence (styles, palettes, layout, a11y). Use it
   to decide _what_ good UI looks like; use this skill to _source_ the components
   that realize it. They compose: pick the aesthetic with `ui-ux-pro-max`, then

@@ -4,7 +4,7 @@ These examples expand the proposed structure for enforcing engineering practices
 
 ## Policy examples
 
-- `engineering-practices.md` — org-wide non-negotiables: evidence before claims, TDD, review, secrets, side effects.
+- `engineering-practices.md` — org-wide non-negotiables: evidence before claims, opt-in TDD, review, secrets, side effects.
 - `agent-practices.md` — cross-agent behavior rules: session start, skill loading, planning, delegation, communication.
 - `review-gates.md` — when independent review is required and how to handle BLOCK/LGTM verdicts.
 - `project-agent-policy.md` — example `.agent/policy/` layout plus `project-exceptions.md` format.

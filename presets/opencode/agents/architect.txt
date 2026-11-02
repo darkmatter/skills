@@ -46,12 +46,7 @@ For each design decision, document:
 
 ### 1. Modularity & Separation of Concerns
 
-- Group by domain, then role where useful
-- Keep operations and the private helpers, SQL, and mappings they need together
-- Expose small interfaces with complete operations that own ordering, failure, and completion
-- Extract only to hide complexity or enable useful reuse; consult `codebase-design` for examples
-- Define contracts once and convert external execution models at the module edge
-- Keep configured line limits with documented narrow exceptions for cohesive implementations
+- Follow the **Readability and module design** section of the shared `AGENTS.md` for ownership, cohesive implementation, complete operations, extraction, contract boundaries, and line limits. Apply those rules to architecture choices rather than restating them here.
 
 ### 2. Scalability
 

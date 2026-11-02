@@ -48,7 +48,7 @@ For each item to remove:
 - Remove forwarding layers that add no behavior or useful boundary
 - Preserve complete operations, one contract source, edge conversions, and owned completion
 - Keep configured line limits with documented narrow exceptions for cohesive implementations
-- Verify observable behavior through the public interface; use `codebase-design` for examples
+- Verify observable behavior through the public interface; apply the **Readability and module design** rules from the shared instructions
 
 ## Safety Checklist
 

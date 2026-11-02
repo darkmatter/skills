@@ -8,7 +8,17 @@ metadata:
 
 # Darkmatter Design System
 
-This is darkmatter's design system: a dark-first, terminal/console aesthetic built on **Tailwind CSS v4**, **React 19**, and **Radix UI**. Use it for look, tokens, and component APIs when the app has no other established system. Reusable UI still lives in the repo's own UI package ([ADR-0013](../../docs/adr/0013-shared-ui-is-its-own-package.md)); do not require `@native/ui` or any other alias.
+This is darkmatter's design system: a dark-first, terminal/console aesthetic built on **Tailwind CSS v4**, **React 19**, and **Radix UI**. Reusable UI still lives in the repo's own UI package ([ADR-0013](../../docs/adr/0013-shared-ui-is-its-own-package.md)); do not require `@native/ui` or any other alias.
+
+## Precedence
+
+An existing project design system wins. If the app already defines tokens, typography, components, or a brand guide, use those and leave this system's tokens out — do not blend two token sets or restyle the project to match the starter.
+
+Use this skill as the visual baseline only when the app has no established design system or guidelines. When that is the case:
+
+- Follow this skill for tokens, layout, and component APIs.
+- Source external blocks through `shadcn-registry-first`, then adapt them to this system's tokens; see `ui-component-architecture` for the shared-UI package boundary.
+- Use `sops-secret-access` for private registry credentials.
 
 ## Setup — build on the starter
 
@@ -44,6 +54,7 @@ To build a screen: add routes/components under the app, import from the UI packa
 
 ## Hard rules
 
+- An existing project design system takes precedence. Do not introduce this system's tokens or components into a project that already has its own.
 - Dark-first. The system defines a single dark theme; there is no light mode.
 - Use design tokens and mapped utilities (`bg-n-bg-2`, `text-n-mute`, `border-n-hl`, `text-primary`, `bg-card`), never raw hex/OKLCH or unmapped Tailwind colors.
 - Build responsively with Tailwind breakpoints and the system's layout primitives (`PageLayout`, `Grid`). Never hard-code fixed pixel widths for page structure.
@@ -54,7 +65,7 @@ To build a screen: add routes/components under the app, import from the UI packa
 
 Before finishing any Darkmatter UI:
 
-- All reusable UI comes from the repo's UI package; no second component library mixed in.
+- All reusable UI comes from the repo's UI package. Installed registry blocks are graduated there and adapted to the tokens; no second component library is mixed in.
 - Colors resolve to `--n-*` tokens or mapped utilities; no raw values.
 - Layout uses `PageLayout`/`Grid` and is responsive across breakpoints.
 - Numeric data uses `tabular-nums`.

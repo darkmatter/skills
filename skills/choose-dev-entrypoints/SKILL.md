@@ -7,6 +7,13 @@ description: Choose the right dev-environment entrypoint and responsibility boun
 
 Use this skill to assign development-environment responsibilities to the layer that naturally owns them. The goal is not to pick one universal command runner. The goal is to keep each layer small, local, cacheable where possible, and unsurprising for humans entering the repo.
 
+This skill owns entrypoint layering and the language of repo ops scripts.
+Tool versions and the check contract are in
+[darkmatter-ts-toolchain](../darkmatter-ts-toolchain/SKILL.md); flake output
+layout is in [nix-flake-organization](../nix-flake-organization/SKILL.md);
+durable artifact placement is in
+[repository-organization](../repository-organization/SKILL.md).
+
 ## Core model
 
 Prefer declarations by the consumer of a capability over eager setup by an earlier layer.
@@ -155,7 +162,7 @@ enter shell -> maybe codegen for everyone
 
 ### Imperative glue
 
-Use `scripts/dev.ts` when startup needs conditionals, traps, process cleanup, readiness checks, or multi-service orchestration that is hard to express in JSON. Call it from `bun run`, `turbo`, or `just` so the public entrypoint remains discoverable. In a TypeScript-only repo do not add `scripts/dev.sh` ([ADR-0012](../../docs/adr/0012-ops-scripts-in-typescript.md)).
+Use `scripts/dev.ts` when startup needs conditionals, traps, process cleanup, readiness checks, or multi-service orchestration that is hard to express in JSON. Call it from `bun run`, `turbo`, or `just` so the public entrypoint remains discoverable. Repo chores with conditionals, modes, or multi-step operational work belong in an executable under `ops/bin/` when the repo has that boundary (otherwise `scripts/`); the `just` recipe or package script stays a thin delegate with enumerated, self-documenting parameters. In a TypeScript-only repo do not add `scripts/dev.sh` ([ADR-0012](../../docs/adr/0012-ops-scripts-in-typescript.md)).
 
 ```json
 {
@@ -172,6 +179,7 @@ Use `scripts/dev.ts` when startup needs conditionals, traps, process cleanup, re
 - Cacheable tasks declare accurate inputs and outputs.
 - `just` recipes are thin aliases or repo chores, not hidden task semantics.
 - Scripts contain real imperative complexity, not a parallel task graph.
+- Complex operational tasks have their own executable under `ops/bin/` (or the repo's established ops directory), not an overloaded `justfile` recipe.
 - The public command a human should type is obvious from README, package scripts, or `just --list`.
 - There is one canonical path for each workflow, with compatibility aliases only when they reduce friction.
 

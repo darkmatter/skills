@@ -1,6 +1,6 @@
 # 0015 — Cohesive modules and small public interfaces
 
-- **Status:** accepted
+- **Status:** partially superseded by [ADR-0017](0017-skill-and-instruction-ownership.md) — ownership and canonical-rule location only; technical decisions remain in force
 - **Date:** 2026-09-12
 - **Deciders:** cm
 

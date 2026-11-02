@@ -212,7 +212,7 @@ Verdict: WARNING — 2 HIGH issues should be resolved before merge.
 
 ## Project-Specific Guidelines
 
-Use `codebase-design` for good and bad examples of module boundaries and readability; use `domain-organization` for owner, role, and filename conventions.
+Review against the **Readability and module design** section of the shared `AGENTS.md`; use project-specific conventions for owner, role, and filename additions.
 
 When available, also check project-specific conventions from `AGENTS.md` or project rules:
 

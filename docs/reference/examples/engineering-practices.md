@@ -59,7 +59,10 @@ If two instructions conflict, stop and report the conflict instead of silently c
 
 ## Module design
 
-Apply the readability rules in the shared `AGENTS.md`; use the `codebase-design` skill for examples when available. Organize by domain then role, keep related implementation together, and expose complete operations. Extract only when it hides complexity or enables useful reuse. Define contracts once, convert external execution models at the edge, and own work through completion. Keep configured line limits with documented narrow exceptions, explain reasons in comments, and test public behavior.
+The **Readability and module design** section of the shared `AGENTS.md` is the
+owner for module boundaries and readability. This policy example does not
+restate or extend those rules; projects may add only explicit, scoped exceptions
+in their own policy file.
 
 ## Required final evidence for code changes
 

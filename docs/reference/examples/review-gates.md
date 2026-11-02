@@ -42,7 +42,7 @@ Review is optional for:
 
 ## Readability review
 
-Apply the shared `AGENTS.md` module design rules and the `codebase-design` examples when available. Review ownership, cohesive implementation, complete operations, meaningful extraction, one contract source, edge conversions, completion, explanatory comments, and behavioral tests. Check configured line limits and documented narrow exceptions; size alone does not justify scattering one operation across files.
+Review against the **Readability and module design** section of the shared `AGENTS.md`: ownership, cohesive implementation, complete operations, meaningful extraction, one contract source, edge conversions, completion, explanatory comments, and behavioral tests. Check configured line limits and documented narrow exceptions; size alone does not justify scattering one operation across files.
 
 ## Review evidence
 

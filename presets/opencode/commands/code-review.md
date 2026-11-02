@@ -17,7 +17,7 @@ Review code changes for quality, security, and maintainability: $ARGUMENTS
 
 ## Check Categories
 
-Apply the shared `AGENTS.md` readability rules and use `codebase-design` for examples when available; organization follows domain then role.
+Apply the **Readability and module design** section of the shared `AGENTS.md`; organization follows domain then role.
 
 ### Security Issues (CRITICAL)
 

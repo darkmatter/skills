@@ -28,8 +28,8 @@ RED → GREEN → REFACTOR → REPEAT
 
 ### Step 2: Write Failing Tests (RED)
 
-- Write tests that exercise the interface
-- Include happy path, edge cases, and error conditions
+- Write tests that exercise the requested contract through its public interface
+- Include the cases that contract requires, not a fixed happy-path/edge/error checklist
 - Run tests - verify they FAIL
 
 ### Step 3: Delegate Implementation (GREEN)
@@ -52,19 +52,14 @@ RED → GREEN → REFACTOR → REPEAT
 ### Step 6: Check Coverage
 
 - Preserve the project's configured coverage gates.
-- Inspect uncovered areas for meaningful public behavior or failure risks.
-- Add tests for those outcomes, not to mirror private helpers or inflate a percentage.
+- Inspect uncovered areas for public behavior the requested contract requires.
+- Follow `when-to-write-tests` before adding a test for an uncovered area; a percentage alone is not a reason.
 
-## Coverage Requirements
+## Test Selection
 
-Choose tests at the public boundary that exercise the requested behavior. A single complete-operation test may cover many helpers. Use `codebase-design` for good and bad examples when available.
+`when-to-write-tests` owns whether a test is needed and what coverage is appropriate. This command owns only the RED → GREEN → REFACTOR sequence for the requested TDD run.
 
-## Test Types to Include
-
-- **Unit Tests**: Public deterministic behavior, when a focused test adds useful coverage
-- **Edge Cases**: Empty, null, max values, boundaries
-- **Error Conditions**: Invalid inputs, network failures
-- **Integration Tests**: API endpoints, database operations
+When a TDD run is explicitly requested, write the smallest test that exercises the requested public contract; use `when-to-write-tests` before adding coverage beyond that request. Apply any project-required gates; do not add unit, integration, or E2E categories merely because they are listed here.
 
 ---
 

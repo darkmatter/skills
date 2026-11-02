@@ -42,8 +42,8 @@ Analyze the conversation and code changes to extract:
 
 If patterns are significant, suggest updates to:
 
-- `skills/codebase-design/SKILL.md` — module design and readability
-- `skills/domain-organization/SKILL.md` — domain, role, and filename conventions
+- The shared **Readability and module design** section in `AGENTS.md` — module design and readability
+- `skills/repository-organization/SKILL.md` — artifact placement and instruction ownership
 - `skills/[domain]/SKILL.md`
 - `rules/[category].md`
 

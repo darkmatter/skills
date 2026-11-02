@@ -8,9 +8,10 @@ the boundary rule (banning app imports inside the UI package) is the most valuab
 Assumes a flat-config (`eslint.config.js`) ESLint 9 setup. Adapt globs to the
 repo's actual UI package path.
 
-Apply [codebase-design](../../codebase-design/SKILL.md) when interpreting size
-diagnostics. These examples are optional additions to the current toolchain;
-they do not authorize downgrading existing checks or fragmenting cohesive UI.
+Apply the "Readability and module design" section in the shared agent
+instructions when interpreting size diagnostics. These examples are optional
+additions to the current toolchain; they do not authorize downgrading existing
+checks or fragmenting cohesive UI.
 
 ## 1. Ban app imports inside the UI package (the important one)
 
@@ -90,9 +91,9 @@ exception when deeper markup remains the clearest representation.
 ```
 
 For a new rule, start permissive (6–8) and assess its diagnostics against real
-screens. Retain configured file limits; use 300 nonblank, noncomment lines when
-introducing a file limit, with documented narrow increases for cohesive
-components.
+screens. Retain configured file limits; use a narrow, documented increase when a
+split would scatter cohesive code. See the "Readability and module design"
+section in the shared agent instructions.
 
 ## 4. Tailwind class hygiene (optional)
 

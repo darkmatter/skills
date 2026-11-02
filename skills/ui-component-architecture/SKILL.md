@@ -27,10 +27,11 @@ alias are per-repo ([ADR-0013](../../docs/adr/0013-shared-ui-is-its-own-package.
 Discover them from the workspace (`package.json` workspaces, `packages/*`,
 vendor trees). Do not invent a required name.
 
-Apply [codebase-design](../codebase-design/SKILL.md) when choosing component
-boundaries. Keep state, handlers, private components, and layout together when
-they explain one capability. An extraction should hide behavior or enable useful
-reuse; neither JSX length nor a second call site establishes that on its own.
+Follow the "Readability and module design" section in the shared agent
+instructions when choosing component boundaries. This skill applies that
+section at UI granularity: a reusable presentational unit with an independent
+interface may graduate to the shared package; extraction must not merely
+shorten JSX.
 
 ## When to use
 
@@ -65,9 +66,9 @@ Don't reimplement a `Button`, `Card`, `Badge`, `Input`, `Dialog`, or
 
 A route should make its data and major visual capabilities easy to follow.
 Compose existing primitives and extract components with a meaningful interface.
-Keep cohesive state and event handling with the UI they control. A component
-that only forwards a screen's props and markup adds navigation without hiding
-complexity. Private components may share a file with their owner.
+Keep an interaction's state, handlers, and private components with their owner;
+private components may share a file with the UI they support (see the
+"Readability and module design" section in the shared agent instructions).
 
 ### Graduate reusable units into the UI package
 
@@ -85,8 +86,9 @@ The load-bearing heuristic for what moves into the shared package:
 
 ### Style with tokens and variants, not scattered magic values
 
-- Use theme tokens (CSS variables, the Tailwind theme) — not raw hex literals
-  sprinkled through `className`.
+- Use the project's design-system tokens (CSS variables, the Tailwind theme) —
+  not raw hex literals sprinkled through `className`. When the project has no
+  system of its own, the fallback language is `darkmatter-design-system`.
 - For components with variants, use a `cn` + variant map (or `cva`) rather than
   conditional class-string soup.
 - Centralize styles for a reusable visual unit; keep incidental layout local.
@@ -107,8 +109,10 @@ reusable_. This tells you what to import, what to inline, and what to extract.
 ### 3. Author the screen thin
 
 Compose existing primitives and keep each interaction understandable in one
-place. If a file exceeds its configured limit, split at a useful responsibility
-or document a narrow increase; file height alone does not select a component.
+place. If a file reaches its configured limit, split at a useful responsibility
+or document a narrow increase rather than splitting a component to satisfy a
+count (see the "Readability and module design" section in the shared agent
+instructions).
 
 ### 4. Extract the reusable pieces
 
@@ -128,7 +132,8 @@ For each piece that meets the graduation heuristic:
   UI-package component.
 - Types and build pass using the repository's commands.
 - Interactions complete through the component's public interface; tests observe
-  user behavior rather than its private hook or helper calls.
+  user behavior rather than private hooks or helpers (see the "Readability and
+  module design" section in the shared agent instructions).
 
 ## What graduates vs what stays
 
@@ -169,9 +174,9 @@ and private components nearby even when they are used once.
 - `shadcn-registry-first` — sources _external_ blocks from registries. This skill
   governs _internal_ reuse and extraction. They compose: registry → app screen →
   graduate stable pieces into the UI package.
-- `darkmatter-design-system` — visual language and tokens when the app uses that
-  system. Those tokens still live in the UI package; this skill is the package
-  boundary.
+- `darkmatter-design-system` — fallback visual language and tokens when the app
+  has no design system of its own; an existing project system wins. Those tokens
+  still live in the UI package; this skill is the package boundary.
 - `repository-organization` — where directories and packages live. This operates
   one level down, at the component-reuse granularity.
 - `vercel-react-best-practices` — performance patterns for the components you

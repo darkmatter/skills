@@ -126,6 +126,28 @@
               touch $out
             '';
 
+            # Structure, relative links, catalog parity, and the CLI
+            # regression tests. lychee runs offline over owned Markdown only;
+            # vendored .gitmodules trees are excluded by the CLI.
+            checks.skills =
+              pkgs.runCommand "check-skills"
+                {
+                  nativeBuildInputs = [
+                    pkgs.bash
+                    pkgs.lychee
+                    pkgs.python3
+                  ];
+                  # lychee builds its HTTP client even in --offline mode and
+                  # aborts when it cannot find a CA bundle in the sandbox.
+                  SSL_CERT_FILE = "${pkgs.cacert}/etc/ssl/certs/ca-bundle.crt";
+                }
+                ''
+                  cd ${./.}
+                  bash scripts/validate-skill.sh
+                  python3 scripts/test_validate_skill.py
+                  touch $out
+                '';
+
             treefmt = {
               projectRootFile = "flake.nix";
               settings = {

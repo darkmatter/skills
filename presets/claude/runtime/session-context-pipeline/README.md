@@ -1,6 +1,6 @@
 ---
 name: session-context-pipeline
-description: Hook-driven background pipeline for Claude Code sessions — a throttled summarizer keeps a tags+bullets digest of the running session in a temp file, a watcher enriches context from it (detects libraries in use, clones their repos, injects doc links/excerpts so no API guesswork is needed), and an end-of-turn reviewer checks the turn's diff against a configurable checklist (unconventional solutions? tested? silent failures?). Triggers when the user asks to "set up the session context pipeline", "install session hooks", "summarize my session automatically", "auto-inject library docs", "clone libraries the session uses", "add an end-of-turn review checklist", or wants live session context / background enrichment / turn review wired into hooks. Do NOT trigger for a one-off manual review of a diff or plan (use end-of-turn-review) or for extracting reusable skills from finished sessions (use continuous-learning).
+description: Hook-driven background pipeline for Claude Code sessions — a throttled summarizer keeps a tags+bullets digest of the running session in a temp file, a watcher enriches context from it (detects libraries in use, clones their repos, injects doc links/excerpts so no API guesswork is needed), and an end-of-turn reviewer checks the turn's diff against a configurable checklist (unconventional solutions? tested? silent failures?). Triggers when the user asks to "set up the session context pipeline", "install session hooks", "summarize my session automatically", "auto-inject library docs", "clone libraries the session uses", "add an end-of-turn review checklist", or wants live session context / background enrichment / turn review wired into hooks. Do NOT trigger for a one-off manual review of a diff or plan (review the diff directly against the shared completion-evidence expectations) or for extracting reusable skills from finished sessions (use continuous-learning).
 ---
 
 # Session context pipeline runtime (Claude Code)
@@ -60,8 +60,9 @@ malformed JSON — the hooks exit 0 silently and the session proceeds untouched.
 
 ## When NOT to use
 
-- One-off review of a specific diff or plan — that's `end-of-turn-review`
-  (this skill's reviewer is the always-on, checklist-driven sibling)
+- One-off review of a specific diff or plan — review it directly against the
+  shared completion-evidence expectations (this bundle's reviewer is the
+  always-on, checklist-driven sibling)
 - Extracting reusable skills/patterns from a finished session — that's
   `continuous-learning`
 - Anything requiring the summary to be perfect ground truth — it's a lossy,
@@ -87,9 +88,9 @@ after installing. Project installs seed `.claude/session-context-pipeline.json`
 from `config.example.json`.
 
 Requirements: `jq`, `curl`, `git` (all standard on darkmatter machines), and a
-LiteLLM key (`LITELLM_API_KEY` or `~/.config/litellm/key` — same convention as
-`end-of-turn-review`). A `claude` binary upgrades enrichment briefs from
-README digests to targeted API excerpts; optional.
+LiteLLM key (`LITELLM_API_KEY` or `~/.config/litellm/key`). A `claude` binary
+upgrades enrichment briefs from README digests to targeted API excerpts;
+optional.
 
 ## Tools
 

@@ -10,15 +10,17 @@ This repo ships five things:
 1. **OpenCode-first presets** (`presets/`) — installable source packs for LLM clients.
 2. **A catalog of shared skills** (`skills/`) — installed across all darkmatter projects via Nix Home Manager, or as a Claude Code plugin (see [Claude Code plugin marketplace](#claude-code-plugin-marketplace)).
 3. **Shared instruction topics** (`docs/agents/`) — one file per section, exported as the flake output `agentsMd` so downstream repos import the topics they adopt; bundled into every LLM client's global `AGENTS.md` and into this repo's own generated `AGENTS.md`.
-4. **Reference codebases** (`references/`) — per-language exemplar code agents consult for preferred conventions.
+4. **Skill reference material** (`skills/<name>/reference/`) — vendored or pinned upstream sources used by a skill.
 5. **Tooling** (`scripts/`) — installers, sync scripts, and validation helpers.
 
 It is **provider-agnostic**. Skills and `.agent/` content target any agent tool (Claude Code, Codex, OpenCode, Cursor, Aider, etc.) by following the cross-vendor `AGENTS.md` convention plus the per-vendor shims (`CLAUDE.md`, `.cursorrules`).
 
-Code conventions follow [codebase-design](skills/codebase-design/SKILL.md): keep
-each capability together, make it simple to use, and split it only when the split
-improves understanding. The skill contains the canonical rules and good/bad
-examples; [ADR-0015](docs/adr/0015-cohesive-modules.md) records the decision.
+Code conventions follow the **Readability and module design** section in
+[docs/agents/60-readability.md](docs/agents/60-readability.md): keep each
+capability together, make it simple to use, and split it only when the split
+improves understanding. [ADR-0015](docs/adr/0015-cohesive-modules.md) records the
+module decision; [ADR-0017](docs/adr/0017-skill-and-instruction-ownership.md)
+records current policy ownership.
 
 ## Layout
 
@@ -30,12 +32,11 @@ darkmatter/skills/
 ├── .claude-plugin/          ← Claude Code marketplace + plugin manifests
 ├── README.md                ← this file
 ├── flake.nix                ← Nix entry; exports the Home Manager module
-├── home-manager.nix         ← HM module that wires skills/ into agent CLIs
-├── runtime/                 ← client-agnostic opt-in hook utilities (end-of-turn-review)
+├── nix/
+│   └── home-manager.nix     ← HM module that wires skills/ into agent CLIs
 ├── lib/                     ← Nix library helpers (skills source, submodules)
 ├── presets/                 ← installable source packs, especially OpenCode
 ├── skills/                  ← team-wide shareable skills (the catalog)
-├── references/              ← per-language reference codebases (rust, go, typescript)
 ├── scripts/
 │   ├── install-base.sh      ← install docs/AGENTS.md into a client dir
 │   ├── install-omp.sh       ← install the OMP preset into ~/.omp/agent
@@ -51,6 +52,8 @@ darkmatter/skills/
     ├── agents/              ← shared instruction topics, <order>-<topic>.md
     ├── AGENTS.md            ← GENERATED topic bundle — nix build .#agents-md-shared
     ├── AGENTS.repo.md       ← this repo's own agent instructions
+    ├── adr/                 ← architecture decision records
+    ├── reference/           ← reference examples for agent-project policy
     ├── catalog.md           ← what's in skills/
     └── opencode-layout.md   ← source-to-install mapping for OpenCode
 ```
@@ -91,9 +94,9 @@ Use this table before adding a new instruction, skill, command, hook, or tool. T
 | ------------------------------------------------------------ | ----------------------------------------------------------------------- | ------------------------------------- | --------------------------------------------------------------------------------------------------- |
 | Org-wide rules that must apply in every session              | `docs/agents/<order>-<topic>.md`                                        | Always, as global agent instructions  | Keep short: safety, verification, preserving user changes, secret handling, evidence-before-claims. |
 | Project-specific rules and decisions                         | Target project's own `AGENTS.md`, `.agent/context/*`, `.agent/policy/*` | Always inside that project            | Stack choices, local conventions, approved exceptions, project state. Owned by each project repo.   |
-| Reusable task guidance the model should choose when relevant | `skills/<name>/SKILL.md`                                                | On demand via skill discovery         | Debugging, TDD, Effect, Neon, Nix, codebase cleanup. Add a row in `docs/catalog.md`.                |
+| Reusable task guidance the model should choose when relevant | `skills/<name>/SKILL.md`                                                | On demand via skill discovery         | Effect, Nix, UI, codebase cleanup, test decisions. Add a row in `docs/catalog.md`.                  |
 | Long skill detail, examples, fixtures, or lookup data        | `skills/<name>/reference/`                                              | Only after the skill points there     | Use for large docs so `SKILL.md` stays concise.                                                     |
-| Per-language convention exemplar code                        | `references/<language>/`                                                | On demand, from the repo checkout     | Reference codebases (rust, go, typescript). Code lives here; prose stays in skills. See ADR-0008.   |
+| Skill-owned reference code or upstream source                | `skills/<name>/reference/`                                              | Only after the skill points there     | Pinned or vendored material owned by that skill (for example `effect-typescript/reference/effect`). |
 | Deterministic helper used by a skill                         | `skills/<name>/scripts/`                                                | Only when the skill/script is invoked | Bash or Python stdlib preferred; document deps in the skill and catalog.                            |
 | Manual slash-invoked workflow for OpenCode                   | `presets/opencode/commands/`                                            | User invokes `/command`               | Use for explicit workflows, prompts with arguments, or timing-sensitive actions.                    |
 | OpenCode specialist agent definition                         | `presets/opencode/agents/`                                              | Invoked by agent routing or user      | Use for role-specific behavior and permissions, not reusable task instructions.                     |
@@ -161,8 +164,6 @@ Home Manager deliberately does not write `~/.claude/CLAUDE.md` — Claude Code t
 @~/.claude/darkmatter/AGENTS.md
 ```
 
-`runtime/end-of-turn-review/` is a separate, client-agnostic opt-in review hook utility.
-
 ## Bootstrap a new project
 
 Project bootstrap is owned by the **`darkmatter-repo-setup` skill** (`skills/darkmatter-repo-setup/SKILL.md`), which reads the separate **`darkmatter/template` repo** as the canonical template and applies it to the target repository.
@@ -214,9 +215,9 @@ The module enables every `darkmatter/*` skill and syncs them to Claude, Codex, a
 1. Pick a lowercase, hyphenated name. The directory name must exactly match the frontmatter `name:` field.
 2. Create `skills/<skill-name>/SKILL.md` with YAML frontmatter (`name`, `description`).
 3. Optionally add `scripts/`, `reference/` subdirectories for code and supporting docs.
-4. Run `scripts/validate-skill.sh skills/<skill-name>` to check structure.
-5. Document it in `docs/catalog.md`.
-6. Open a PR — CI runs `scripts/validate-skill.sh` across all skills via `.github/workflows/validate-skills.yml`.
+4. Validate with `nix build .#checks.x86_64-linux.skills` (dependency-complete). For a focused check, run `scripts/validate-skill.sh skills/<skill-name>`; bare `scripts/validate-skill.sh` checks every skill plus catalog parity. The script requires `lychee` on `PATH` and fails loudly when it is missing. The check verifies that the catalog **Local skills** table matches `skills/` and that relative Markdown links resolve.
+5. Document it in `docs/catalog.md` under **Local skills**.
+6. Open a PR — CI runs the same flake check after installing Nix via `.github/workflows/validate-skills.yml`.
 
 See the [skill catalog](docs/catalog.md) for existing capabilities and registration.
 
@@ -233,6 +234,9 @@ skills (macOS setup, local secrets, Slack side effects) that don't belong in a
 sandbox — so sandboxes get a curated subset instead:
 
 - `.agents/skills.manifest` — the curation surface: one skill name per line.
+  It is required: a checkout without the manifest cannot generate or verify the
+  sandbox subset, and `scripts/sync-sandbox-skills.sh` fails instead of
+  guessing.
 - `.agents/skills/` — **generated** copies of the listed skills, at the
   contract's default `skillsSubdir`. Never edit these by hand; edit
   `skills/<name>/` or the manifest and run `scripts/sync-sandbox-skills.sh`.

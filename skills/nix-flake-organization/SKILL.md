@@ -7,10 +7,11 @@ description: Use when reorganizing Nix flakes, NixOS modules, nix-darwin modules
 
 Organize flakes with the [numtide/blueprint](https://github.com/numtide/blueprint) folder convention, nested under a top-level `nix/` directory (blueprint's `prefix = "nix/"`). `flake.nix` stays a minimal entrypoint; every other output lives in a file under `nix/` whose path determines its output attribute. There is no separate glue layer: the file at the mapped path *is* the implementation. Outputs the mapping cannot express (such as `apps` or compatibility aliases) may keep explicit wiring beside the blueprint invocation, but their implementations still live under `nix/`.
 
-Apply [codebase-design](../codebase-design/SKILL.md) within those boundaries:
-keep each output's implementation together with its mapped file and extract
-only to hide complexity or enable useful reuse. Preserve Nix's roles rather
-than imposing TypeScript `models/` and `services/` directories.
+Apply the **Readability and module design** rules from the shared agent
+instructions within those boundaries: keep each output's implementation together
+with its mapped file and extract only to hide complexity or enable useful reuse.
+Preserve Nix's roles rather than imposing TypeScript `models/` and `services/`
+directories.
 
 ## When to use
 

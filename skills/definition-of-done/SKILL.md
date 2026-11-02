@@ -31,10 +31,16 @@ Agent: ... (uses this skill to ask clarifying questions and produce a DoD checkl
 
 ## Implementation criteria
 
-For code work, use [codebase-design](../codebase-design/SKILL.md): complete
-operations, clear ownership, retained line limits, and verification through the
-public interface. A helper count, file count, or coverage percentage does not
-prove a capability is complete.
+For code work, apply the **Readability and module design** rules from the shared
+agent instructions: complete operations, clear ownership, retained line limits,
+and verification through the public interface. A helper count, file count, or
+coverage percentage does not prove a capability is complete.
+
+Use `when-to-write-tests` for test necessity and the language toolchain for test
+placement. When TDD is explicitly requested or required, use the requested
+red/green procedure; otherwise do not add a test-first gate. This skill defines
+the completion condition and orchestrates those owners rather than restating
+their policies.
 
 ## Reference
 

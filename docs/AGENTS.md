@@ -78,7 +78,7 @@ Keep each capability together, make it simple to use, and split it only when the
 9. **Comment on reasons and invariants:** explain constraints and decisions the code cannot express clearly.
 10. **Test observable behavior:** exercise outcomes through the public interface instead of asserting private calls or creating a test for every helper.
 
-For package design, extraction decisions, or readability review, use the `codebase-design` skill for good and bad examples when it is installed; these rules also apply when it is unavailable.
+These rules are the canonical module and readability convention for Darkmatter repositories. Skills, presets, and review checklists reference this section instead of restating or forking it; specialized skills describe only how the rules apply to their domain.
 
 ## Should
 

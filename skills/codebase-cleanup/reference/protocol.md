@@ -4,10 +4,11 @@ Every pass in this skill follows this exact protocol. The pass-specific files at
 
 ## Shared design rules
 
-Use [codebase-design](../../codebase-design/SKILL.md) when evaluating every pass.
-Keep related operations and private helpers with their owner. Preserve public
-contracts, error propagation, completion, and cleanup. Test those behaviors
-through the interface; do not add a test per moved helper.
+Use the **Readability and module design** rules from the shared agent
+instructions when evaluating every pass. Keep related operations and private
+helpers with their owner. Preserve public contracts, error propagation,
+completion, and cleanup. Test those behaviors through the interface when
+`when-to-write-tests` says a test is needed; do not add a test per moved helper.
 
 Retain configured line limits. Split coherent responsibilities, or document a
 targeted increase when splitting would scatter one implementation. A smaller

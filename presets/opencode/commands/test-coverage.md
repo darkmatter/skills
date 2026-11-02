@@ -17,7 +17,7 @@ Analyze test coverage and identify gaps: $ARGUMENTS
 
 ## Coverage Targets
 
-Read and preserve the project's configured coverage gates. A percentage identifies areas to inspect; it does not require a test for every uncovered line or function. Prioritize meaningful public behavior and material failure risks. Test complete operations rather than private call sequences; use `when-to-write-tests` and `codebase-design` for examples when available.
+Read and preserve the project's configured coverage gates. A percentage identifies areas to inspect; it does not require a test for every uncovered line or function. Prioritize meaningful public behavior and material failure risks. Test complete operations rather than private call sequences; follow `when-to-write-tests` for necessity and apply the **Readability and module design** rules for operation boundaries.
 
 ## Coverage Report Analysis
 

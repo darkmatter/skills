@@ -96,9 +96,7 @@ if [ "$changed_lines" -lt 10 ]; then
   exit 0
 fi
 
-if [ -x .agent/skills/end-of-turn-review/scripts/review.sh ]; then
-  git diff | .agent/skills/end-of-turn-review/scripts/review.sh --kind=diff
-elif command -v review-agent >/dev/null 2>&1; then
+if command -v review-agent >/dev/null 2>&1; then
   git diff | review-agent --kind=diff
 else
   echo "diff review skipped: no review script configured" >&2

@@ -1,40 +1,56 @@
 # Skill catalog
 
 The default Darkmatter bundle installs every top-level directory in `skills/`.
-`home-manager.nix` derives the installed inventory from that source, so adding
-a catalogued skill includes it in future installations.
+`nix/home-manager.nix` derives the installed inventory from that source, so
+adding a local skill includes it in future installations. `docs/catalog.md` is
+the human-readable inventory: the local table is repo-owned policy, while the
+external table records installs declared outside this source tree.
 
-## Installed skills
+Rule ownership follows the **Readability and module design** section in the
+shared agent instructions and the single-owner conventions in
+[`repository-organization`](../skills/repository-organization/SKILL.md). A skill
+owns the policy named in its row; other skills reference that owner instead of
+copying it. See [ADR-0017](adr/0017-skill-and-instruction-ownership.md) for the
+decision that made ownership explicit and retired deleted skills.
 
-| Skill | Purpose |
+## Local skills
+
+These are the top-level directories under `skills/` and are maintained in this
+repository.
+
+| Skill | Owns | Adjacent owner / boundary |
+| --- | --- | --- |
+| `advisor` | Advisor-facing review instructions: prevent reinvention and log observed agent events. | Standalone observer guidance; completion and evidence remain with `definition-of-done` and the shared completion-evidence section. |
+| `alchemy` | Alchemy v2 infrastructure, preview/deploy workflow, and troubleshooting for TypeScript/Effect apps. | `darkmatter-ts-toolchain` owns stack and database selection; `choose-dev-entrypoints` owns command entrypoints; `sops-secret-access` owns secret access. |
+| `choose-dev-entrypoints` | Entrypoint layering across Nix, Just, Bun, Turborepo, package scripts, shell hooks, and `scripts/`, including ops-script language. | `nix-flake-organization` owns flake/module layout; `darkmatter-ts-toolchain` owns the TypeScript contract. |
+| `codebase-cleanup` | Scoped cleanup and the optional eight-pass quality audit. | `when-to-write-tests` owns test necessity; the **Readability and module design** section owns module rules; feature work and bug fixes stay out of cleanup scope. |
+| `darkmatter-design-system` | Darkmatter visual language and tokens when a project has no established design system. | `ui-component-architecture` owns component/package responsibility; `shadcn-registry-first` owns component sourcing. |
+| `darkmatter-repo-setup` | Repo bootstrap, standards onboarding, and compliance checks against the template and toolchain. | Orchestrates owners: `repository-organization` owns placement, `darkmatter-ts-toolchain` owns the TypeScript contract, `nix-flake-organization` owns flake layout. |
+| `darkmatter-ts-toolchain` | TypeScript stack, dependency and persistence choices, configuration policy references, TypeScript test placement, and the check contract. | `effect-typescript` owns implementation patterns; `choose-dev-entrypoints` owns entrypoints; `alchemy` owns deploy implementation. |
+| `definition-of-done` | Completion conditions and the evidence expected before claiming done. | Orchestrates `when-to-write-tests`, the language toolchain, and the explicit TDD procedure instead of redefining them. |
+| `effect-typescript` | Typed Effect implementation patterns for services, adapters, HTTP, and Effect agent code. | `darkmatter-ts-toolchain` owns stack, dependency, and persistence choices. |
+| `nix-flake-organization` | Nix flake, NixOS, nix-darwin, Home Manager, host, package, and devshell folder mapping and file contracts. | `choose-dev-entrypoints` owns dev/build/test entrypoints; `repository-organization` owns repo-level artifact placement. |
+| `repository-organization` | Artifact placement, README and ADR process, instruction ownership, and explicit exception format. | Does not define source architecture or language rules; the **Readability and module design** section owns module rules, and `nix-flake-organization` owns flake layout. |
+| `run-ui-registry-variations` | Manual-invocation workflow that builds and compares three registry-derived UI variations. | Composes `shadcn-registry-first`; `darkmatter-design-system` owns fallback tokens; never auto-triggered. |
+| `shadcn-registry-first` | Registry-first component sourcing, installation, and the shared comparison procedure. | `ui-component-architecture` owns package boundaries; `run-ui-registry-variations` is the explicit-only variation workflow. |
+| `sops-secret-access` | SOPS-backed configuration and secret access procedure. | `repository-organization` decides where encrypted configuration lives; deploy-specific secret handling stays with `alchemy`. |
+| `ui-component-architecture` | Shared React UI package responsibility and keeping app screens thin. | `darkmatter-design-system` owns fallback visual tokens; `shadcn-registry-first` owns component sourcing. |
+| `when-to-write-tests` | Test necessity and coverage decisions, plus the pointer to explicit opt-in TDD. | `darkmatter-ts-toolchain` owns TypeScript test placement; the requested TDD command or workflow owns the red/green procedure. |
+
+## Externally installed skills
+
+These installs are declared in the root `package.json` `skills` array. They are
+maintained upstream and are not vendored in `skills/`, so they are not part of
+the local inventory, the Home Manager source, or repo-owned policy.
+
+| Skill | Source |
 | --- | --- |
-| `agent-browser` | Browser automation guidance. |
-| `alchemy` | Darkmatter's Alchemy v2 infrastructure and deployment workflow, with Postgres-first app data guidance. |
-| `choose-dev-entrypoints` | Choose the correct Nix, Bun, Turbo, Just, or script entrypoint. TypeScript-only repos implement ops scripts in TypeScript ([ADR-0012](adr/0012-ops-scripts-in-typescript.md)). |
-| `codebase-cleanup` | Focused cleanup and optional eight-pass code-quality audits. |
-| `codebase-design` | Canonical module conventions with good/bad examples: cohesive capabilities, small public interfaces, meaningful extraction, and retained line limits ([ADR-0015](adr/0015-cohesive-modules.md)). |
-| `darkmatter-design-system` | Darkmatter visual language and tokens. Reusable UI lives in the repo's own package ([ADR-0013](adr/0013-shared-ui-is-its-own-package.md)). |
-| `darkmatter-gitops-conventions` | Safe GitOps changes, validation, rollout, and rollback. SOPS payloads are JSON ([ADR-0011](adr/0011-sops-files-as-json.md)). |
-| `darkmatter-repo-setup` | Darkmatter repo setup and compliance checks against the template/toolchain standard, including Bun catalogs, Effect 4, effect-agent, effect-orpc, Postgres-first data, and React 19/shadcn UI defaults. |
-| `darkmatter-ts-toolchain` | Darkmatter TypeScript/Bun preferred stack and CI contract: Bun catalogs, Effect 4, effect-orpc, Postgres-first data, tsgo, oxlint/oxfmt, Vitest, Alchemy, and UI defaults. Ops scripts in TS-only repos are TypeScript ([ADR-0012](adr/0012-ops-scripts-in-typescript.md)). |
-| `definition-of-done` | Define a clear, verifiable completion condition for agentic work. Verification follows `when-to-write-tests`. |
-| `diagnose` | Evidence-led diagnosis of bugs and performance regressions. |
-| `domain-organization` | Organize source by domain owner, role, and module; plan file moves, public boundaries, naming, and scoped enforcement. |
-| `effect-typescript` | Typed Effect patterns for meaningful TypeScript I/O, including effect-orpc typed RPC, Postgres adapters, and named config files read through `Config` ([ADR-0014](adr/0014-named-config-files-over-flags-and-env.md)). |
-| `find-skills` | Find available skills for a task. |
-| `flue` | Use when working with the Flue framework. |
-| `nix-flake-organization` | Maintain the Darkmatter Nix flake/module layout. |
-| `record-rule` | Manually invoked: interview for intent and applicability, then reconcile a note with org-wide or project-local policies, skills, and adhere rules, land on `main`, activate, and verify in every configured agent. |
-| `repository-organization` | Organize durable repository context and assets. |
-| `run-ui-registry-variations` | Build and compare UI registry variations. |
-| `rust-best-practices` | Idiomatic Rust implementation and review guidance. |
-| `shadcn-registry-first` | Reuse configured shadcn registries before hand-building common UI. |
-| `sops-secret-access` | Safe SOPS-backed configuration and registry access. Payloads are JSON ([ADR-0011](adr/0011-sops-files-as-json.md)). |
-| `test-driven-development` | Opt-in TDD: a few E2E happy-path tests of the public contract, not a unit test per function. |
-| `ui-component-architecture` | Keep reusable React UI in its own package. The package name is per-repo ([ADR-0013](adr/0013-shared-ui-is-its-own-package.md)). |
-| `ui-ux-pro-max` | UI/UX design intelligence across supported stacks. |
-| `vercel-react-best-practices` | React and Next.js performance guidance. |
-| `when-to-write-tests` | Decide whether to add a test. Default is no new test. Tests sit beside their source; `tests/` is end-to-end only. |
+| `agent-browser` | `vercel-labs/agent-browser` |
+| `find-skills` | `vercel-labs/skills` |
+| `rust-best-practices` | `apollographql/skills` |
+| `test-driven-development` | `obra/superpowers` |
+| `ui-ux-pro-max` | `nextlevelbuilder/ui-ux-pro-max-skill` |
+| `vercel-react-best-practices` | `vercel-labs/agent-skills` |
 
 ## Client runtimes
 
@@ -47,16 +63,15 @@ the bundle:
   contract implemented by the OpenCode plugin.
 - `presets/claude/runtime/session-context-pipeline/` is an opt-in Claude Code
   hook bundle.
-- `runtime/end-of-turn-review/` is an opt-in client-agnostic review
-  utility.
 
 ## Add or reactivate a skill
 
-1. Confirm the capability is not already native to the agent or represented by
-   an installed skill.
+1. Confirm the capability is not already native to the agent, represented by a
+   local skill, or supplied by a declared external install.
 2. Keep client-specific hooks and runtime assets under the matching preset.
-3. Validate the skill with `scripts/validate-skill.sh skills/<name>`.
-4. Add its row above. The module derives the correct selected ID when a
+3. Validate with `nix build .#checks.x86_64-linux.skills` (dependency-complete). For a focused check, `scripts/validate-skill.sh skills/<name>` requires `lychee` on `PATH`; bare `scripts/validate-skill.sh` checks every skill plus `## Local skills` parity. The script fails loudly without `lychee`.
+4. Add its row to **Local skills** with the policy it owns and its adjacent
+   owner boundaries. The module derives the correct selected ID when a
    consuming configuration flattens the source namespace.
 5. Rebuild the consuming Home Manager/Darwin configuration and verify the
    effective inventory.

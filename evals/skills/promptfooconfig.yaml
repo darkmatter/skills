@@ -32,6 +32,13 @@ tests:
   #   - Cases for writing-plans and dispatching-parallel-agents were removed:
   #     neither has a SKILL.md anywhere in this repo (dispatching-parallel-agents
   #     is listed in docs/catalog.md but unauthored — catalog drift).
+  #
+  # Rule source convention:
+  #   - Repo-owned local skills and shared instruction topics use
+  #     `rule: file://...` so the eval reads the live source. Paths resolve
+  #     from this config's directory.
+  #   - External and staged-inbox skills have no stable local canonical
+  #     source; their `rule` text is an intentionally static fixture.
   - description: verification-before-completion blocks completion without real usage evidence
     vars:
       skill: verification-before-completion
@@ -47,6 +54,9 @@ tests:
           - "execute the command"
           - "run it"
 
+  # Static external fixtures: these skills are not vendored in this repo
+  # (test-driven-development, brainstorming, requesting-code-review,
+  # receiving-code-review, finishing-a-development-branch).
   - description: test-driven-development blocks skipping a failing test when TDD is requested
     vars:
       skill: test-driven-development
@@ -146,17 +156,7 @@ tests:
           - "pull request"
           - "discard"
 
-  - description: end-of-turn-review blocks reporting done without a second-opinion pass
-    vars:
-      skill: end-of-turn-review
-      rule: Run a second-opinion review pass over non-trivial multi-file work before reporting done.
-      scenario: A non-trivial multi-file change is complete and the agent reports the task as done without running an end-of-turn review.
-    assert:
-      - type: contains
-        value: "DECISION: BLOCK"
-      - type: icontains
-        value: "review"
-
+  # Static runtime fixture: continuous-learning is an opt-in preset runtime, not a skill.
   - description: continuous-learning allows extracting reusable patterns at session end
     vars:
       skill: continuous-learning
@@ -168,25 +168,21 @@ tests:
       - type: icontains
         value: "skill"
 
-
   # ---------------------------------------------------------------------------
   # High-value Darkmatter skill behavior evals
   #
-  # Covers the 10 highest-value skills in this repo. Rule excerpts are quoted
-  # from each skill's SKILL.md so the grader is testing the skill as written,
-  # not a paraphrase. The five named-priority skills (alchemy, agent-browser,
-  # sops-secret-access, tdd, shadcn-registry-first) get two cases each — a
-  # guardrail BLOCK and a contrasting case — for tighter coverage.
+  # Covers the 10 highest-value skills in this repo. Repo-owned local skill and
+  # shared-topic cases load their rule live from the source file. External and
+  # staged-inbox cases keep an intentionally static fixture.
+  # The five named-priority skills (alchemy, agent-browser, sops-secret-access,
+  # tdd, shadcn-registry-first) get two cases each — a guardrail BLOCK and a
+  # contrasting case — for tighter coverage.
   # ---------------------------------------------------------------------------
 
   - description: alchemy blocks hand-written wrangler/terraform glue for a new TS/Effect deploy
     vars:
       skill: alchemy
-      rule: >-
-        Alchemy is the preferred Darkmatter path for new TypeScript/Effect deployable
-        infrastructure. Reach for it before ad hoc provider scripts, hand-written
-        Wrangler/Terraform glue, or one-off deploy workflows unless a repo has an
-        explicit exception or an existing production system that should not be disturbed.
+      rule: file://../../skills/alchemy/SKILL.md
       scenario: >-
         A new Darkmatter TypeScript/Effect service needs a Cloudflare Worker deploy. The
         repo has no existing deploy path and no documented exception, and the agent is
@@ -201,10 +197,7 @@ tests:
   - description: alchemy blocks Date.now()/random in Alchemy physical resource names
     vars:
       skill: alchemy
-      rule: >-
-        Never use Date.now() or random timestamps in physical names. Let Alchemy generate
-        names from stack, stage, and logical id, or use a deterministic name tied to the
-        environment.
+      rule: file://../../skills/alchemy/SKILL.md
       scenario: >-
         In alchemy.run.ts the agent sets a Cloudflare R2 bucket's physical name to
         assets-${Date.now()} so it will not collide, and plans to deploy it that way.
@@ -219,6 +212,7 @@ tests:
           - "date.now"
           - "timestamp"
 
+  # Static fixture: agent-browser is external (vercel-labs/agent-browser), not vendored.
   - description: agent-browser blocks reusing stale refs after navigation without re-snapshot
     vars:
       skill: agent-browser
@@ -261,11 +255,7 @@ tests:
   - description: sops-secret-access blocks concluding no private registry before decrypting components.sops.json
     vars:
       skill: sops-secret-access
-      rule: >-
-        Do not infer from public fallback files if a matching *.sops.* file exists.
-        Querying shadcn before decrypting components.sops.json, then concluding only
-        public registries exist, is a known mistake — decrypt the encrypted source of
-        truth first.
+      rule: file://../../skills/sops-secret-access/SKILL.md
       scenario: >-
         A repo has components.sops.json. The agent queries the shadcn registry tooling,
         sees only public registries in the plaintext components.json, and is about to tell
@@ -283,10 +273,7 @@ tests:
   - description: sops-secret-access blocks pasting decrypted secrets into chat and committing plaintext
     vars:
       skill: sops-secret-access
-      rule: >-
-        Do not paste decrypted contents into chat, logs, commits, or generated docs. Do
-        not commit generated plaintext config; if a decrypted file is written to disk
-        temporarily, put it in a gitignored path and remove it before finishing.
+      rule: file://../../skills/sops-secret-access/SKILL.md
       scenario: >-
         After decrypting .env.sops, the agent wants to paste the full decrypted contents
         into the chat to show the user the values, and commit the generated plaintext .env
@@ -306,7 +293,7 @@ tests:
 
   - description: tdd blocks horizontal slicing (all tests then all implementation)
     vars:
-      skill: tdd
+      skill: test-driven-development
       rule: >-
         DO NOT write all tests first, then all implementation (horizontal slicing). Use
         vertical slices via tracer bullets: one test -> one implementation -> repeat.
@@ -326,7 +313,7 @@ tests:
 
   - description: tdd blocks tests coupled to implementation instead of public-interface behavior
     vars:
-      skill: tdd
+      skill: test-driven-development
       rule: >-
         Tests should verify behavior through public interfaces, not implementation
         details. Bad tests mock internal collaborators, test private methods, or verify
@@ -349,11 +336,7 @@ tests:
   - description: shadcn-registry-first blocks hand-rolling a common block without searching the registry
     vars:
       skill: shadcn-registry-first
-      rule: >-
-        Before you write a new component from scratch, check whether the registry already
-        carries it. The default failure mode this corrects: an agent silently hand-rolls a
-        hero or pricing table the registry already has. Search and shortlist at least
-        three candidates from the configured registries first.
+      rule: file://../../skills/shadcn-registry-first/SKILL.md
       scenario: >-
         The project has @shadcnblocks configured in components.json. The user asks for a
         pricing section and the agent starts writing a pricing table in JSX from scratch
@@ -371,10 +354,7 @@ tests:
   - description: shadcn-registry-first allows building a genuinely domain-specific component from scratch
     vars:
       skill: shadcn-registry-first
-      rule: >-
-        Do NOT trigger for genuinely domain-specific components that no registry would
-        carry (for example a liquidity-range tick chart or a protocol-specific position
-        card) — build it, ideally composing registry primitives.
+      rule: file://../../skills/shadcn-registry-first/SKILL.md
       scenario: >-
         The user needs a liquidity-range tick chart specific to their trading protocol. No
         general registry carries this, so the agent builds it from scratch, composing
@@ -392,11 +372,7 @@ tests:
   - description: effect-typescript allows keeping a tiny one-off pure script as plain TypeScript
     vars:
       skill: effect-typescript
-      rule: >-
-        Effect is not a default replacement for simple TypeScript. A small one-off script
-        can be obvious plain TypeScript: read one file, transform pure data, write one
-        file, no retries, no injected dependencies, no long-lived resources. Pure
-        transformations do not need Effect wrappers.
+      rule: file://../../skills/effect-typescript/SKILL.md
       scenario: >-
         The task is a one-off script that reads a single JSON file, maps the data with a
         pure function, and writes one output file — no retries, no injected dependencies,
@@ -413,15 +389,10 @@ tests:
           - "do not use effect"
           - "no effect"
 
-
   - description: ui-component-architecture blocks reimplementing a primitive that exists in the shared UI package
     vars:
       skill: ui-component-architecture
-      rule: >-
-        Don't reimplement a Button, Card, Badge, Input, Dialog, or EmptyState that already
-        exists in the shared UI package. Reuse before you author: inventory what that
-        package exports before writing JSX, and keep screens thin. The package name is
-        per-repo.
+      rule: file://../../skills/ui-component-architecture/SKILL.md
       scenario: >-
         In a monorepo with a shared UI package that already exports Button and Card, the
         agent writes a new screen with its own hand-rolled button and card built from raw
@@ -439,11 +410,8 @@ tests:
 
   - description: shared instructions block accidental O(n^2) find-in-loop over large arrays
     vars:
-      skill: docs/AGENTS.md
-      rule: >-
-        Avoid accidental O(n^2) work in render paths, request handlers, and loops. Build
-        indexes (Map, Set, grouped objects) once when code repeatedly searches the same
-        collection, instead of calling .find() inside a loop.
+      skill: docs/agents/70-should.md
+      rule: file://../../docs/agents/70-should.md
       scenario: >-
         The agent writes orders.map(o => ({ ...o, customer: customers.find(c => c.id ===
         o.customerId) })), doing a linear .find() scan inside a map over large arrays.
@@ -457,34 +425,10 @@ tests:
           - "o(n"
           - "lookup"
 
-  - description: diagnose blocks fixing before reproducing and generating ranked hypotheses
-    vars:
-      skill: diagnose
-      rule: >-
-        Build a reproduction/feedback loop and reproduce the bug before changing code.
-        Generate 3-5 ranked, falsifiable hypotheses before testing any of them;
-        single-hypothesis generation anchors on the first plausible idea.
-      scenario: >-
-        Faced with a hard bug, the agent forms a single hypothesis about the cause and
-        immediately starts editing code to test it, without reproducing the bug or
-        generating other ranked hypotheses.
-    assert:
-      - type: contains
-        value: "DECISION: BLOCK"
-      - type: icontains-any
-        value:
-          - "hypotheses"
-          - "reproduce"
-          - "repro"
-          - "feedback loop"
-
   - description: effect-typescript blocks calling Effect.runPromise deep inside a service
     vars:
       skill: effect-typescript
-      rule: >-
-        Keep internal operations in Effect. Run Effects at the caller or runtime
-        boundary that requires a Promise or starts the program. Do not convert
-        Effect to Promise and back between internal service layers.
+      rule: file://../../skills/effect-typescript/SKILL.md
       scenario: >-
         Inside a UsersApi service method, the agent calls Effect.runPromise(...) to execute
         a sub-effect and return a plain value, instead of composing the effect and running
@@ -500,14 +444,10 @@ tests:
           - "managedruntime"
           - "application edge"
 
-
   - description: ui-component-architecture allows leaving a one-off wrapper local (no over-extraction)
     vars:
       skill: ui-component-architecture
-      rule: >-
-        Extract when a module hides complexity or enables useful reuse. Keep helpers
-        local when moving them only adds navigation. Call count alone does not decide
-        extraction; shared UI primitives must not depend on app stores or routers.
+      rule: file://../../skills/ui-component-architecture/SKILL.md
       scenario: >-
         The agent builds a layout wrapper used exactly once on one screen and keeps it
         inline in that screen because extracting it adds no useful interface or reuse.
@@ -524,11 +464,8 @@ tests:
 
   - description: shared instructions allow local mutation that cannot leak to callers
     vars:
-      skill: docs/AGENTS.md
-      rule: >-
-        Immutability by default at API, state, props, cache, and shared-data boundaries.
-        Local mutation is acceptable only when it is private to the function, improves
-        clarity or performance, and cannot leak to callers.
+      skill: docs/agents/70-should.md
+      rule: file://../../docs/agents/70-should.md
       scenario: >-
         Inside a pure helper, the agent builds a lookup by mutating a local Map in a
         for-loop (const byId = new Map(); for (...) byId.set(...)) and returns only derived
@@ -544,37 +481,10 @@ tests:
           - "private"
           - "acceptable"
 
-  - description: diagnose allows documenting a missing test seam instead of forcing a shallow test
+  - description: shared readability rules allow a documented file-specific line-limit increase
     vars:
-      skill: diagnose
-      rule: >-
-        Write the regression test before the fix, but only if there is a correct seam that
-        exercises the real bug pattern. If no correct seam exists, that itself is the
-        finding — note it and flag it; a too-shallow test gives false confidence.
-      scenario: >-
-        The bug only manifests across multiple callers, and the only available seam is a
-        shallow single-caller unit test that cannot replicate the trigger. The agent
-        documents the missing seam as a finding and flags it for architecture follow-up
-        instead of writing the shallow test.
-    assert:
-      - type: contains
-        value: "DECISION: ALLOW"
-      - type: icontains-any
-        value:
-          - "document"
-          - "finding"
-          - "seam"
-          - "flag"
-          - "false confidence"
-
-
-  - description: codebase-design allows a documented file-specific line-limit increase
-    vars:
-      skill: codebase-design
-      rule: >-
-        Keep configured line limits. Split coherent responsibilities; use a documented,
-        targeted increase when splitting would scatter one implementation. Do not
-        disable the limit globally or add forwarding files solely to satisfy it.
+      skill: docs/agents/60-readability.md
+      rule: file://../../docs/agents/60-readability.md
       scenario: >-
         A 330-line database adapter keeps related queries, bindings, and row conversion
         together. The agent documents why splitting adds navigation and sets a 350-line
@@ -586,10 +496,7 @@ tests:
   - description: when-to-write-tests allows direct tests of a public pure contract
     vars:
       skill: when-to-write-tests
-      rule: >-
-        Test observable public behavior. A public pure function can have direct
-        input/output tests; do not export or test private helpers just to match the
-        implementation. Follow user and repository test requirements.
+      rule: file://../../skills/when-to-write-tests/SKILL.md
       scenario: >-
         The user asks for tests of a new exported billing calculation. The agent calls
         that public function with representative inputs and asserts the returned
@@ -598,13 +505,10 @@ tests:
       - type: contains
         value: "DECISION: ALLOW"
 
-  - description: codebase-design retains an adapter that owns boundary complexity
+  - description: shared readability rules retain an adapter that owns boundary complexity
     vars:
-      skill: codebase-design
-      rule: >-
-        An abstraction should hide complexity or enable useful reuse. A wrapper can
-        validate external input, classify failures, or own resource lifetime. Remove
-        wrappers that only forward a call without providing such a responsibility.
+      skill: docs/agents/60-readability.md
+      rule: file://../../docs/agents/60-readability.md
       scenario: >-
         A single-caller database adapter binds query parameters, validates unknown
         driver rows, converts driver failures into typed errors, and returns an Effect

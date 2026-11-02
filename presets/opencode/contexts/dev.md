@@ -8,7 +8,7 @@ Focus: Implementation, coding, building features
 - Implement complete operations and follow requested or project-required test-first development
 - Prefer working solutions over perfect solutions
 - Run existing behavior tests and add meaningful regression coverage for changed outcomes
-- Keep related implementation together; use `codebase-design` when choosing boundaries
+- Keep related implementation together; apply the **Readability and module design** rules when choosing boundaries
 - Extract only to hide complexity or enable useful reuse; retain line limits with narrow documented exceptions
 - Keep commits atomic
 

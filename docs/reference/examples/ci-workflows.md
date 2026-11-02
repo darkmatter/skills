@@ -7,10 +7,10 @@ This shows two CI examples:
 
 ## `darkmatter/skills` repo workflow
 
-Path: `.github/workflows/validate.yml`
+Path: `.github/workflows/validate-skills.yml`
 
 ```yaml
-name: validate
+name: Validate skills
 
 on:
   pull_request:
@@ -18,49 +18,25 @@ on:
     branches: [main]
 
 jobs:
-  validate:
+  validate-skills:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-
-      - name: Validate skills
-        run: scripts/validate-skill.sh
-
-      - name: Validate base instruction files
-        run: |
-          set -eu
-          required='docs/AGENTS.md'
-          for path in $required; do
-            test -e "$path" || { echo "missing $path"; exit 1; }
-          done
-
-      - name: Check skill catalog coverage
-        run: |
-          set -eu
-          for skill in skills/*/SKILL.md; do
-            name="$(basename "$(dirname "$skill")")"
-            grep -q "\`$name\`" docs/catalog.md || {
-              echo "docs/catalog.md missing skill: $name"
-              exit 1
-            }
-          done
-
-      - name: Enforce manual skill convention
-        run: |
-          set -eu
-          for skill in skills/{run,kickoff,setup,init,do}-*/SKILL.md; do
-            [ -e "$skill" ] || continue
-            grep -q '^description:.*Manual-invocation skill' "$skill" || {
-              echo "manual skill missing Manual-invocation description: $skill"
-              exit 1
-            }
-          done
-
-      - name: Shellcheck scripts
-        uses: ludeeus/action-shellcheck@master
-        with:
-          scandir: "./scripts"
+      - uses: cachix/install-nix-action@v31
+      - name: Validate skills (structure, links, catalog, regressions)
+        run: nix build .#checks.x86_64-linux.skills
+      - name: Check generated instructions
+        run: nix build .#checks.x86_64-linux.agents-md
+      - name: Evaluate Home Manager module on the native platform
+        run: nix eval --impure --raw --file scripts/check-home-manager.nix
+      - name: Check sandbox skill subset is in sync
+        run: scripts/sync-sandbox-skills.sh --check
 ```
+
+The sandbox drift check reads `.agents/skills.manifest` and compares the
+generated `.agents/skills/` tree against it. Both are required for the Centaur
+sandbox distribution: a checkout without the manifest fails the check instead
+of producing or validating an empty subset.
 
 ## Downstream project workflow
 

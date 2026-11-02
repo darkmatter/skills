@@ -5,8 +5,8 @@ description: Decide whether a new test is needed. Use before writing or requesti
 
 # When to write tests
 
-Test observable behavior through the capability's interface. Follow
-[codebase-design](../codebase-design/SKILL.md) for the shared rules and examples.
+Test observable behavior through the capability's interface. Apply the
+**Readability and module design** rules from the shared agent instructions.
 Prefer a few tests that cover real behavior over a test for every private helper.
 
 ## Default
@@ -14,6 +14,14 @@ Prefer a few tests that cover real behavior over a test for every private helper
 No new test.
 
 Smoke the changed path (run the thing). That is verification.
+
+## TDD is explicit opt-in
+
+TDD changes how a required test is written, not whether one is required. Use
+the red/green/refactor procedure only when the user explicitly requests TDD or
+the repository requires it, and then follow the invoked TDD command or
+workflow. Do not silently impose TDD, manufacture a failing test, or require
+test-first for ordinary behavior work merely because a test is needed.
 
 ## Write a test only when
 
@@ -26,7 +34,11 @@ function, assert its input/output behavior directly. Test failure, ordering,
 and cleanup when they are part of the contract; do not add a layer of tests
 for private helpers or assertions about internal calls.
 
-Put it next to the source as `<file>.test.ts`, not in a separate `test/` or `tests/` directory. Only a test that spawns the real server or CLI, or spans packages, goes in the repo-root `tests/`.
+Place the test where the language toolchain skill requires. For TypeScript,
+`darkmatter-ts-toolchain` owns placement: `<file>.test.ts` beside the source it
+covers, with the repo-root `tests/` reserved for end-to-end tests that spawn the
+real server or CLI or span packages. Do not add a per-package `test/` or
+`tests/` directory. Other stacks follow their toolchain or project convention.
 
 ## Do not write a test for
 
