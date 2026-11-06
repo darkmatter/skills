@@ -35,7 +35,7 @@ export function Hero() {
           design system
         </h1>
         <p className="mt-6 max-w-[640px] text-lg leading-[1.55] text-zinc-400">
-          The dark-first, terminal-inspired system behind darkmatter — a
+          The dark-first, terminal-inspired system behind Darkmatter — a
           bootstrapped app studio building software, protocols, and trading
           infrastructure at the intersection of AI and crypto.
         </p>

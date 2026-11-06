@@ -170,7 +170,7 @@ export function ComponentsSection() {
             </Alert>
             <Accordion type="single" collapsible>
               <AccordionItem value="a">
-                <AccordionTrigger className="font-mono text-[13px]">What is darkmatter?</AccordionTrigger>
+                <AccordionTrigger className="font-mono text-[13px]">What is Darkmatter?</AccordionTrigger>
                 <AccordionContent className="font-mono text-[12px] text-zinc-400">
                   A bootstrapped app studio building at the AI/crypto intersection.
                 </AccordionContent>

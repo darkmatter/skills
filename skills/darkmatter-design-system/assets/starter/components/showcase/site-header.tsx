@@ -1,5 +1,6 @@
 "use client"
 
+import { Logo } from "@/components/logo"
 import { GitHubIcon } from "@/components/ui/github-icon"
 import { Button } from "@/components/ui/button"
 
@@ -15,17 +16,14 @@ export function SiteHeader() {
   return (
     <header className="fixed inset-x-0 top-0 z-50 border-b border-zinc-900/70 bg-black/70 backdrop-blur-md">
       <div className="mx-auto flex h-16 max-w-[1280px] items-center justify-between px-6">
-        <a href="#top" className="flex items-center gap-2.5">
-          <img src="/img/logo-square-white.svg" alt="darkmatter" width={22} height={22} />
-          <span className="font-mono text-sm font-semibold tracking-[-0.01em] text-white">
-            darkmatter
-          </span>
-          <span className="ml-1 rounded-full border border-zinc-800 px-2 py-0.5 font-mono text-[10px] tracking-[0.04em] text-zinc-500 lowercase">
-            design system
-          </span>
+        <a href="#top" className="flex items-center">
+          {/* Phones get the mark: the wordmark would crowd the buttons. */}
+          <Logo artwork="mark" height={15} descriptor="design system" className="sm:hidden" />
+          <Logo artwork="wordmark" height={18} descriptor="design system" className="max-sm:hidden" />
         </a>
 
-        <nav className="hidden items-center gap-7 md:flex">
+        {/* The links fit beside the wordmark and the buttons from `lg`; at `md` they push "Get started" off the edge. */}
+        <nav className="hidden items-center gap-7 lg:flex">
           {NAV.map((item) => (
             <a
               key={item.href}

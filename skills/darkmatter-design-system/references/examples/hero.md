@@ -49,7 +49,7 @@ export function Hero() {
         </h1>
 
         <p className="mt-6 max-w-[640px] text-lg leading-relaxed text-muted-foreground">
-          The dark-first, terminal-inspired system behind darkmatter — a
+          The dark-first, terminal-inspired system behind Darkmatter — a
           bootstrapped app studio building software, protocols, and trading
           infrastructure at the intersection of AI and crypto.
         </p>

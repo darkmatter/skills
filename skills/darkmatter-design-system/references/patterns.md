@@ -6,7 +6,7 @@ Cross-cutting composition guidance for darkmatter screens. For component APIs se
 
 ```tsx
 <div className="min-h-screen bg-background text-foreground">
-  <header>{/* nav: white wordmark + font-mono links */}</header>
+  <header>{/* nav: white wordmark from assets/logos.md + font-sans links */}</header>
   <main className="mx-auto w-full max-w-6xl px-4 sm:px-6 lg:px-8">
     {/* sections with py-16 / py-24 rhythm */}
   </main>
@@ -41,4 +41,4 @@ Wrap rendered markdown in `<div className="prose-dark">` — it sets Lora body +
 
 ## Voice
 
-Terminal-forward and precise. Lead with `font-mono` for brand/display/labels/metrics; keep paragraphs in `font-sans` (Geist). Muted secondary text (`text-muted-foreground`). Restraint over decoration — the black canvas and mono type do the work; glows are accents.
+Terminal-forward and precise. Lead with `font-mono` for display/labels/metrics; keep paragraphs in `font-sans` (Geist). Muted secondary text (`text-muted-foreground`). Restraint over decoration — the black canvas and mono type do the work; glows are accents.
