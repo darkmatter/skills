@@ -4,11 +4,11 @@ import { ThemeProvider } from "@/components/theme-provider";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "darkmatter — design system",
+  title: "Darkmatter — design system",
   description:
-    "The visual and interaction language for darkmatter: a dark-first, terminal-inspired system built on Radix, Tailwind v4, and Geist Mono.",
+    "The visual and interaction language for Darkmatter: a dark-first, terminal-inspired system built on Radix, Tailwind v4, and Geist Mono.",
   icons: {
-    icon: "/img/logo-square-white.svg",
+    icon: [{ url: "/favicon-16.png", sizes: "16x16", type: "image/png" }],
   },
 };
 

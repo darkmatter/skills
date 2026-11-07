@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/navigation-menu"
 ```
 
-Use for the primary top-nav on marketing/product pages. Wordmark + links commonly set in `font-mono`.
+Use for the primary top-nav on marketing/product pages. Lead it with the logo artwork from [`../assets/logos.md`](../assets/logos.md).
 
 ## Breadcrumb
 

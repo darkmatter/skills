@@ -49,6 +49,7 @@ To build a screen: add routes/components under the app, import from the UI packa
 - **Spacing, radii & layout** → `references/foundations/spacing-layout.md`
 - **Responsiveness & breakpoints** → `references/foundations/responsiveness.md` (always consult before building layouts)
 - **Motion** → `references/foundations/motion.md`
+- **Logo, favicon & icons** → `references/assets/logos.md`
 - **Component catalog + task-area docs** → `references/components/index.md`
 - **Worked examples** → `references/examples/`
 

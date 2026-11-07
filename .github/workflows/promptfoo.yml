@@ -18,7 +18,9 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: 22
+          # promptfoo 0.121.9 requires Node >=22.22.0, so pin a range that
+          # excludes older cached 22.x runtimes but stays on Node 22.
+          node-version: ">=22.22.0 <23"
           cache: npm
 
       - name: Install dependencies
@@ -55,7 +57,8 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: 22
+          # Same Node floor as the skill-evals job (promptfoo 0.121.9).
+          node-version: ">=22.22.0 <23"
           cache: npm
 
       - name: Install dependencies
