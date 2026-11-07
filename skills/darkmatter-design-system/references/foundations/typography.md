@@ -15,7 +15,7 @@ Note the base layer in `globals.css`: `h1`–`h6` already default to `font-headi
 
 ## Brand voice rule
 
-Reach for `font-mono` (Geist Mono) for the moments that should feel like darkmatter: hero display headings, eyebrow/section labels (often uppercase + tracked), metrics, badges, the nav wordmark, and anything terminal-flavored. Use `font-sans` (Geist) for readable body copy **and for interactive controls** — button labels and nav links render in sans (the `Button` base sets `font-sans`; give nav links `font-sans` too). Don't set body paragraphs, button labels, or nav links in mono; mono there reads as overused.
+Reach for `font-mono` (Geist Mono) for the moments that should feel like darkmatter: hero display headings, eyebrow/section labels (often uppercase + tracked), metrics, badges, and anything terminal-flavored. Use `font-sans` (Geist) for readable body copy **and for interactive controls** — button labels and nav links render in sans (the `Button` base sets `font-sans`; give nav links `font-sans` too). Don't set body paragraphs, button labels, or nav links in mono; mono there reads as overused.
 
 ## Large mono display rule (important)
 
