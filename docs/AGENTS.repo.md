@@ -4,8 +4,7 @@ This repo is **infrastructure for other agent projects**, not an agent project i
 
 What lives here:
 
-- `skills/` — team-wide shared skills, distributed via the Nix Home Manager module exported by `flake.nix`
-- `.agents/skills/` — GENERATED subset of `skills/` shipped to Centaur sandboxes, managed by flake-skills (the `mkSkillsFlake` export in `flake.nix`); never edited by hand
+- `skills/` — team-wide shared skills, distributed via the Nix Home Manager module exported by `flake.nix`; Centaur sandboxes consume this same directory directly, with no manifest or generated subset
 - `references/` — per-language reference codebases (`rust/`, `go/`, `typescript/`) showing preferred conventions as exemplar code
 - `docs/agents/` — shared instruction topics named `<NN>-<topic>.md`; filenames set bundle order, files are discovered automatically, and the suffix becomes the key in the flake output `agentsMd`
 - `docs/AGENTS.md` — GENERATED bundle of every topic (`packages.agents-md-shared`); the Home Manager module installs it as every LLM client's global `AGENTS.md`. The root `AGENTS.md` is generated too: every topic plus `docs/AGENTS.repo.md`, via `packages.agents-md`
