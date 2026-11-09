@@ -65,8 +65,10 @@ Treat the submodule as read-only during app/deploy work. Edit it only when the u
 Prefer Bun unless the project already standardizes on another package manager. Current Alchemy v2 docs recommend Bun or Node.js 22+ and install Alchemy with Effect platform packages:
 
 ```bash
-bun add "alchemy@2.0.0-beta.40" "effect@>=4.0.0-beta.66 || >=4.0.0" "@effect/platform-bun@>=4.0.0-beta.66 || >=4.0.0" "@effect/platform-node@>=4.0.0-beta.66 || >=4.0.0"
+bun add "alchemy@2.0.0-beta.85" "@alchemy.run/cloudflare@2.0.0-beta.85" "effect@^4.1.0" "@effect/platform-bun@^4.1.0" "@effect/platform-node@^4.1.0"
 ```
+
+Since 2.0.0-beta.84, providers ship as their own packages at the same version as `alchemy`: `@alchemy.run/cloudflare`, `@alchemy.run/aws`, `@alchemy.run/github`, and so on, replacing the `alchemy/Cloudflare`-style subpaths. Framework adapters for `Cloudflare.Website.*` come from `@alchemy.run/frontend-frameworks`. Beta.85 requires Effect `^4.1.0`.
 
 Pin package versions according to the existing repo policy. If a repo already uses a catalog, workspace protocol, or lockfile-only upgrade lane, follow that instead of pasting the docs command blindly.
 
@@ -120,7 +122,7 @@ Every deploy file should default-export `Alchemy.Stack(name, options, Effect.gen
 
 ```ts
 import * as Alchemy from "alchemy";
-import * as Cloudflare from "alchemy/Cloudflare";
+import * as Cloudflare from "@alchemy.run/cloudflare";
 import * as Effect from "effect/Effect";
 
 export default Alchemy.Stack(

@@ -5,7 +5,7 @@ on:
       - "main"
 jobs:
   flakehub-publish:
-    runs-on: "ubuntu-latest"
+    runs-on: "arc"
     permissions:
       id-token: "write"
       contents: "read"
@@ -13,7 +13,8 @@ jobs:
       - uses: "actions/checkout@v6"
         with:
           persist-credentials: false
-      - uses: "DeterminateSystems/determinate-nix-action@v3"
+      # No DeterminateSystems/determinate-nix-action step: the arc runner image
+      # already ships Determinate Nix, so there is nothing to install.
       - uses: "DeterminateSystems/flakehub-push@main"
         with:
           name: "darkmatter/skills"

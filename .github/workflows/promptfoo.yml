@@ -8,7 +8,7 @@ on:
 
 jobs:
   skill-evals:
-    runs-on: ubuntu-latest
+    runs-on: arc
     permissions:
       contents: read
     env:
@@ -21,20 +21,28 @@ jobs:
           # promptfoo 0.121.9 requires Node >=22.22.0, so pin a range that
           # excludes older cached 22.x runtimes but stays on Node 22.
           node-version: ">=22.22.0 <23"
-          cache: npm
+
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version-file: package.json
 
       - name: Install dependencies
-        run: npm ci
+        run: bun install --frozen-lockfile --ignore-scripts
+
+      # Second pass without --ignore-scripts runs trusted native deps (the
+      # better-sqlite3 prebuild promptfoo needs); untrusted stay blocked.
+      - name: Build trusted native dependencies
+        run: bun install --frozen-lockfile --force
 
       - name: Validate Promptfoo configs
-        run: npm run eval:validate
+        run: bun run eval:validate
 
       - name: Require model provider secrets
         run: |
           test -n "$OPENAI_API_KEY" || { echo 'OPENAI_API_KEY secret is required for Promptfoo CI evals'; exit 1; }
 
       - name: Run skill evals
-        run: npm run eval:ci
+        run: bun run eval:ci
 
       - name: Upload eval artifacts
         if: always()
@@ -49,7 +57,7 @@ jobs:
     # they make real model calls + network clones of darkmatter repos, so they
     # are not run in CI. We DO run their pure diff-assertion unit tests here,
     # which need no model and no network.
-    runs-on: ubuntu-latest
+    runs-on: arc
     permissions:
       contents: read
     steps:
@@ -59,13 +67,19 @@ jobs:
         with:
           # Same Node floor as the skill-evals job (promptfoo 0.121.9).
           node-version: ">=22.22.0 <23"
-          cache: npm
+
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version-file: package.json
 
       - name: Install dependencies
-        run: npm ci
+        run: bun install --frozen-lockfile --ignore-scripts
+
+      - name: Build trusted native dependencies
+        run: bun install --frozen-lockfile --force
 
       - name: Validate Promptfoo configs
-        run: npm run eval:validate
+        run: bun run eval:validate
 
       - name: Run prompt-test assertion unit tests
-        run: npm run test:prompt-tests
+        run: bun run test:prompt-tests

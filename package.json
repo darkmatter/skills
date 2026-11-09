@@ -1,4 +1,5 @@
 {
+  "name": "@darkmatter/skills",
   "private": true,
   "type": "module",
   "skills": [
@@ -18,5 +19,16 @@
   },
   "devDependencies": {
     "promptfoo": "0.121.9"
-  }
+  },
+  "packageManager": "bun@1.4.4",
+  "overrides": {
+    "@effect/platform-node-shared": "4.1.2",
+    "@effect/sql-d1": "4.1.2",
+    "@effect/sql-sqlite-do": "4.1.2",
+    "vite": "npm:@voidzero-dev/vite-plus-core@1.2.0",
+    "vitest": "5.0.4"
+  },
+  "trustedDependencies": [
+    "better-sqlite3"
+  ]
 }

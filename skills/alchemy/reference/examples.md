@@ -80,7 +80,7 @@ Use it when you need to wire multiple Cloudflare resources into one Worker and v
 
 ```ts
 import * as Alchemy from "alchemy";
-import * as Cloudflare from "alchemy/Cloudflare";
+import * as Cloudflare from "@alchemy.run/cloudflare";
 import * as Effect from "effect/Effect";
 
 import { Gateway } from "./src/AiGateway.ts";
@@ -143,7 +143,7 @@ Use it when the local development path matters as much as deploy: public preview
 
 ```ts
 import * as Alchemy from "alchemy";
-import * as Cloudflare from "alchemy/Cloudflare";
+import * as Cloudflare from "@alchemy.run/cloudflare";
 import * as Effect from "effect/Effect";
 import type { Counter as CounterClass } from "./src/AsyncWorker.ts";
 import EffectWorker from "./src/EffectWorker.ts";
@@ -187,7 +187,7 @@ Use it when a frontend deploy needs to bind directly to backend infrastructure i
 
 ```ts
 import * as Alchemy from "alchemy";
-import * as Cloudflare from "alchemy/Cloudflare";
+import * as Cloudflare from "@alchemy.run/cloudflare";
 import * as Effect from "effect/Effect";
 import Backend, { Bucket } from "./src/backend.ts";
 
@@ -226,7 +226,7 @@ Use this for a Next.js app built by OpenNext for Cloudflare Workers. The importa
 
 ```ts
 import * as Alchemy from "alchemy";
-import * as Cloudflare from "alchemy/Cloudflare";
+import * as Cloudflare from "@alchemy.run/cloudflare";
 import * as Effect from "effect/Effect";
 
 export default Alchemy.Stack(
@@ -274,7 +274,7 @@ Use it when an AWS deploy needs function outputs to feed observability resources
 
 ```ts
 import * as Alchemy from "alchemy";
-import * as AWS from "alchemy/AWS";
+import * as AWS from "@alchemy.run/aws";
 import * as Output from "alchemy/Output";
 import * as Effect from "effect/Effect";
 import JobFunction from "./src/JobFunction.ts";
@@ -366,7 +366,7 @@ Use this when backend and frontend should deploy together and frontend build-tim
 
 ```ts
 import * as Alchemy from "alchemy";
-import * as Cloudflare from "alchemy/Cloudflare";
+import * as Cloudflare from "@alchemy.run/cloudflare";
 import * as Effect from "effect/Effect";
 import { Path } from "effect/Path";
 import Service from "./backend/src/Service.ts";
@@ -405,7 +405,7 @@ Sources:
 Use this when packages deploy independently and the frontend should reference the backend stack output explicitly.
 
 ```ts
-import * as Cloudflare from "alchemy/Cloudflare";
+import * as Cloudflare from "@alchemy.run/cloudflare";
 import * as Effect from "effect/Effect";
 import Service from "./src/Service.ts";
 import { Backend } from "./src/Stack.ts";
@@ -426,7 +426,7 @@ export default Backend.make(
 
 ```ts
 import * as Alchemy from "alchemy";
-import * as Cloudflare from "alchemy/Cloudflare";
+import * as Cloudflare from "@alchemy.run/cloudflare";
 import { Backend } from "@monorepo-multi-stack/backend";
 import * as Effect from "effect/Effect";
 

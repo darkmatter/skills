@@ -19,10 +19,11 @@ on:
 
 jobs:
   validate-skills:
-    runs-on: ubuntu-latest
+    runs-on: arc
     steps:
       - uses: actions/checkout@v4
-      - uses: cachix/install-nix-action@v31
+      # No cachix/install-nix-action step: the arc runner image already ships
+      # Nix with flakes enabled.
       - name: Validate skills (structure, links, catalog, regressions)
         run: nix build .#checks.x86_64-linux.skills
       - name: Check generated instructions
@@ -48,7 +49,7 @@ on:
 
 jobs:
   agent-policy:
-    runs-on: ubuntu-latest
+    runs-on: arc
     steps:
       - uses: actions/checkout@v4
 
@@ -68,6 +69,13 @@ jobs:
             exit 1
           }
 
+      # The arc runner image does not guarantee Python.
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.x"
+
+      - run: pip install pyyaml
+
       - name: Parse agent.yaml
         run: |
           python3 - <<'PY'
@@ -82,6 +90,11 @@ jobs:
         uses: gitleaks/gitleaks-action@v2
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      # arc keeps Node off PATH until setup-node runs; corepack/pnpm below need it.
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
 
       - name: Project checks
         run: |
