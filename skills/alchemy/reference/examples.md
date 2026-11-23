@@ -8,27 +8,28 @@ Upstream root: `https://github.com/alchemy-run/alchemy-effect/tree/main/examples
 
 ## First choices by deploy shape
 
-| Scenario                                                                        | Start with                                                                                          | What to inspect                                                                           |
-| ------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------- |
-| Basic Cloudflare Worker with R2, D1, Queue, Durable Object, assets, and secrets | `examples/cloudflare-worker`                                                                        | `alchemy.run.ts`, worker bindings, queue consumer registration, `Cloudflare.InferEnv`     |
-| Async Cloudflare Worker and Durable Object wiring                               | `examples/cloudflare-worker-async`                                                                  | Worker + DO namespace declaration and binding shape                                       |
-| Local Cloudflare development with multiple workers and `alchemy dev`            | `examples/cloudflare-dev`                                                                           | Multiple worker outputs, DO binding, dev ports, and feedback loops                        |
-| Next.js / OpenNext app on Cloudflare Workers                                    | Inline `Next.js / OpenNext Worker` example below                                                    | `.open-next/worker.js`, `.open-next/assets`, Worker asset handling, `nodejs_compat` flags |
-| TanStack app on Cloudflare                                                      | `examples/cloudflare-tanstack`, `examples/cloudflare-tanstack-start-solid`                          | `Cloudflare.Vite`, backend worker binding, `nodejs_compat`                                |
-| Solid/Vue frontend deploys                                                      | `examples/cloudflare-solidstart`, `examples/cloudflare-solidjs-ssr`, `examples/cloudflare-vue`      | Framework-specific Vite/SSR wiring                                                        |
-| Cloudflare + Neon + Drizzle                                                     | `examples/cloudflare-neon-drizzle`                                                                  | Database binding and migration shape                                                      |
-| Cloudflare + PlanetScale + Drizzle                                              | `examples/cloudflare-planetscale-mysql-drizzle`, `examples/cloudflare-planetscale-postgres-drizzle` | Database provider, branch/password resources, Drizzle migration shape                     |
-| Cloudflare secrets                                                              | `examples/cloudflare-secrets-store`                                                                 | Secret storage and Worker access pattern                                                  |
-| Cloudflare email routing                                                        | `examples/cloudflare-email`                                                                         | Email routing resources and worker integration                                            |
-| Git-backed artifacts on Cloudflare                                              | `examples/cloudflare-git-artifacts`                                                                 | Build/artifact resource flow                                                              |
-| AWS Lambda function                                                             | `examples/aws-lambda`                                                                               | `AWS.providers()`, `Alchemy.localState()`, Lambda outputs, CloudWatch dashboard/alarm     |
-| AWS Lambda with HTTP API                                                        | `examples/aws-lambda-httpapi`                                                                       | API Gateway / function URL style HTTP deploy                                              |
-| AWS Lambda RPC                                                                  | `examples/aws-lambda-rpc`                                                                           | Effect RPC-style runtime wiring                                                           |
-| AWS REST API                                                                    | `examples/aws-rest-api`                                                                             | API Gateway v1 resources                                                                  |
-| AWS static site or Vite                                                         | `examples/aws-static-site`, `examples/aws-vite`                                                     | Static assets, CDN/site deploy shape                                                      |
-| AWS EC2/ECS/EKS/RDS                                                             | `examples/aws-ec2`, `examples/aws-ecs`, `examples/aws-eks`, `examples/aws-rds`                      | Long-lived infrastructure resources and provider/region assumptions                       |
-| Monorepo, one stack                                                             | `examples/monorepo-single-stack`                                                                    | Package layout with one deploy unit                                                       |
-| Monorepo, multiple stacks                                                       | `examples/monorepo-multi-stack`                                                                     | Stack boundaries and deploy ordering                                                      |
+| Scenario                                                                        | Start with                                                                                                | What to inspect                                                                                 |
+| ------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------- |
+| Basic Cloudflare Worker with R2, D1, Queue, Durable Object, assets, and secrets | `examples/cloudflare-worker`                                                                              | `alchemy.run.ts`, worker bindings, queue consumer registration, `Cloudflare.InferEnv`           |
+| Async Cloudflare Worker and Durable Object wiring                               | `examples/cloudflare-worker-async`                                                                        | Worker + DO namespace declaration and binding shape                                             |
+| Local Cloudflare development with multiple workers and `alchemy dev`            | `examples/cloudflare-dev`                                                                                 | Multiple worker outputs, DO binding, dev ports, and feedback loops                              |
+| Next.js / OpenNext app on Cloudflare Workers                                    | Inline `Next.js / OpenNext Worker` example below                                                          | `.open-next/worker.js`, `.open-next/assets`, Worker asset handling, `nodejs_compat` flags       |
+| Rust Cloudflare Worker (workers-rs)                                             | Inline `Rust Worker (workers-rs)` example below; `darkmatter/template` `crates/cloudflare-worker-example` | `Command.Build` running `worker-build`, `bundle: false`, wasm module upload, devshell toolchain |
+| TanStack app on Cloudflare                                                      | `examples/cloudflare-tanstack`, `examples/cloudflare-tanstack-start-solid`                                | `Cloudflare.Vite`, backend worker binding, `nodejs_compat`                                      |
+| Solid/Vue frontend deploys                                                      | `examples/cloudflare-solidstart`, `examples/cloudflare-solidjs-ssr`, `examples/cloudflare-vue`            | Framework-specific Vite/SSR wiring                                                              |
+| Cloudflare + Neon + Drizzle                                                     | `examples/cloudflare-neon-drizzle`                                                                        | Database binding and migration shape                                                            |
+| Cloudflare + PlanetScale + Drizzle                                              | `examples/cloudflare-planetscale-mysql-drizzle`, `examples/cloudflare-planetscale-postgres-drizzle`       | Database provider, branch/password resources, Drizzle migration shape                           |
+| Cloudflare secrets                                                              | `examples/cloudflare-secrets-store`                                                                       | Secret storage and Worker access pattern                                                        |
+| Cloudflare email routing                                                        | `examples/cloudflare-email`                                                                               | Email routing resources and worker integration                                                  |
+| Git-backed artifacts on Cloudflare                                              | `examples/cloudflare-git-artifacts`                                                                       | Build/artifact resource flow                                                                    |
+| AWS Lambda function                                                             | `examples/aws-lambda`                                                                                     | `AWS.providers()`, `Alchemy.localState()`, Lambda outputs, CloudWatch dashboard/alarm           |
+| AWS Lambda with HTTP API                                                        | `examples/aws-lambda-httpapi`                                                                             | API Gateway / function URL style HTTP deploy                                                    |
+| AWS Lambda RPC                                                                  | `examples/aws-lambda-rpc`                                                                                 | Effect RPC-style runtime wiring                                                                 |
+| AWS REST API                                                                    | `examples/aws-rest-api`                                                                                   | API Gateway v1 resources                                                                        |
+| AWS static site or Vite                                                         | `examples/aws-static-site`, `examples/aws-vite`                                                           | Static assets, CDN/site deploy shape                                                            |
+| AWS EC2/ECS/EKS/RDS                                                             | `examples/aws-ec2`, `examples/aws-ecs`, `examples/aws-eks`, `examples/aws-rds`                            | Long-lived infrastructure resources and provider/region assumptions                             |
+| Monorepo, one stack                                                             | `examples/monorepo-single-stack`                                                                          | Package layout with one deploy unit                                                             |
+| Monorepo, multiple stacks                                                       | `examples/monorepo-multi-stack`                                                                           | Stack boundaries and deploy ordering                                                            |
 
 ## Current example directories
 
@@ -266,6 +267,59 @@ export default Alchemy.Stack(
 );
 ```
 
+### Rust Worker (workers-rs)
+
+Use this for a Cloudflare Worker written in Rust with [workers-rs](https://github.com/cloudflare/workers-rs). Alchemy has no Rust support of its own: `worker-build --release` compiles the crate into `build/index.js` (the entry) and `build/index_bg.wasm`, and a Worker with `bundle: false` uploads that output unchanged. With `bundle: false`, Alchemy walks the entry's directory recursively and uploads every file matching the default module rules (`.js`/`.mjs`, `.wasm`, `.txt`/`.html`/`.sql`, `.bin`) as an additional module, so keep unrelated files out of `build/`. A `Command.Build` runs `worker-build` before the Worker, and deriving `main` from its `outdir` makes the Worker wait for it. The build reruns only when a file matched by `memo.include` changes. Bindings go in `env` and are read in Rust with `env.var("GREETING")` and `env.bucket("ARTIFACTS")`.
+
+Working reference: `crates/cloudflare-worker-example` and `packages/infra/src/rust-cloudflare-worker.ts` in `darkmatter/template`. It is verified with deploy, redeploy, R2 binding, `alchemy dev`, and destroy on alchemy `2.0.0-beta.81`.
+
+```ts
+import * as Cloudflare from "alchemy/Cloudflare";
+import * as Command from "alchemy/Command";
+import * as Output from "alchemy/Output";
+import * as Effect from "effect/Effect";
+import { Path } from "effect/Path";
+
+import { ArtifactStore } from "#storage.ts"; // the stack's R2 bucket
+
+export const RustCloudflareWorker = Effect.gen(function* () {
+  const path = yield* Path;
+  const crateDir = path.resolve(import.meta.dirname, "../../../crates/cloudflare-worker-example");
+
+  const build = yield* Command.Build("RustCloudflareWorkerBuild", {
+    command: "worker-build --release",
+    cwd: crateDir,
+    outdir: "build",
+    memo: {
+      // Relative to the crate (cwd). Point at the workspace root's files.
+      include: [
+        "src/**",
+        "Cargo.toml",
+        "../../Cargo.toml",
+        "../../Cargo.lock",
+        "../../.cargo/config.toml",
+      ],
+    },
+  });
+
+  return yield* Cloudflare.Worker("RustCloudflareWorker", {
+    main: build.outdir.pipe(Output.map((outdir) => path.join(outdir, "index.js"))),
+    bundle: false,
+    env: { ARTIFACTS: ArtifactStore, GREETING: "Hello from Rust!" },
+  });
+});
+```
+
+Gotchas:
+
+- **Toolchain.** `worker-build` needs the `wasm32-unknown-unknown` standard library and `lld`. In a Nix devshell, add `pkgs.worker-build` and `pkgs.lld`. nixpkgs `rustc` already ships the wasm32 std. `cargo install worker-build` needs OpenSSL headers and fails on hosts without them. workers-rs 0.8 needs Rust 1.88 or newer (through `wasm-streams` 0.6); set `rust-version = "1.88"` on the crate if the workspace declares an older one.
+- **Memo paths are relative to the crate.** `memo.include` resolves against the build's `cwd`. A crate at a different depth needs different `../` paths to reach the workspace `Cargo.toml` and `Cargo.lock`; a glob that matches nothing fails silently and lockfile bumps stop triggering rebuilds. Toolchain upgrades are not hashed; delete `build/` to force a rebuild.
+- **Deploys need the toolchain.** Once the stack yields the Worker, `alchemy deploy` and `alchemy dev` run `worker-build` on a fresh checkout or whenever the hashed inputs change, so anyone deploying the stack needs it on `PATH`. `alchemy plan` only hashes files.
+- **`alchemy dev` does not watch Rust.** Dev builds the crate once and serves it from local workerd. Rerun `worker-build --release` after an edit and the local Worker reloads.
+- **Dev replaces the stage's cloud Worker.** Running `alchemy dev` on a stage that has a deployed Worker swaps in the local one and deletes the deployed Worker. Use a separate stage for dev.
+- **`CI` set in the environment.** When `CI` is truthy, Alchemy ignores saved profiles and requires `CLOUDFLARE_ACCOUNT_ID` and `CLOUDFLARE_API_TOKEN`. Unset it (`env -u CI`) to use a local `alchemy login` profile from an agent shell that exports `CI`.
+- **Host checks still work.** A workers-rs crate compiles for the host, so it can stay a Cargo workspace member and be covered by `cargo check --workspace` and `cargo test --workspace` without the wasm toolchain.
+
 ### AWS Lambda
 
 Source: `https://github.com/alchemy-run/alchemy-effect/blob/main/examples/aws-lambda/alchemy.run.ts`
@@ -464,3 +518,4 @@ export default Alchemy.Stack(
 - For webhook-driven apps, document which output URL should be registered with the external provider during dev or preview testing.
 - Keep references as links to upstream examples so the local docs do not drift.
 - For Next.js/OpenNext Workers, keep `bundle: false`, asset paths, and compatibility flags aligned with the build output generated by the target project.
+- For Rust (workers-rs) Workers, derive `main` from a `Command.Build` running `worker-build`, and list every input that shapes the wasm (crate sources, crate and workspace `Cargo.toml`, `Cargo.lock`, `.cargo/config.toml`) in `memo.include` so the build reruns when they change.
