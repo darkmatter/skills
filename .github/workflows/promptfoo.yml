@@ -8,11 +8,14 @@ on:
 
 jobs:
   skill-evals:
+    if: >-
+      github.event_name == 'push' ||
+      (github.event.pull_request.head.repo.full_name == github.repository &&
+       github.event.pull_request.user.login != 'dependabot[bot]' &&
+       github.actor != 'dependabot[bot]')
     runs-on: arc
     permissions:
       contents: read
-    env:
-      OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
     steps:
       - uses: actions/checkout@v4
 
@@ -37,20 +40,22 @@ jobs:
       - name: Validate Promptfoo configs
         run: bun run eval:validate
 
-      - name: Require model provider secrets
+      - name: Run skill evals
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
         run: |
           test -n "$OPENAI_API_KEY" || { echo 'OPENAI_API_KEY secret is required for Promptfoo CI evals'; exit 1; }
+          bun run eval:ci
 
-      - name: Run skill evals
-        run: bun run eval:ci
-
+      # Provider errors may include request details. Publish only verified results.
       - name: Upload eval artifacts
-        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: promptfoo-skill-evals
-          path: evals/results/*
-          if-no-files-found: ignore
+          path: |
+            evals/results/skills.json
+            evals/results/skills.html
+          if-no-files-found: error
 
   prompt-test-unit:
     # The real prompt-test evals (evals/prompt-tests) are LOCAL/MANUAL ONLY:
@@ -83,3 +88,6 @@ jobs:
 
       - name: Run prompt-test assertion unit tests
         run: bun run test:prompt-tests
+
+      - name: Test evaluation result checks with a local provider
+        run: bun test evals/skills/verify-results.test.js

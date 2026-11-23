@@ -12,7 +12,7 @@
   ],
   "scripts": {
     "eval:validate": "promptfoo validate config -c evals/skills/promptfooconfig.yaml -c evals/prompt-tests/promptfooconfig.yaml",
-    "eval:ci": "promptfoo eval -c evals/skills/promptfooconfig.yaml --no-share --output evals/results/skills.json --output evals/results/skills.html",
+    "eval:ci": "bun evals/skills/verify-results.js",
     "test:prompt-tests": "node --test evals/prompt-tests/assertions.test.js evals/prompt-tests/assert/check.test.js",
     "eval:prompt-tests:prewarm": "python3 evals/prompt-tests/prewarm.py",
     "eval:prompt-tests": "npm run eval:prompt-tests:prewarm && promptfoo eval -c evals/prompt-tests/promptfooconfig.yaml --no-share --no-cache -j 1 --output evals/results/prompt-tests.json --output evals/results/prompt-tests.html"

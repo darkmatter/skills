@@ -1,0 +1,43 @@
+{
+  "results": {
+    "stats": {
+      "successes": 0,
+      "failures": 0,
+      "errors": 0
+    },
+    "results": [
+      {
+        "success": false,
+        "failureReason": 2,
+        "promptIdx": 0,
+        "gradingResult": null,
+        "error": "API error: 401 Unauthorized",
+        "provider": {
+          "id": "openai:chat:gpt-5.5"
+        },
+        "testCase": {
+          "description": "first"
+        },
+        "response": {
+          "error": "API error: 401 Unauthorized"
+        }
+      },
+      {
+        "success": false,
+        "failureReason": 2,
+        "promptIdx": 0,
+        "gradingResult": null,
+        "error": "API error: 401 Unauthorized",
+        "provider": {
+          "id": "openai:chat:gpt-5.5"
+        },
+        "testCase": {
+          "description": "second"
+        },
+        "response": {
+          "error": "API error: 401 Unauthorized"
+        }
+      }
+    ]
+  }
+}
