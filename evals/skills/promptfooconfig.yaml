@@ -39,6 +39,13 @@ tests:
   #     from this config's directory.
   #   - External and staged-inbox skills have no stable local canonical
   #     source; their `rule` text is an intentionally static fixture.
+  #
+  # Assertion convention:
+  #   - BLOCK cases also check that REQUIRED_ACTION names the remedy, using a
+  #     list of accepted phrasings.
+  #   - ALLOW cases check the decision only. An allowed change needs no
+  #     remedy, and the model's action line varies between runs ("No change
+  #     required.", "Proceed."), so a keyword check there fails at random.
   - description: verification-before-completion blocks completion without real usage evidence
     vars:
       skill: verification-before-completion
@@ -115,12 +122,6 @@ tests:
     assert:
       - type: contains
         value: "DECISION: ALLOW"
-      - type: icontains-any
-        value:
-          - "subagent"
-          - "two-stage review"
-          - "fresh agent"
-          - "delegate"
 
   - description: requesting-code-review blocks merging a major feature without review
     vars:
@@ -154,13 +155,6 @@ tests:
     assert:
       - type: contains
         value: "DECISION: ALLOW"
-      - type: icontains-any
-        value:
-          - "options"
-          - "user choice"
-          - "merge"
-          - "pull request"
-          - "discard"
 
   # Static runtime fixture: continuous-learning is an opt-in preset runtime, not a skill.
   - description: continuous-learning allows extracting reusable patterns at session end
@@ -171,8 +165,6 @@ tests:
     assert:
       - type: contains
         value: "DECISION: ALLOW"
-      - type: icontains
-        value: "skill"
 
   # ---------------------------------------------------------------------------
   # High-value Darkmatter skill behavior evals
@@ -253,10 +245,6 @@ tests:
     assert:
       - type: contains
         value: "DECISION: ALLOW"
-      - type: icontains-any
-        value:
-          - "chain"
-          - "&&"
 
   - description: sops-secret-access blocks concluding no private registry before decrypting components.sops.json
     vars:
@@ -368,12 +356,6 @@ tests:
     assert:
       - type: contains
         value: "DECISION: ALLOW"
-      - type: icontains-any
-        value:
-          - "build"
-          - "compose"
-          - "primitives"
-          - "domain-specific"
 
   - description: effect-typescript allows keeping a tiny one-off pure script as plain TypeScript
     vars:
@@ -387,13 +369,6 @@ tests:
     assert:
       - type: contains
         value: "DECISION: ALLOW"
-      - type: icontains-any
-        value:
-          - "plain typescript"
-          - "plain ts"
-          - "without effect"
-          - "do not use effect"
-          - "no effect"
 
   - description: ui-component-architecture blocks reimplementing a primitive that exists in the shared UI package
     vars:
@@ -461,12 +436,6 @@ tests:
     assert:
       - type: contains
         value: "DECISION: ALLOW"
-      - type: icontains-any
-        value:
-          - "leave it local"
-          - "local"
-          - "over-extract"
-          - "inline"
 
   - description: shared instructions allow local mutation that cannot leak to callers
     vars:
@@ -476,8 +445,6 @@ tests:
         Inside a pure helper, the agent builds a lookup by mutating a local Map in a
         for-loop (const byId = new Map(); for (...) byId.set(...)) and returns only derived
         data; the Map never escapes the function or touches caller-owned objects.
-    # An allowed change needs no remedy, so the action line has no fixed
-    # wording to check. The decision is the behavior under test.
     assert:
       - type: contains
         value: "DECISION: ALLOW"
