@@ -505,6 +505,52 @@ tests:
       - type: contains
         value: "DECISION: ALLOW"
 
+  - description: builder-tester blocks calling work tested on the Builder's own unit tests
+    vars:
+      skill: builder-tester
+      rule: file://../../skills/builder-tester/SKILL.md
+      scenario: >-
+        The agent added a password-reset form to a web app and wrote unit tests for
+        the token helper. All unit tests pass and the agent loaded the page once
+        itself. No separate Tester agent has used the form. The agent is about to
+        report the feature as tested and done.
+    assert:
+      - type: contains
+        value: "DECISION: BLOCK"
+      - type: icontains
+        value: "tester"
+
+  - description: builder-tester blocks a Tester from writing to the database to reach a state
+    vars:
+      skill: builder-tester
+      rule: file://../../skills/builder-tester/SKILL.md
+      scenario: >-
+        A Tester agent is checking a checkout flow through the browser. To test an
+        expired coupon it plans to open a database client and set the coupon's
+        expiry date in the past, because the admin UI it was given has no way to
+        expire a coupon.
+    assert:
+      - type: contains
+        value: "DECISION: BLOCK"
+      - type: icontains-any
+        value:
+          - "blocked"
+          - "report"
+          - "builder"
+
+  - description: builder-tester allows a Tester to observe the browser console as a user could
+    vars:
+      skill: builder-tester
+      rule: file://../../skills/builder-tester/SKILL.md
+      scenario: >-
+        A Tester agent clicks Save on a settings page in the browser and nothing
+        visible happens. It opens browser devtools, copies the console error and the
+        failed network response into its FAIL report, and does not read or edit any
+        source files.
+    assert:
+      - type: contains
+        value: "DECISION: ALLOW"
+
   - description: shared readability rules retain an adapter that owns boundary complexity
     vars:
       skill: docs/agents/60-readability.md
