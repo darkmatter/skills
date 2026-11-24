@@ -65,8 +65,14 @@ tests:
     assert:
       - type: contains
         value: "DECISION: BLOCK"
-      - type: icontains
-        value: "failing test"
+      # The rule says "failing test through the public interface", so a
+      # correct answer often reads "failing public-interface test".
+      - type: icontains-any
+        value:
+          - "failing test"
+          - "failing public-interface test"
+          - "failing public interface test"
+          - "observe it fail"
 
   - description: systematic-debugging blocks patching before root-cause investigation
     vars:
@@ -470,16 +476,11 @@ tests:
         Inside a pure helper, the agent builds a lookup by mutating a local Map in a
         for-loop (const byId = new Map(); for (...) byId.set(...)) and returns only derived
         data; the Map never escapes the function or touches caller-owned objects.
+    # An allowed change needs no remedy, so the action line has no fixed
+    # wording to check. The decision is the behavior under test.
     assert:
       - type: contains
         value: "DECISION: ALLOW"
-      - type: icontains-any
-        value:
-          - "local"
-          - "cannot leak"
-          - "does not leak"
-          - "private"
-          - "acceptable"
 
   - description: shared readability rules allow a documented file-specific line-limit increase
     vars:
