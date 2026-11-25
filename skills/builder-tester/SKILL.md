@@ -65,7 +65,7 @@ nothing. Run this from the repo root and record the directory it prints:
 
 ```bash
 s="$(mktemp -d)" &&
-cp "$(git rev-parse --git-path index)" "$s/index" &&
+git ls-files -s -z | GIT_INDEX_FILE="$s/index" git update-index -z --index-info &&
 GIT_INDEX_FILE="$s/index" git add -A &&
 GIT_INDEX_FILE="$s/index" git write-tree > "$s/tree" &&
 git ls-files -z --others --ignored --exclude-standard --directory |
@@ -77,8 +77,9 @@ echo "$s"
 
 - `tree` holds a tree hash of every tracked file, including tracked files
   that match ignore rules, plus every untracked file that is not ignored. It
-  is built on a copy of your index, so your real index and staged changes are
-  untouched.
+  starts from your index's file list without its saved timestamps (an empty
+  list in a new repo), so every file is re-read and a quick same-size edit
+  cannot slip past. Your real index and staged changes are untouched.
 - `ignored` lists a hash of each ignored file, such as `.env` or
   `devenv.local.nix`. Only hashes are kept, so ignored secrets never enter
   Git.
