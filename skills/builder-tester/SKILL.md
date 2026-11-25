@@ -60,14 +60,30 @@ Build and start the product at the current code: start the dev server, build
 the binary, pack the library, seed a test account. Setup is yours because it
 can need developer access. Everything after setup belongs to the Tester.
 
-In a git repository, take a snapshot of the working tree so you can prove the
-Tester changed nothing. Run this from the repo root and record the hash it
-prints. It writes to a throwaway index, so your real index and staged changes
-are untouched:
+In a git repository, take a snapshot so you can prove the Tester changed
+nothing. Run this from the repo root and record the directory it prints:
 
 ```bash
-i="$(mktemp -d)/index"; GIT_INDEX_FILE="$i" git add -A && GIT_INDEX_FILE="$i" git write-tree
+s="$(mktemp -d)" &&
+cp "$(git rev-parse --git-path index)" "$s/index" &&
+GIT_INDEX_FILE="$s/index" git add -A &&
+GIT_INDEX_FILE="$s/index" git write-tree > "$s/tree" &&
+git ls-files -z --others --ignored --exclude-standard --directory |
+  xargs -0 sh -c 'for f; do [ -d "$f" ] ||
+    printf "%s %s\n" "$(git hash-object --no-filters -- "$f")" "$f"; done' sh \
+  > "$s/ignored" &&
+echo "$s"
 ```
+
+- `tree` holds a tree hash of every tracked file, including tracked files
+  that match ignore rules, plus every untracked file that is not ignored. It
+  is built on a copy of your index, so your real index and staged changes are
+  untouched.
+- `ignored` lists a hash of each ignored file, such as `.env` or
+  `devenv.local.nix`. Only hashes are kept, so ignored secrets never enter
+  Git.
+- Files inside ignored directories (dependencies, build output, caches) are
+  not covered.
 
 Start anything long-running (dev server, watcher) before the snapshot, and
 keep its output outside the repo, or it will show up as a change.
@@ -83,7 +99,7 @@ User: <who>, using <surface>
 Access: <URL | command | install path>
 User docs: <the files or pages a user reads; nothing else in the repo is user-facing>
 Credentials and data: <test account, seeded records, or "create your own through the product">
-Build: <commit, version, or snapshot hash; how to recognize it, if a user can>
+Build: <commit, version, or the snapshot's tree hash; how to recognize it, if a user can>
 A user should now be able to:
   <scenarios: Given / When / Then, concrete inputs and outcomes>
 What changed, in user terms: <every user-visible behavior change, including any beyond the ask>
@@ -106,18 +122,22 @@ call the result user-tested.
 ### 5. Check the snapshot
 
 When the Tester reports, before you act on the verdict, run the same snapshot
-command again and compare the two hashes:
+command again and compare the two snapshot directories:
 
 ```bash
-git diff --stat <before-hash> <after-hash>
+git diff --stat "$(cat <before>/tree)" "$(cat <after>/tree)"
+diff <before>/ignored <after>/ignored
 ```
 
-- No output: continue.
+- No output from either: continue.
 - Generated files only (a cache, a local database, a log the app writes): not
   a violation. Note it, and consider whether the app should write there.
 - Source, tests, or config changed: the round does not count. Restore your
-  version with `git restore --source=<before-hash> -- <path>` (delete any files
-  the Tester added), then run the round again with a fresh Tester.
+  version of changed files with
+  `git restore --source="$(cat <before>/tree)" -- <path>` and delete any
+  files the Tester added. A changed ignored file has only a hash in the
+  snapshot, so recreate it the way you set it up. Then run the round again
+  with a fresh Tester.
 
 ### 6. Act on the verdict
 
@@ -135,11 +155,17 @@ The Tester returns PASS, FAIL, or BLOCKED with evidence.
   credentials). If the Tester expected different behavior and its reading of
   the task is reasonable, the task is ambiguous. Ask the user. Do not overrule
   the Tester yourself.
-- **Findings in old behavior**: if an exploratory finding also happens on the
-  build before your change, it is not yours to fix in this change. Show that
-  it predates the change by reproducing it on the earlier build, then list it
-  for the user in your report. Scenario failures and anything your change
-  broke still block.
+- **Findings in old behavior**: an exploratory finding that also happens on
+  the build before your change is not yours to fix in this change, but the
+  Tester decides that, not you. Start the earlier build outside this working
+  tree (for example a git worktree at the base commit, on another port or
+  install path), then send the same Tester its access and the finding IDs.
+  The Tester repeats those findings there and gives an updated verdict.
+  Findings it confirms as pre-existing no longer block; list them for the
+  user in your report. This is not a new round, because your build has not
+  changed, but check the snapshot again when the Tester replies. If you
+  cannot start the earlier build, the finding blocks until the user decides.
+  Scenario failures and anything your change broke always block.
 - **Three rounds in a row without PASS**: stop and report to the user with the
   open failures and the Tester's evidence.
 

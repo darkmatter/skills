@@ -52,8 +52,9 @@ a user would also hit is a finding.
    - docs and help text: do they match what actually happens?
 4. Keep going after the first failure. Finish the other scenarios unless you
    are blocked.
-5. If you cannot tell whether a problem is new with this change, say so. The
-   Builder can check; you cannot.
+5. If you cannot tell whether an exploratory finding is new with this change,
+   say so. The Builder may give you the earlier build to compare (see
+   **Earlier builds**).
 
 ## Report
 
@@ -75,19 +76,40 @@ F1 <short title> (severity: blocker | major | minor; scenario S<n> or explorator
    Expected: <what a user would expect, and why>
    Actual: <what happened>
    Evidence: <output, text, screenshot path>
+   Pre-existing: <only if you confirmed it on the earlier build: that build and your evidence>
 
 NOT COVERED
 <what you could not test and why>
 ```
 
-- **PASS**: every scenario passed and you found no blocker or major issue.
-  Minor findings can go with a PASS.
-- **FAIL**: any scenario failed, or you found a blocker or major issue.
+- **PASS**: every scenario passed and you found no blocker or major issue,
+  apart from findings you confirmed as pre-existing. Minor findings can go
+  with a PASS.
+- **FAIL**: any scenario failed, or you found a blocker or major issue that
+  you have not confirmed as pre-existing.
 - **BLOCKED**: you could not finish testing without breaking a limit, or the
   product could not be reached.
+
+## Earlier builds
+
+The Builder may send you access to the build from before the change, with the
+IDs of findings it thinks were already there. Repeat each named finding's
+steps on that build, through the same surface and within the same limits.
+
+- If it happens there the same way, mark it pre-existing in your report, with
+  the earlier build and your evidence. It no longer counts against the
+  verdict.
+- If it does not happen there, or happens differently, the change caused it,
+  and it still counts.
+- A scenario failure is never pre-existing. The scenarios are what this
+  change promised, so a failed scenario always counts.
+
+Then send the full report again with an updated verdict. The Builder's belief
+is not evidence; only your reproduction on the earlier build is.
 
 ## Re-tests
 
 When the Builder says a new build is ready, confirm you are on it, then re-run
-every scenario and re-check each earlier failure by ID. Give fresh evidence.
-"Passed last round" is not evidence. Do not ask how it was fixed.
+every scenario and re-check each earlier failure by ID. Findings you confirmed
+as pre-existing keep that mark. Give fresh evidence. "Passed last round" is
+not evidence. Do not ask how it was fixed.
