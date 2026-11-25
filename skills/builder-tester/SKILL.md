@@ -61,30 +61,27 @@ the binary, pack the library, seed a test account. Setup is yours because it
 can need developer access. Everything after setup belongs to the Tester.
 
 In a git repository, take a snapshot so you can prove the Tester changed
-nothing. Run this from the repo root and record the directory it prints:
+nothing. Run this skill's [scripts/snapshot.sh](scripts/snapshot.sh) from
+anywhere in the repo and record the directory it prints:
 
 ```bash
-s="$(mktemp -d)" &&
-git ls-files -s -z | GIT_INDEX_FILE="$s/index" git update-index -z --index-info &&
-GIT_INDEX_FILE="$s/index" git add -A &&
-GIT_INDEX_FILE="$s/index" git write-tree > "$s/tree" &&
-git ls-files -z --others --ignored --exclude-standard --directory |
-  xargs -0 sh -c 'for f; do [ -d "$f" ] ||
-    printf "%s %s\n" "$(git hash-object --no-filters -- "$f")" "$f"; done' sh \
-  > "$s/ignored" &&
-echo "$s"
+sh <this skill's directory>/scripts/snapshot.sh
 ```
 
-- `tree` holds a tree hash of every tracked file, including tracked files
-  that match ignore rules, plus every untracked file that is not ignored. It
-  starts from your index's file list without its saved timestamps (an empty
-  list in a new repo), so every file is re-read and a quick same-size edit
-  cannot slip past. Your real index and staged changes are untouched.
-- `ignored` lists a hash of each ignored file, such as `.env` or
+The directory holds one file, `state`:
+
+- A `tree` line for the repo and for each checked-out submodule, nested ones
+  included. Each covers every tracked file, including tracked files that
+  match ignore rules, and every untracked file that is not ignored. Every
+  file is re-read, so even a quick same-size edit shows.
+- An `ignored` line with a hash of each ignored file, such as `.env` or
   `devenv.local.nix`. Only hashes are kept, so ignored secrets never enter
   Git.
 - Files inside ignored directories (dependencies, build output, caches) are
   not covered.
+
+Your real index and staged changes are untouched. It also works in a new
+repo where nothing is staged yet.
 
 Start anything long-running (dev server, watcher) before the snapshot, and
 keep its output outside the repo, or it will show up as a change.
@@ -100,7 +97,7 @@ User: <who>, using <surface>
 Access: <URL | command | install path>
 User docs: <the files or pages a user reads; nothing else in the repo is user-facing>
 Credentials and data: <test account, seeded records, or "create your own through the product">
-Build: <commit, version, or the snapshot's tree hash; how to recognize it, if a user can>
+Build: <commit, version, or the snapshot's top tree hash; how to recognize it, if a user can>
 A user should now be able to:
   <scenarios: Given / When / Then, concrete inputs and outcomes>
 What changed, in user terms: <every user-visible behavior change, including any beyond the ask>
@@ -122,23 +119,24 @@ call the result user-tested.
 
 ### 5. Check the snapshot
 
-When the Tester reports, before you act on the verdict, run the same snapshot
-command again and compare the two snapshot directories:
+When the Tester reports, before you act on the verdict, run the snapshot
+script again and compare the two:
 
 ```bash
-git diff --stat "$(cat <before>/tree)" "$(cat <after>/tree)"
-diff <before>/ignored <after>/ignored
+diff <before>/state <after>/state
 ```
 
-- No output from either: continue.
+- No output: continue.
+- A changed `tree` line names its repo (`.` or a submodule path). See which
+  files changed with `git -C <repo> diff --stat <before-hash> <after-hash>`.
 - Generated files only (a cache, a local database, a log the app writes): not
   a violation. Note it, and consider whether the app should write there.
 - Source, tests, or config changed: the round does not count. Restore your
   version of changed files with
-  `git restore --source="$(cat <before>/tree)" -- <path>` and delete any
-  files the Tester added. A changed ignored file has only a hash in the
-  snapshot, so recreate it the way you set it up. Then run the round again
-  with a fresh Tester.
+  `git -C <repo> restore --source=<before-hash> -- <path>` and delete any
+  files the Tester added. A changed `ignored` line has only a hash, so
+  recreate that file the way you set it up. Then run the round again with a
+  fresh Tester.
 
 ### 6. Act on the verdict
 
