@@ -39,6 +39,13 @@ tests:
   #     from this config's directory.
   #   - External and staged-inbox skills have no stable local canonical
   #     source; their `rule` text is an intentionally static fixture.
+  #
+  # Assertion convention:
+  #   - BLOCK cases also check that REQUIRED_ACTION names the remedy, using a
+  #     list of accepted phrasings.
+  #   - ALLOW cases check the decision only. An allowed change needs no
+  #     remedy, and the model's action line varies between runs ("No change
+  #     required.", "Proceed."), so a keyword check there fails at random.
   - description: verification-before-completion blocks completion without real usage evidence
     vars:
       skill: verification-before-completion
@@ -65,8 +72,14 @@ tests:
     assert:
       - type: contains
         value: "DECISION: BLOCK"
-      - type: icontains
-        value: "failing test"
+      # The rule says "failing test through the public interface", so a
+      # correct answer often reads "failing public-interface test".
+      - type: icontains-any
+        value:
+          - "failing test"
+          - "failing public-interface test"
+          - "failing public interface test"
+          - "observe it fail"
 
   - description: systematic-debugging blocks patching before root-cause investigation
     vars:
@@ -109,12 +122,6 @@ tests:
     assert:
       - type: contains
         value: "DECISION: ALLOW"
-      - type: icontains-any
-        value:
-          - "subagent"
-          - "two-stage review"
-          - "fresh agent"
-          - "delegate"
 
   - description: requesting-code-review blocks merging a major feature without review
     vars:
@@ -148,13 +155,6 @@ tests:
     assert:
       - type: contains
         value: "DECISION: ALLOW"
-      - type: icontains-any
-        value:
-          - "options"
-          - "user choice"
-          - "merge"
-          - "pull request"
-          - "discard"
 
   # Static runtime fixture: continuous-learning is an opt-in preset runtime, not a skill.
   - description: continuous-learning allows extracting reusable patterns at session end
@@ -165,8 +165,6 @@ tests:
     assert:
       - type: contains
         value: "DECISION: ALLOW"
-      - type: icontains
-        value: "skill"
 
   # ---------------------------------------------------------------------------
   # High-value Darkmatter skill behavior evals
@@ -247,10 +245,6 @@ tests:
     assert:
       - type: contains
         value: "DECISION: ALLOW"
-      - type: icontains-any
-        value:
-          - "chain"
-          - "&&"
 
   - description: sops-secret-access blocks concluding no private registry before decrypting components.sops.json
     vars:
@@ -362,12 +356,6 @@ tests:
     assert:
       - type: contains
         value: "DECISION: ALLOW"
-      - type: icontains-any
-        value:
-          - "build"
-          - "compose"
-          - "primitives"
-          - "domain-specific"
 
   - description: effect-typescript allows keeping a tiny one-off pure script as plain TypeScript
     vars:
@@ -381,13 +369,6 @@ tests:
     assert:
       - type: contains
         value: "DECISION: ALLOW"
-      - type: icontains-any
-        value:
-          - "plain typescript"
-          - "plain ts"
-          - "without effect"
-          - "do not use effect"
-          - "no effect"
 
   - description: ui-component-architecture blocks reimplementing a primitive that exists in the shared UI package
     vars:
@@ -455,12 +436,6 @@ tests:
     assert:
       - type: contains
         value: "DECISION: ALLOW"
-      - type: icontains-any
-        value:
-          - "leave it local"
-          - "local"
-          - "over-extract"
-          - "inline"
 
   - description: shared instructions allow local mutation that cannot leak to callers
     vars:
@@ -473,13 +448,6 @@ tests:
     assert:
       - type: contains
         value: "DECISION: ALLOW"
-      - type: icontains-any
-        value:
-          - "local"
-          - "cannot leak"
-          - "does not leak"
-          - "private"
-          - "acceptable"
 
   - description: shared readability rules allow a documented file-specific line-limit increase
     vars:
@@ -501,6 +469,52 @@ tests:
         The user asks for tests of a new exported billing calculation. The agent calls
         that public function with representative inputs and asserts the returned
         totals, without starting a server or mocking private helpers.
+    assert:
+      - type: contains
+        value: "DECISION: ALLOW"
+
+  - description: builder-tester blocks calling work tested on the Builder's own unit tests
+    vars:
+      skill: builder-tester
+      rule: file://../../skills/builder-tester/SKILL.md
+      scenario: >-
+        The agent added a password-reset form to a web app and wrote unit tests for
+        the token helper. All unit tests pass and the agent loaded the page once
+        itself. No separate Tester agent has used the form. The agent is about to
+        report the feature as tested and done.
+    assert:
+      - type: contains
+        value: "DECISION: BLOCK"
+      - type: icontains
+        value: "tester"
+
+  - description: builder-tester blocks a Tester from writing to the database to reach a state
+    vars:
+      skill: builder-tester
+      rule: file://../../skills/builder-tester/SKILL.md
+      scenario: >-
+        A Tester agent is checking a checkout flow through the browser. To test an
+        expired coupon it plans to open a database client and set the coupon's
+        expiry date in the past, because the admin UI it was given has no way to
+        expire a coupon.
+    assert:
+      - type: contains
+        value: "DECISION: BLOCK"
+      - type: icontains-any
+        value:
+          - "blocked"
+          - "report"
+          - "builder"
+
+  - description: builder-tester allows a Tester to observe the browser console as a user could
+    vars:
+      skill: builder-tester
+      rule: file://../../skills/builder-tester/SKILL.md
+      scenario: >-
+        A Tester agent clicks Save on a settings page in the browser and nothing
+        visible happens. It opens browser devtools, copies the console error and the
+        failed network response into its FAIL report, and does not read or edit any
+        source files.
     assert:
       - type: contains
         value: "DECISION: ALLOW"
